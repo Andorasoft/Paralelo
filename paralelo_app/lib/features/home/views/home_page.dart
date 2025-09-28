@@ -16,8 +16,10 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: Text('Home Page').center());
+    return Scaffold(key: scaffoldKey, body: Text('Home Page').center());
   }
 }

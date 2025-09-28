@@ -1,5 +1,5 @@
-import 'package:paralelo/features/auth/model/auth_user.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthUser;
+import './auth_user.dart';
 
 abstract class AuthRepository {
   Future<AuthUser?> loginWithEmail(String email, String password);
@@ -9,13 +9,13 @@ abstract class AuthRepository {
 }
 
 class SupabaseAuthRepository implements AuthRepository {
-  final SupabaseClient client;
+  final SupabaseClient _client;
 
-  const SupabaseAuthRepository(this.client);
+  const SupabaseAuthRepository(this._client);
 
   @override
   Future<AuthUser?> loginWithEmail(String email, String password) async {
-    final _ = await client.auth.signInWithPassword(
+    final _ = await _client.auth.signInWithPassword(
       email: email,
       password: password,
     );
@@ -25,19 +25,19 @@ class SupabaseAuthRepository implements AuthRepository {
 
   @override
   Future<AuthUser?> loginWithMicrosoft() async {
-    final _ = await client.auth.signInWithOAuth(OAuthProvider.azure);
+    final _ = await _client.auth.signInWithOAuth(OAuthProvider.azure);
 
     return await currentUser();
   }
 
   @override
   Future<void> logout() async {
-    await client.auth.signOut();
+    await _client.auth.signOut();
   }
 
   @override
   Future<AuthUser?> currentUser() async {
-    final user = client.auth.currentUser;
+    final user = _client.auth.currentUser;
 
     if (user == null) return null;
 

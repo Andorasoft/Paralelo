@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
-import 'package:paralelo/features/auth/controller/auth_notifier.dart';
+import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
 import 'package:paralelo/features/auth/widgets/email_form_field.dart';
 import 'package:paralelo/features/auth/widgets/password_form_field.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -22,12 +22,16 @@ class AuthPage extends ConsumerStatefulWidget {
 }
 
 class _AuthPageState extends ConsumerState<AuthPage> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
+
       extendBodyBehindAppBar: true,
       extendBody: true,
 

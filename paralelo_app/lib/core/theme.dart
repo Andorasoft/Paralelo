@@ -94,6 +94,7 @@ extension AppThemeData on ThemeData {
         textStyle: WidgetStateProperty.all(
           TextStyle(fontWeight: FontWeight.w500, fontSize: 14.0),
         ),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
     ),
 
@@ -155,6 +156,12 @@ extension AppThemeData on ThemeData {
       surfaceTintColor: Colors.transparent,
       systemOverlayStyle: SystemUiOverlayStyle.dark.copyWith(
         statusBarColor: Colors.transparent,
+      ),
+    ),
+
+    bottomSheetTheme: BottomSheetThemeData(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadiusGeometry.circular(16.0),
       ),
     ),
 
