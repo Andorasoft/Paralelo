@@ -50,9 +50,7 @@ class DatePickerFormField extends ConsumerWidget {
                 elevation: WidgetStateProperty.all(0.0),
                 shape: WidgetStateProperty.all(
                   RoundedRectangleBorder(
-                    side: BorderSide(
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
+                    side: BorderSide(color: Colors.grey.shade300),
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                 ),

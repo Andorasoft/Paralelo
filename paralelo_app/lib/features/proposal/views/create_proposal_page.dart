@@ -109,31 +109,26 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                 Text(
                   'Mode',
                 ).margin(const EdgeInsets.only(top: 16.0, bottom: 4.0)),
-                Card(
-                  elevation: 0.0,
-                  color: Colors.grey.shade100,
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  spacing: 8.0,
 
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    spacing: 8.0,
+                  children: modes
+                      .map(
+                        (m) => ChoiceChip(
+                          label: Text(m).center(),
+                          showCheckmark: false,
+                          backgroundColor: Colors.transparent,
+                          selected: selected == m,
 
-                    children: modes
-                        .map(
-                          (m) => ChoiceChip(
-                            label: Text(m),
-                            showCheckmark: false,
-                            backgroundColor: Colors.transparent,
-                            selected: selected == m,
-
-                            onSelected: (_) {
-                              setState(() => selected = m);
-                            },
-                          ).expanded(),
-                        )
-                        .toList(),
-                  ),
+                          onSelected: (_) {
+                            setState(() => selected = m);
+                          },
+                        ).expanded(),
+                      )
+                      .toList(),
                 ),
 
                 if (payment.type == 'proyecto') ...[

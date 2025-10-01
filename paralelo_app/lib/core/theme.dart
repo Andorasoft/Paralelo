@@ -110,24 +110,17 @@ extension AppThemeData on ThemeData {
     ),
 
     inputDecorationTheme: InputDecorationTheme(
-      filled: true,
       isDense: true,
       alignLabelWithHint: false,
 
-      hintStyle: TextStyle(fontSize: 16.0, color: const Color(0xFF8195a2)),
-      prefixIconColor: const Color(0xFF9CA3AF),
-      suffixIconColor: const Color(0xFF6B7280),
-
-      fillColor: const Color(0xFFf0f3f5),
-      hoverColor: const Color(0xFFf0f3f5),
-      focusColor: const Color(0xFFf0f3f5),
+      hintStyle: TextStyle(fontSize: 16.0, color: Colors.grey),
 
       enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(width: 1.0, color: Colors.grey.shade300),
         borderRadius: BorderRadius.circular(12.0),
       ),
       focusedBorder: OutlineInputBorder(
-        borderSide: BorderSide.none,
+        borderSide: BorderSide(width: 1.0, color: Colors.grey.shade300),
         borderRadius: BorderRadius.circular(12.0),
       ),
       errorBorder: OutlineInputBorder(
@@ -141,7 +134,11 @@ extension AppThemeData on ThemeData {
     ),
 
     searchBarTheme: SearchBarThemeData(
-      backgroundColor: WidgetStateProperty.all(const Color(0xFFf0f3f5)),
+      backgroundColor: WidgetStateProperty.all(Colors.grey.shade100),
+      hintStyle: WidgetStateProperty.all(
+        TextStyle(fontSize: 16.0, color: Colors.grey.shade600),
+      ),
+
       elevation: WidgetStateProperty.all(0.0),
     ),
 

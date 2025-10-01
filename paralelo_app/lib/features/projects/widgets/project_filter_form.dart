@@ -156,6 +156,7 @@ class _ProjectFilterFormState extends ConsumerState<ProjectFilterForm> {
           DropdownButtonFormField(
             onChanged: (value) {},
             initialValue: filters['payment_type'],
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
             items: [
               DropdownMenuItem(value: 'hourly', child: Text('Hourly')),
               DropdownMenuItem(value: 'project', child: Text('Project')),
