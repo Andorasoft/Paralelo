@@ -72,9 +72,14 @@ extension AppThemeData on ThemeData {
         shape: WidgetStateProperty.all(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
         ),
-        side: WidgetStateProperty.all(
-          BorderSide(width: 1.0, color: const Color(0xFF3B82F6)),
-        ),
+        side: WidgetStateProperty.resolveWith<BorderSide>((states) {
+          return BorderSide(
+            width: 1.0,
+            color: !states.contains(WidgetState.disabled)
+                ? Color(0xFF3B82F6)
+                : Colors.black12,
+          );
+        }),
         minimumSize: WidgetStateProperty.all(Size(double.minPositive, 44.0)),
         textStyle: WidgetStateProperty.all(
           TextStyle(fontWeight: FontWeight.w500, fontSize: 14.0),

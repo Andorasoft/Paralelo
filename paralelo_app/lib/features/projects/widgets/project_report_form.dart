@@ -29,7 +29,7 @@ class _ProjectReportFormState extends ConsumerState<ProjectReportForm> {
       'description': 'Lenguaje ofensivo, discriminación o acoso.',
     },
     {
-      'title': 'Lenguaje ofensivo',
+      'title': 'Incumplimiento de términos',
       'description':
           'Incumple los términos de uso, categorías no permitidas o reglas de publicación.',
     },

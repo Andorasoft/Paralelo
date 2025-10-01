@@ -3,19 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 
-class AddProjectPage extends ConsumerStatefulWidget {
-  static const routeName = 'AddProjectPage';
-  static const routePath = '/add-project';
+class CreateProjectPage extends ConsumerStatefulWidget {
+  static const routeName = 'CreateProjectPage';
+  static const routePath = '/create-project';
 
-  const AddProjectPage({super.key});
+  const CreateProjectPage({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return _AddProjectPageState();
+    return _CreateProjectPageState();
   }
 }
 
-class _AddProjectPageState extends ConsumerState<AddProjectPage> {
+class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override

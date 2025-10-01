@@ -1,29 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/core/providers.dart';
 
-class ChatsPage extends ConsumerStatefulWidget {
+class ChatsPage extends ConsumerWidget {
   static const routeName = 'ChatsPage';
   static const routePath = '/chats';
 
-  const ChatsPage({super.key});
+  final String roomId;
+
+  const ChatsPage({super.key, required this.roomId});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() {
-    return _ChatsPageState();
-  }
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final messagesAsync = ref.watch(messagesProvider(roomId));
 
-class _ChatsPageState extends ConsumerState<ChatsPage> {
-  final scaffoldKey = GlobalKey<ScaffoldState>();
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
-      key: scaffoldKey,
-
-      body: Text('Chats Page').center(),
-    ).hideKeyboardOnTap(context);
+      appBar: AppBar(title: const Text('Chat')),
+      body: messagesAsync.when(
+        data: (messages) => ListView.builder(
+          reverse: true,
+          itemCount: messages.length,
+          itemBuilder: (_, i) {
+            final msg = messages[i];
+            return ListTile(
+              title: Text(msg['text'] ?? ''),
+              subtitle: Text(msg['senderId'] ?? ''),
+            );
+          },
+        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('Error: $e')),
+      ),
+    );
   }
 }

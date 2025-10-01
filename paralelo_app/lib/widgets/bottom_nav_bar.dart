@@ -7,7 +7,7 @@ import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/calendar/views/calendar_page.dart';
 import 'package:paralelo/features/chats/views/chats_page.dart';
 import 'package:paralelo/features/home/views/home_page.dart';
-import 'package:paralelo/features/projects/views/add_project_page.dart';
+import 'package:paralelo/features/projects/views/create_project_page.dart';
 import 'package:paralelo/features/projects/views/marketplace_page.dart';
 
 class BottomNavBar extends ConsumerWidget {
@@ -31,7 +31,7 @@ class BottomNavBar extends ConsumerWidget {
 
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            await ref.read(goRouterProvider).push(AddProjectPage.routePath);
+            await ref.read(goRouterProvider).push(CreateProjectPage.routePath);
           },
           highlightElevation: 0.0,
           elevation: 2.0,
@@ -53,7 +53,7 @@ class BottomNavBar extends ConsumerWidget {
           BottomNavBarItem(
             label: 'Chats',
             icon: Icon(TablerIcons.message_2, size: 28.0),
-            page: const ChatsPage(),
+            page: const ChatsPage(roomId: ''),
           ),
           BottomNavBarItem(
             label: 'Agenda',

@@ -9,6 +9,7 @@ import 'package:paralelo/features/projects/widgets/project_filter_form.dart';
 import 'package:paralelo/features/projects/widgets/project_card.dart';
 import 'package:paralelo/features/projects/widgets/search_form_field.dart';
 import 'package:paralelo/features/projects/widgets/project_sort_form.dart';
+import 'package:paralelo/widgets/loading_indicator.dart';
 
 class MarketplacePage extends ConsumerStatefulWidget {
   static const routeName = 'MarketplacePage';
@@ -90,17 +91,7 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
         future: _projectsFuture,
         builder: (_, snapshot) {
           if (!snapshot.hasData) {
-            return Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              spacing: 8.0,
-
-              children: [
-                CircularProgressIndicator.adaptive(),
-                Text('Cargando...', textAlign: TextAlign.center),
-              ],
-            );
+            return LoadingIndicator().center();
           }
 
           final projects = snapshot.data!;

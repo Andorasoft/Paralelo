@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
 import 'package:paralelo/features/auth/views/auth_page.dart';
-import 'package:paralelo/features/projects/views/add_project_page.dart';
+import 'package:paralelo/features/projects/models/project.dart';
+import 'package:paralelo/features/projects/views/create_project_page.dart';
 import 'package:paralelo/features/projects/views/project_details_page.dart';
+import 'package:paralelo/features/proposal/views/create_proposal_page.dart';
 import 'package:paralelo/widgets/bottom_nav_bar.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
@@ -31,13 +33,19 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: AuthPage.routePath, builder: (_, __) => const AuthPage()),
 
       GoRoute(
-        path: AddProjectPage.routePath,
-        builder: (_, _) => const AddProjectPage(),
+        path: CreateProjectPage.routePath,
+        builder: (_, _) => const CreateProjectPage(),
       ),
       GoRoute(
         path: ProjectDetailsPage.routePath,
         builder: (_, state) =>
-            ProjectDetailsPage(projectId: state.extra as int),
+            ProjectDetailsPage(project: state.extra as Project),
+      ),
+
+      GoRoute(
+        path: CreateProposalPage.routePath,
+        builder: (_, state) =>
+            CreateProposalPage(project: state.extra as Project),
       ),
     ],
   );

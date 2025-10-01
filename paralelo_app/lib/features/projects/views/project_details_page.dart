@@ -1,17 +1,15 @@
-import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
+import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/features/projects/controllers/project_payment_provider.dart';
-import 'package:paralelo/features/projects/controllers/project_provider.dart';
 import 'package:paralelo/features/projects/controllers/project_skill_provider.dart';
 import 'package:paralelo/features/projects/models/project.dart';
 import 'package:paralelo/features/projects/models/project_payment.dart';
-import 'package:paralelo/features/projects/models/project_requirement.dart';
 import 'package:paralelo/features/projects/models/project_skill.dart';
-import 'package:paralelo/features/projects/models/skill.dart';
-import 'package:paralelo/features/projects/widgets/project_report_form.dart';
+import 'package:paralelo/features/projects/widgets/project_report_button.dart';
+import 'package:paralelo/features/proposal/views/create_proposal_page.dart';
 import 'package:paralelo/features/user/controllers/app_user_provider.dart';
 import 'package:paralelo/features/user/models/app_user.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
@@ -21,9 +19,9 @@ class ProjectDetailsPage extends ConsumerStatefulWidget {
   static const routeName = 'ProjectDetailsPage';
   static const routePath = '/project-details';
 
-  final int projectId;
+  final Project project;
 
-  const ProjectDetailsPage({super.key, required this.projectId});
+  const ProjectDetailsPage({super.key, required this.project});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -32,22 +30,14 @@ class ProjectDetailsPage extends ConsumerStatefulWidget {
 }
 
 class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
-  late Project project;
-  late ProjectPayment projectPayment;
-  late ProjectRequirement projectRequirement;
-  late List<ProjectSkill> projectSkills;
-  late AppUser user;
-
-  late Future<List<Object?>> loadProjectFuture;
-  late Future<AppUser?> loadOwnerFuture;
-
-  bool isReady = false;
+  late Future<(Project, ProjectPayment, List<ProjectSkill>, AppUser)>
+  loadDataFuture;
 
   @override
   void initState() {
     super.initState();
 
-    loadProjectFuture = loadProject();
+    loadDataFuture = loadData();
   }
 
   @override
@@ -64,15 +54,13 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
       ),
 
       body: FutureBuilder(
-        future: loadProjectFuture,
+        future: loadDataFuture,
         builder: (_, snapshot) {
           if (!snapshot.hasData) {
             return LoadingIndicator();
           }
 
-          project = snapshot.data![0] as Project;
-          projectPayment = snapshot.data![1] as ProjectPayment;
-          projectSkills = snapshot.data![2] as List<ProjectSkill>;
+          final (project, projectPayment, projectSkills, user) = snapshot.data!;
 
           return ListView(
             children: [
@@ -126,93 +114,54 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
                 ).margin(const EdgeInsets.all(16.0)),
               ),
 
-              FutureBuilder(
-                future: loadOwnerFuture,
-                builder: (_, snapshot) {
-                  if (!snapshot.hasData) {
-                    return LoadingIndicator();
-                  }
+              Column(children: [Text('${user.firstName} ${user.lastName}')]),
 
-                  if (snapshot.hasError) {
-                    return Text(snapshot.error.toString());
-                  }
-
-                  user = snapshot.data!;
-
-                  return Column(
-                    children: [Text('${user.firstName} ${user.lastName}')],
-                  );
-                },
-              ),
-
-              TextButton.icon(
-                onPressed: () async {
-                  final _ = await showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (_) {
-                      return ProjectReportForm().useSafeArea();
-                    },
-                  );
-                },
-
-                icon: Icon(
-                  LucideIcons.flag,
-                  color: Theme.of(context).colorScheme.outline,
-                ),
-                label: Text(
-                  'Reportar esta publicación',
-                  style: TextStyle(
-                    fontWeight: FontWeight.normal,
-                    color: Theme.of(context).colorScheme.outline,
-                  ),
-                ),
-              ).center(),
+              ProjectReportButton().center(),
             ],
           ).margin(const EdgeInsets.symmetric(horizontal: 16.0));
         },
       ),
 
-      bottomNavigationBar: FilledButton(
-        onPressed: () {},
-        style: Theme.of(context).filledButtonTheme.style?.copyWith(
-          shape: WidgetStateProperty.all(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadiusGeometry.circular(100.0),
+      bottomNavigationBar: FutureBuilder(
+        future: loadDataFuture,
+        builder: (_, snapshot) {
+          return FilledButton(
+            onPressed: snapshot.hasData
+                ? () async {
+                    await ref
+                        .read(goRouterProvider)
+                        .push(
+                          CreateProposalPage.routePath,
+                          extra: widget.project,
+                        );
+                  }
+                : null,
+            style: Theme.of(context).filledButtonTheme.style?.copyWith(
+              shape: WidgetStateProperty.all(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100),
+                ),
+              ),
             ),
-          ),
-        ),
-        child: Text('Ofrecer ayuda'),
+            child: const Text('Ofrecer ayuda'),
+          ).margin(const EdgeInsets.symmetric(horizontal: 16)).useSafeArea();
+        },
       ).margin(const EdgeInsets.symmetric(horizontal: 16.0)).useSafeArea(),
     );
   }
 
-  Future<void> loadData() async {
-    project = (await ref.read(projectProvider).getById(widget.projectId))!;
-    projectPayment = (await ref
+  Future<(Project, ProjectPayment, List<ProjectSkill>, AppUser)>
+  loadData() async {
+    final payment = (await ref
         .read(projectPaymentProvider)
-        .getByProject(widget.projectId))!;
-    projectSkills = (await ref
+        .getByProject(widget.project.id))!;
+    final skills = (await ref
         .read(projectSkillProvider)
-        .getByProject(widget.projectId));
-    user = (await ref.read(appUserProvider).getById(project.ownerId))!;
+        .getByProject(widget.project.id));
+    final owner = (await ref
+        .read(appUserProvider)
+        .getById(widget.project.ownerId))!;
 
-    safeSetState(() => isReady = true);
-  }
-
-  Future<List<Object?>> loadProject() {
-    return Future.wait([
-      ref.read(projectProvider).getById(widget.projectId),
-      ref.read(projectPaymentProvider).getByProject(widget.projectId),
-      ref.read(projectSkillProvider).getByProject(widget.projectId),
-    ]);
-  }
-
-  Future<Skill> loadSkill() {
-    throw UnimplementedError();
-  }
-
-  Future<AppUser?> loadOwner() {
-    return ref.read(appUserProvider).getById(project.ownerId);
+    return (widget.project, payment, skills, owner);
   }
 }

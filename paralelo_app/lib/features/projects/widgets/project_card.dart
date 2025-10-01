@@ -1,36 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:paralelo/core/router.dart';
-import 'package:paralelo/features/projects/views/project_details_page.dart';
-import 'package:paralelo/features/projects/widgets/project_report_form.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/features/projects/views/project_details_page.dart';
+import 'package:paralelo/features/proposal/views/create_proposal_page.dart';
+import 'package:paralelo/features/projects/widgets/project_report_button.dart';
 import 'package:paralelo/features/projects/models/project.dart';
+import 'package:paralelo/core/router.dart';
 
-class ProjectCard extends ConsumerStatefulWidget {
+class ProjectCard extends ConsumerWidget {
   final Project project;
   final bool isPremium;
 
   const ProjectCard({super.key, required this.project, this.isPremium = false});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() {
-    return _ProjectCardState();
-  }
-}
-
-class _ProjectCardState extends ConsumerState<ProjectCard> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       elevation: 0.0,
       color: Colors.transparent,
       shape: RoundedRectangleBorder(
         side: BorderSide(
           width: 1.0,
-          color: widget.isPremium
+          color: isPremium
               ? Theme.of(context).colorScheme.primary
               : Theme.of(context).colorScheme.primaryContainer,
         ),
@@ -51,15 +44,13 @@ class _ProjectCardState extends ConsumerState<ProjectCard> {
 
             children: [
               Text(
-                timeago
-                    .format(widget.project.createdAt, locale: 'es')
-                    .capitalize()!,
+                timeago.format(project.createdAt, locale: 'es').capitalize()!,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: Theme.of(context).colorScheme.outline,
                 ),
               ),
 
-              if (widget.isPremium)
+              if (isPremium)
                 Chip(
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   color: WidgetStateProperty.all(
@@ -83,7 +74,7 @@ class _ProjectCardState extends ConsumerState<ProjectCard> {
             onPressed: () async {
               await ref
                   .read(goRouterProvider)
-                  .push(ProjectDetailsPage.routePath, extra: widget.project.id);
+                  .push(ProjectDetailsPage.routePath, extra: project);
             },
             style: Theme.of(context).textButtonTheme.style?.copyWith(
               overlayColor: WidgetStateProperty.all(Colors.transparent),
@@ -94,14 +85,14 @@ class _ProjectCardState extends ConsumerState<ProjectCard> {
               splashFactory: NoSplash.splashFactory,
             ),
             child: Text(
-              widget.project.title,
+              project.title,
               style: Theme.of(
                 context,
               ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
             ),
           ),
           Text(
-            widget.project.description,
+            project.description,
             maxLines: 5,
             overflow: TextOverflow.ellipsis,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -110,7 +101,11 @@ class _ProjectCardState extends ConsumerState<ProjectCard> {
           ),
 
           OutlinedButton(
-            onPressed: () {},
+            onPressed: () async {
+              await ref
+                  .read(goRouterProvider)
+                  .push(CreateProposalPage.routePath, extra: project);
+            },
             style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
               shape: WidgetStateProperty.all(
                 RoundedRectangleBorder(
@@ -126,29 +121,7 @@ class _ProjectCardState extends ConsumerState<ProjectCard> {
 
           Divider().margin(EdgeInsets.symmetric(vertical: 4.0)),
 
-          TextButton.icon(
-            onPressed: () async {
-              final _ = await showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                builder: (_) {
-                  return ProjectReportForm().useSafeArea();
-                },
-              );
-            },
-
-            icon: Icon(
-              LucideIcons.flag,
-              color: Theme.of(context).colorScheme.outline,
-            ),
-            label: Text(
-              'Reportar esta publicación',
-              style: TextStyle(
-                fontWeight: FontWeight.normal,
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ),
-          ).center(),
+          ProjectReportButton().center(),
         ],
       ).margin(const EdgeInsets.all(16.0)),
     );

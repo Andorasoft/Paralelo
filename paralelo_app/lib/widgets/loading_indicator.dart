@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+
 class LoadingIndicator extends ConsumerWidget {
   final String? message;
 
@@ -15,7 +17,7 @@ class LoadingIndicator extends ConsumerWidget {
       spacing: 8.0,
 
       children: [
-        CircularProgressIndicator.adaptive(),
+        CircularProgressIndicator.adaptive().center(),
         Text(message ?? 'Cargando...', textAlign: TextAlign.center),
       ],
     );
