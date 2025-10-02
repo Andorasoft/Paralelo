@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBuEn7b8VoojxcEWq9BPc-3gRbG_i0UUlE',
-    appId: '1:91360332225:android:51d39426a44e45325d4740',
+    appId: '1:91360332225:android:6b84499ff35c750d5d4740',
     messagingSenderId: '91360332225',
     projectId: 'andorasoft-paralelo',
     storageBucket: 'andorasoft-paralelo.firebasestorage.app',
@@ -59,10 +59,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBHt0NVYjpDXjtSG5-QrEfAZCz3tu_LM2c',
-    appId: '1:91360332225:ios:55e8c10a18a9d4065d4740',
+    appId: '1:91360332225:ios:7bda2bb2750c84235d4740',
     messagingSenderId: '91360332225',
     projectId: 'andorasoft-paralelo',
     storageBucket: 'andorasoft-paralelo.firebasestorage.app',
-    iosBundleId: 'com.example.paralelo',
+    iosBundleId: 'com.andorasoft.paralelo',
   );
+
 }

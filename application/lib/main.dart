@@ -7,12 +7,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:paralelo/firebase_options.dart';
+import 'package:paralelo/core/providers.dart';
 import 'package:paralelo/core/router.dart';
 import 'package:paralelo/core/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       systemNavigationBarColor: Colors.transparent,
@@ -37,6 +39,16 @@ class MainApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(goRouterProvider);
+
+    ref.listen<AsyncValue<String?>>(deviceTokenProvider, (previous, next) {
+      next.whenData((token) {
+        if (token != null && token.isNotEmpty) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text("Nuevo token FCM:\n$token")));
+        }
+      });
+    });
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,

@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:91360332225:android:51d39426a44e45325d4740",
+        "mobilesdk_app_id": "1:91360332225:android:6b84499ff35c750d5d4740",
         "android_client_info": {
-          "package_name": "com.example.paralelo"
+          "package_name": "com.andorasoft.paralelo"
         }
       },
       "oauth_client": [],
