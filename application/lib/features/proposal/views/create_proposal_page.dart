@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:uuid/uuid.dart';
 
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
 import 'package:paralelo/features/projects/controllers/project_payment_provider.dart';
 import 'package:paralelo/features/projects/models/project_payment.dart';
 import 'package:paralelo/features/projects/models/project.dart';
-import 'package:paralelo/core/router.dart';
+import 'package:paralelo/features/user/controllers/app_user_provider.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/widgets/number_form_field.dart';
+import 'package:paralelo/core/providers.dart';
+import 'package:paralelo/core/router.dart';
 
 class CreateProposalPage extends ConsumerStatefulWidget {
   static const routeName = 'CreateProposalPage';
@@ -209,8 +213,19 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
               ).expanded(),
               FilledButton(
                 onPressed: snapshot.hasData
-                    ? () {
-                        formKey.currentState!.validate();
+                    ? () async {
+                        final user = (await ref
+                            .read(appUserProvider)
+                            .getByEmail(ref.read(authProvider)!.email))!;
+
+                        await ref
+                            .read(chatServiceProvider)
+                            .sendMessage(
+                              Uuid().v4(),
+                              user.id.toString(),
+                              widget.project.ownerId.toString(),
+                              messageFieldController.text,
+                            );
                       }
                     : null,
                 child: Text('Aplicar'),

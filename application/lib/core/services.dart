@@ -2,6 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  debugPrint("📩 Mensaje en background: ${message.messageId}");
+}
+
 class ChatService {
   final _firestore = FirebaseFirestore.instance;
 
@@ -15,14 +20,22 @@ class ChatService {
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
-  Future<void> sendMessage(String roomId, String userId, String text) async {
-    await _firestore.collection('chats').doc(roomId).collection('messages').add(
-      {
-        'text': text,
-        'sender_id': userId,
-        'created_at': FieldValue.serverTimestamp(),
-      },
-    );
+  Future<void> sendMessage(
+    String roomId,
+    String senderId,
+    String recipientId,
+    String text,
+  ) async {
+    await _firestore
+        .collection('chats')
+        .doc(roomId)
+        .collection('messages')
+        .add({
+          'text': text,
+          'sender_id': senderId,
+          'recipient_id': recipientId,
+          'created_at': FieldValue.serverTimestamp(),
+        });
   }
 }
 
@@ -58,5 +71,41 @@ class FCMService {
       debugPrint("New Device Token: $newToken");
       onRefresh(newToken);
     });
+  }
+
+  void listenMessages({
+    void Function(RemoteMessage message)? onMessage,
+    void Function(RemoteMessage message)? onMessageOpenedApp,
+  }) {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      debugPrint("📥 Mensaje en foreground: ${message.notification?.title}");
+      if (onMessage != null) onMessage(message);
+    });
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      debugPrint("📲 Notificación abierta: ${message.notification?.title}");
+      if (onMessageOpenedApp != null) onMessageOpenedApp(message);
+    });
+  }
+
+  /// Inicializar todo
+  Future<void> initialize({
+    void Function(RemoteMessage message)? onMessage,
+    void Function(RemoteMessage message)? onMessageOpenedApp,
+    void Function(String token)? onTokenRefresh,
+  }) async {
+    await requestPermissions();
+    await getDeviceToken();
+
+    if (onTokenRefresh != null) {
+      listenTokenRefresh(onTokenRefresh);
+    }
+    listenMessages(
+      onMessage: onMessage,
+      onMessageOpenedApp: onMessageOpenedApp,
+    );
+
+    // Handler para mensajes en background
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   }
 }
