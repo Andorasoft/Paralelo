@@ -2,7 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import './project.dart';
 
 abstract class ProjectRepository {
-  Future<List<Project>> getAll();
+  Future<List<Project>> getAll(int userId, {int? universityId});
   Future<Project?> getById(int id);
 }
 
@@ -12,8 +12,8 @@ class SupabaseProjectRepository implements ProjectRepository {
   const SupabaseProjectRepository(this._client);
 
   @override
-  Future<List<Project>> getAll({int? universityId}) async {
-    final data = await _client.from('project').select();
+  Future<List<Project>> getAll(int userId, {int? universityId}) async {
+    final data = await _client.from('project').select().neq('owner_id', userId);
 
     return data.map((i) => _fromMap(i)).toList();
   }

@@ -16,8 +16,8 @@ class _ProjectProvider {
 
   const _ProjectProvider(this._repo);
 
-  Future<List<Project>> getAll() {
-    return _repo.getAll();
+  Future<List<Project>> getAll(int userId, {int? universityId}) {
+    return _repo.getAll(userId, universityId: universityId);
   }
 
   Future<Project?> getById(int id) {

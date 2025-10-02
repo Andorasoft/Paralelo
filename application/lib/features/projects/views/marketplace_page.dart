@@ -3,12 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
 import 'package:paralelo/features/projects/controllers/project_provider.dart';
 import 'package:paralelo/features/projects/models/project.dart';
 import 'package:paralelo/features/projects/widgets/project_filter_form.dart';
 import 'package:paralelo/features/projects/widgets/project_card.dart';
 import 'package:paralelo/features/projects/widgets/search_form_field.dart';
 import 'package:paralelo/features/projects/widgets/project_sort_form.dart';
+import 'package:paralelo/features/user/controllers/app_user_provider.dart';
+import 'package:paralelo/features/user/models/app_user.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 
 class MarketplacePage extends ConsumerStatefulWidget {
@@ -26,13 +29,13 @@ class MarketplacePage extends ConsumerStatefulWidget {
 class _MarketplacePageState extends ConsumerState<MarketplacePage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
-  late Future<List<Project>> _projectsFuture;
+  late Future<(AppUser, List<Project>)> _loadDataFuture;
 
   @override
   void initState() {
     super.initState();
 
-    _projectsFuture = ref.read(projectProvider).getAll();
+    _loadDataFuture = _loadData();
   }
 
   @override
@@ -88,13 +91,13 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
       ),
 
       body: FutureBuilder(
-        future: _projectsFuture,
+        future: _loadDataFuture,
         builder: (_, snapshot) {
           if (!snapshot.hasData) {
             return LoadingIndicator().center();
           }
 
-          final projects = snapshot.data!;
+          final (user, projects) = snapshot.data!;
 
           return ListView(
             children: [
@@ -127,5 +130,14 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
         },
       ),
     ).hideKeyboardOnTap(context);
+  }
+
+  Future<(AppUser, List<Project>)> _loadData() async {
+    final user = (await ref
+        .read(appUserProvider)
+        .getByEmail(ref.read(authProvider)!.email))!;
+    final projects = (await ref.read(projectProvider).getAll(user.id));
+
+    return (user, projects);
   }
 }

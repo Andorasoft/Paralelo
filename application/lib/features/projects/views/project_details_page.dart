@@ -37,7 +37,7 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
   void initState() {
     super.initState();
 
-    loadDataFuture = loadData();
+    loadDataFuture = _loadData();
   }
 
   @override
@@ -151,7 +151,7 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
   }
 
   Future<(Project, ProjectPayment, List<ProjectSkill>, AppUser)>
-  loadData() async {
+  _loadData() async {
     final payment = (await ref
         .read(projectPaymentProvider)
         .getByProject(widget.project.id))!;
