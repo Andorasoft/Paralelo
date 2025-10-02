@@ -24,6 +24,9 @@ class AppUser {
   /// Identifier of the university associated with the user.
   final int? universityId;
 
+  /// Optional device token for push notifications.
+  final String? deviceToken;
+
   /// Creates an immutable [AppUser] instance.
   ///
   /// All fields are required except [pictureUrl].
@@ -35,5 +38,6 @@ class AppUser {
     required this.email,
     this.pictureUrl,
     this.universityId,
+    this.deviceToken,
   });
 }

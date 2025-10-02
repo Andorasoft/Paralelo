@@ -42,6 +42,7 @@ class SupabaseAppUserRepository implements AppUserRepository {
       email: map['email'],
       pictureUrl: map['picture_url'],
       universityId: map['university_id'],
+      deviceToken: map['device_token'],
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
 import 'package:paralelo/features/auth/views/auth_page.dart';
+import 'package:paralelo/features/chats/views/chat_room_page.dart';
 import 'package:paralelo/features/projects/models/project.dart';
 import 'package:paralelo/features/projects/views/create_project_page.dart';
 import 'package:paralelo/features/projects/views/project_details_page.dart';
@@ -46,6 +47,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: CreateProposalPage.routePath,
         builder: (_, state) =>
             CreateProposalPage(project: state.extra as Project),
+      ),
+
+      GoRoute(
+        path: ChatRoomPage.routePath,
+        builder: (_, state) => ChatRoomPage(roomId: state.extra as String),
       ),
     ],
   );

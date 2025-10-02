@@ -53,7 +53,7 @@ class BottomNavBar extends ConsumerWidget {
           BottomNavBarItem(
             label: 'Chats',
             icon: Icon(TablerIcons.message_2, size: 28.0),
-            page: const ChatsPage(roomId: ''),
+            page: const ChatsPage(),
           ),
           BottomNavBarItem(
             label: 'Agenda',

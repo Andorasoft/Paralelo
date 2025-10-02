@@ -86,7 +86,7 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
 
             child: ListView(
               children: [
-                Text('Ofrecer ayuda en'),
+                Text('Propuesta para el proyecto'),
                 Text(
                   widget.project.title,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -95,7 +95,7 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                 ),
 
                 Text(
-                  'Message',
+                  'Mensaje al solicitante',
                 ).margin(const EdgeInsets.only(top: 16.0, bottom: 4.0)),
                 TextFormField(
                   controller: messageFieldController,
@@ -103,11 +103,13 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
 
                   minLines: 4,
                   maxLines: null,
-                  decoration: InputDecoration(hintText: 'E.g.'),
+                  decoration: InputDecoration(
+                    hintText: 'Escribe aquí tu propuesta o cómo planeas ayudar',
+                  ),
                 ),
 
                 Text(
-                  'Mode',
+                  'Modalidad de trabajo',
                 ).margin(const EdgeInsets.only(top: 16.0, bottom: 4.0)),
                 Row(
                   mainAxisSize: MainAxisSize.max,
@@ -133,7 +135,7 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
 
                 if (payment.type == 'proyecto') ...[
                   Text(
-                    'Amount',
+                    'Monto total (USD)',
                   ).margin(const EdgeInsets.only(top: 16.0, bottom: 4.0)),
                   TextFormField(
                     controller: amountFieldController,
@@ -147,7 +149,7 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                   ),
                 ] else ...[
                   Text(
-                    'Hourly rate',
+                    'Tarifa por hora (USD)',
                   ).margin(const EdgeInsets.only(top: 16.0, bottom: 4.0)),
                   TextFormField(
                     controller: amountFieldController,
@@ -162,20 +164,25 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                 ],
 
                 Text(
-                  'Estimated delivery time',
+                  'Tiempo estimado de entrega',
                 ).margin(const EdgeInsets.only(top: 16.0, bottom: 4.0)),
                 NumberFormField(
                   controller: timeFieldController,
                   focusNode: timeFieldFocusNode,
                   validator: (num? value) {
-                    if (value == null) return "Ingresa un número";
-                    if (value < 0) return "Debe ser mayor o igual a 0";
+                    if (value == null) {
+                      return 'Por favor, ingresa un número válido';
+                    }
+                    if (value < 0) {
+                      return "El valor debe ser mayor o igual a 1";
+                    }
+
                     return null;
                   },
 
                   hintText: payment.type == 'proyecto'
-                      ? 'E.g. 2 days'
-                      : 'E.g. 4 hours',
+                      ? 'Ejemplo: 2 días'
+                      : 'Ejemplo: 4 horas',
                   min: 0,
                   max: 50,
                   icon: Icon(LucideIcons.calendar),
@@ -198,7 +205,7 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
             children: [
               OutlinedButton(
                 onPressed: snapshot.hasData ? () {} : null,
-                child: Text('Cancel'),
+                child: Text('Cancelar'),
               ).expanded(),
               FilledButton(
                 onPressed: snapshot.hasData
@@ -206,7 +213,7 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                         formKey.currentState!.validate();
                       }
                     : null,
-                child: Text('Send proposal'),
+                child: Text('Aplicar'),
               ).expanded(),
             ],
           ).margin(const EdgeInsets.symmetric(horizontal: 16.0)).useSafeArea();

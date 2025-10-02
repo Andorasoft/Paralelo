@@ -8,7 +8,7 @@ class ChatService {
         .collection('chats')
         .doc(roomId)
         .collection('messages')
-        .orderBy('createdAt', descending: true)
+        .orderBy('created_at', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
@@ -17,8 +17,8 @@ class ChatService {
     await _firestore.collection('chats').doc(roomId).collection('messages').add(
       {
         'text': text,
-        'senderId': userId,
-        'createdAt': FieldValue.serverTimestamp(),
+        'sender_id': userId,
+        'created_at': FieldValue.serverTimestamp(),
       },
     );
   }
