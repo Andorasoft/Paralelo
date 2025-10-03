@@ -66,7 +66,7 @@ export const sendChatNotification = onDocumentCreated(
 
     const payload: admin.messaging.Message = {
       notification: {
-        title: "New message",
+        title: "Te enviaron un mensaje nuevo",
         body: message.text,
       },
       data: {
