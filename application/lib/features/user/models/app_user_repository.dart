@@ -4,6 +4,15 @@ import './app_user.dart';
 abstract class AppUserRepository {
   Future<AppUser?> getById(int id);
   Future<AppUser?> getByEmail(String email);
+  Future<AppUser?> update(
+    int id, {
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? pictureUrl,
+    int? universityId,
+    String? deviceToken,
+  });
 }
 
 class SupabaseAppUserRepository implements AppUserRepository {
@@ -28,6 +37,39 @@ class SupabaseAppUserRepository implements AppUserRepository {
         .from('app_user')
         .select()
         .eq('email', email)
+        .maybeSingle();
+
+    return data != null ? _fromMap(data) : null;
+  }
+
+  @override
+  Future<AppUser?> update(
+    int id, {
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? pictureUrl,
+    int? universityId,
+    String? deviceToken,
+  }) async {
+    final updates = <String, dynamic>{};
+
+    if (firstName != null) updates['first_name'] = firstName;
+    if (lastName != null) updates['last_name'] = lastName;
+    if (email != null) updates['email'] = email;
+    if (pictureUrl != null) updates['picture_url'] = pictureUrl;
+    if (universityId != null) updates['university_id'] = universityId;
+    if (deviceToken != null) updates['device_token'] = deviceToken;
+
+    if (updates.isEmpty) {
+      return await getById(id);
+    }
+
+    final data = await _client
+        .from('app_user')
+        .update(updates)
+        .eq('id', id)
+        .select()
         .maybeSingle();
 
     return data != null ? _fromMap(data) : null;

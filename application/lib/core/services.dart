@@ -2,15 +2,23 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
+/// Background handler for FCM messages.
+/// This will be triggered when the app is in the background or terminated.
 @pragma('vm:entry-point')
-Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  debugPrint("📩 Mensaje en background: ${message.messageId}");
+Future<void> _messagingBackgroundHandler(RemoteMessage message) async {
+  debugPrint("📩 Background message received: ${message.messageId}");
 }
 
+/// Service for managing chat messages with Firestore.
 class ChatService {
-  final _firestore = FirebaseFirestore.instance;
+  static final _firestore = FirebaseFirestore.instance;
 
-  Stream<List<Map<String, dynamic>>> messagesStream(String roomId) {
+  ChatService._internal();
+
+  /// Returns a stream of messages for a given chat room.
+  ///
+  /// [roomId] - ID of the chat room to listen to.
+  static Stream<List<Map<String, dynamic>>> messagesStream(String roomId) {
     return _firestore
         .collection('chats')
         .doc(roomId)
@@ -20,7 +28,13 @@ class ChatService {
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
-  Future<void> sendMessage(
+  /// Sends a new message to a chat room.
+  ///
+  /// [roomId] - ID of the chat room.
+  /// [senderId] - ID of the sender.
+  /// [recipientId] - ID of the recipient.
+  /// [text] - Message text.
+  static Future<void> sendMessage(
     String roomId,
     String senderId,
     String recipientId,
@@ -39,12 +53,24 @@ class ChatService {
   }
 }
 
+/// Service for handling Firebase Cloud Messaging (FCM).
+///
+/// Implements a Singleton pattern to ensure only one instance is used
+/// throughout the application.
 class FCMService {
-  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
+  /// Singleton instance.
+  static final instance = FCMService._internal();
 
-  /// Request permissions (mainly for iOS)
+  final _messaging = FirebaseMessaging.instance;
+
+  /// Private constructor for Singleton.
+  FCMService._internal();
+
+  /// Requests notification permissions (mainly for iOS).
+  ///
+  /// Returns `true` if permission is granted.
   Future<bool> requestPermissions() async {
-    NotificationSettings settings = await _messaging.requestPermission(
+    final settings = await _messaging.requestPermission(
       alert: true,
       badge: true,
       sound: true,
@@ -53,59 +79,71 @@ class FCMService {
     return settings.authorizationStatus == AuthorizationStatus.authorized;
   }
 
-  /// Get current device token
+  /// Retrieves the current device FCM token.
+  ///
+  /// Returns the token as a [String], or `null` if there was an error.
   Future<String?> getDeviceToken() async {
     try {
       String? token = await _messaging.getToken();
-      debugPrint("Device Token: $token");
+      debugPrint("📱 Device Token: $token");
       return token;
     } catch (e) {
-      debugPrint("Error getting FCM token: $e");
+      debugPrint("❌ Error retrieving FCM token: $e");
       return null;
     }
   }
 
-  /// Listen for token refresh
-  void listenTokenRefresh(Function(String) onRefresh) {
+  /// Listens for FCM token refresh events.
+  ///
+  /// [onRefresh] - Callback executed when the token is refreshed.
+  void _listenTokenRefresh(Function(String) onRefresh) {
     _messaging.onTokenRefresh.listen((newToken) {
-      debugPrint("New Device Token: $newToken");
+      debugPrint("🔄 New Device Token: $newToken");
       onRefresh(newToken);
     });
   }
 
-  void listenMessages({
+  /// Listens for foreground and opened-app messages.
+  ///
+  /// [onMessage] - Called when a message is received in foreground.
+  /// [onMessageOpenedApp] - Called when the user taps on a notification.
+  void _listenMessages({
     void Function(RemoteMessage message)? onMessage,
     void Function(RemoteMessage message)? onMessageOpenedApp,
   }) {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      debugPrint("📥 Mensaje en foreground: ${message.notification?.title}");
-      if (onMessage != null) onMessage(message);
+      debugPrint("📥 Foreground message: ${message.notification?.title}");
+      onMessage?.call(message);
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      debugPrint("📲 Notificación abierta: ${message.notification?.title}");
-      if (onMessageOpenedApp != null) onMessageOpenedApp(message);
+      debugPrint("📲 Notification opened: ${message.notification?.title}");
+      onMessageOpenedApp?.call(message);
     });
   }
 
-  /// Inicializar todo
-  Future<void> initialize({
+  /// Initializes FCM listeners and background handlers.
+  ///
+  /// [onMessage] - Callback for foreground messages.
+  /// [onMessageOpenedApp] - Callback when user opens a notification.
+  /// [onTokenRefresh] - Callback for when the FCM token changes.
+  static Future<void> initialize({
     void Function(RemoteMessage message)? onMessage,
     void Function(RemoteMessage message)? onMessageOpenedApp,
     void Function(String token)? onTokenRefresh,
   }) async {
-    await requestPermissions();
-    await getDeviceToken();
+    await instance.getDeviceToken();
 
     if (onTokenRefresh != null) {
-      listenTokenRefresh(onTokenRefresh);
+      instance._listenTokenRefresh(onTokenRefresh);
     }
-    listenMessages(
+
+    instance._listenMessages(
       onMessage: onMessage,
       onMessageOpenedApp: onMessageOpenedApp,
     );
 
-    // Handler para mensajes en background
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    // Background message handler
+    FirebaseMessaging.onBackgroundMessage(_messagingBackgroundHandler);
   }
 }

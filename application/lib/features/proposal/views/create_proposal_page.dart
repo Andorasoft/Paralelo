@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:uuid/uuid.dart';
 
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
@@ -9,9 +8,11 @@ import 'package:paralelo/features/projects/controllers/project_payment_provider.
 import 'package:paralelo/features/projects/models/project_payment.dart';
 import 'package:paralelo/features/projects/models/project.dart';
 import 'package:paralelo/features/user/controllers/app_user_provider.dart';
+import 'package:paralelo/features/chats/controllers/chat_room_provider.dart';
+import 'package:paralelo/features/proposal/controllers/proposal_provider.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/widgets/number_form_field.dart';
-import 'package:paralelo/core/providers.dart';
+import 'package:paralelo/core/services.dart';
 import 'package:paralelo/core/router.dart';
 
 class CreateProposalPage extends ConsumerStatefulWidget {
@@ -41,20 +42,20 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
   final amountFieldController = TextEditingController();
   final timeFieldController = NumberEditingController(value: 1);
 
-  late Future<ProjectPayment?> loadPaymentFuture;
+  late Future<ProjectPayment?> loadDataFuture;
 
   final messageFieldFocusNode = FocusNode();
   final amountFieldFocusNode = FocusNode();
   final timeFieldFocusNode = FocusNode();
 
   List<String> modes = ['Remote', 'In-person', 'Hybrid'];
-  String selected = 'Remote';
+  String selectedMode = 'Remote';
 
   @override
   void initState() {
     super.initState();
 
-    loadPaymentFuture = loadPayment();
+    loadDataFuture = loadData();
   }
 
   @override
@@ -73,7 +74,7 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
       ),
 
       body: FutureBuilder(
-        future: loadPaymentFuture,
+        future: loadDataFuture,
         builder: (_, snapshot) {
           if (!snapshot.hasData) {
             return LoadingIndicator().center();
@@ -127,10 +128,10 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                           label: Text(m).center(),
                           showCheckmark: false,
                           backgroundColor: Colors.transparent,
-                          selected: selected == m,
+                          selected: selectedMode == m,
 
                           onSelected: (_) {
-                            setState(() => selected = m);
+                            setState(() => selectedMode = m);
                           },
                         ).expanded(),
                       )
@@ -198,7 +199,7 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
       ),
 
       bottomNavigationBar: FutureBuilder(
-        future: loadPayment(),
+        future: loadData(),
         builder: (_, snapshot) {
           return Row(
             mainAxisSize: MainAxisSize.max,
@@ -218,14 +219,29 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                             .read(appUserProvider)
                             .getByEmail(ref.read(authProvider)!.email))!;
 
-                        await ref
-                            .read(chatServiceProvider)
-                            .sendMessage(
-                              Uuid().v4(),
-                              user.id.toString(),
-                              widget.project.ownerId.toString(),
-                              messageFieldController.text,
+                        final proposal = await ref
+                            .read(proposalProvider)
+                            .create(
+                              message: messageFieldController.text,
+                              mode: selectedMode,
+                              status: 'PENDING',
+                              providerId: widget.project.ownerId,
+                              projectId: widget.project.id,
                             );
+                        final room = await ref
+                            .read(chatRoomProvider)
+                            .create(
+                              user1Id: widget.project.ownerId,
+                              user2Id: user.id,
+                              proposalId: proposal.id,
+                            );
+
+                        await ChatService.sendMessage(
+                          room.id,
+                          '${user.id}',
+                          '${widget.project.ownerId}',
+                          proposal.message,
+                        );
                       }
                     : null,
                 child: Text('Aplicar'),
@@ -237,7 +253,7 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
     ).hideKeyboardOnTap(context);
   }
 
-  Future<ProjectPayment?> loadPayment() {
+  Future<ProjectPayment?> loadData() {
     if (widget.projectPayment != null) {
       return Future.value(widget.projectPayment);
     }

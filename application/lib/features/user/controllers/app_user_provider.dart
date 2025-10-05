@@ -23,4 +23,24 @@ class _AppUserProvider {
   Future<AppUser?> getByEmail(String email) {
     return _repo.getByEmail(email);
   }
+
+  Future<AppUser?> update(
+    int id, {
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? pictureUrl,
+    int? universityId,
+    String? deviceToken,
+  }) {
+    return _repo.update(
+      id,
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      pictureUrl: pictureUrl,
+      universityId: universityId,
+      deviceToken: deviceToken,
+    );
+  }
 }

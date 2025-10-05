@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:paralelo/firebase_options.dart';
-import 'package:paralelo/core/services.dart';
 import 'package:paralelo/core/router.dart';
 import 'package:paralelo/core/theme.dart';
 
@@ -29,18 +28,6 @@ void main() async {
     authOptions: const FlutterAuthClientOptions(autoRefreshToken: true),
   );
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  FCMService().initialize(
-    onMessage: (msg) {
-      debugPrint("🔥 Foreground: ${msg.notification?.title}");
-    },
-    onMessageOpenedApp: (msg) {
-      debugPrint("👉 Abrieron notificación: ${msg.notification?.title}");
-    },
-    onTokenRefresh: (newToken) {
-      debugPrint("💾 Guardar token en Supabase: $newToken");
-    },
-  );
 
   runApp(const ProviderScope(child: MainApp()));
 }

@@ -1,7 +1,7 @@
-import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/providers.dart';
 
 class ChatRoomPage extends ConsumerStatefulWidget {
