@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "91360332225",
+    "project_id": "andorasoft-paralelo",
+    "storage_bucket": "andorasoft-paralelo.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:91360332225:android:6b84499ff35c750d5d4740",
+        "android_client_info": {
+          "package_name": "com.andorasoft.paralelo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuEn7b8VoojxcEWq9BPc-3gRbG_i0UUlE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
