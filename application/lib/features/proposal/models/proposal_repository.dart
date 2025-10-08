@@ -9,7 +9,7 @@ abstract class ProposalRepository {
     num? amount,
     num? hourlyRate,
     required String status,
-    required int providerId,
+    required String providerId,
     required int projectId,
   });
 }
@@ -31,7 +31,7 @@ class SupabaseProposalRepository implements ProposalRepository {
     num? amount,
     num? hourlyRate,
     required String status,
-    required int providerId,
+    required String providerId,
     required int projectId,
   }) async {
     final data = await _client

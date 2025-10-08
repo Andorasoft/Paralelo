@@ -24,7 +24,7 @@ class Proposal {
   final String status;
 
   /// Identifier of the provider (user) who submitted the proposal.
-  final int providerId;
+  final String providerId;
 
   /// Identifier of the related project.
   final int projectId;

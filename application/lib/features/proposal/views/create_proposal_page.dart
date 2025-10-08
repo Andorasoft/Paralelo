@@ -7,7 +7,6 @@ import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
 import 'package:paralelo/features/projects/controllers/project_payment_provider.dart';
 import 'package:paralelo/features/projects/models/project_payment.dart';
 import 'package:paralelo/features/projects/models/project.dart';
-import 'package:paralelo/features/user/controllers/app_user_provider.dart';
 import 'package:paralelo/features/chats/controllers/chat_room_provider.dart';
 import 'package:paralelo/features/proposal/controllers/proposal_provider.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
@@ -215,33 +214,13 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
               FilledButton(
                 onPressed: snapshot.hasData
                     ? () async {
-                        final user = (await ref
-                            .read(appUserProvider)
-                            .getByEmail(ref.read(authProvider)!.email))!;
+                        final error = await createProposal();
 
-                        final proposal = await ref
-                            .read(proposalProvider)
-                            .create(
-                              message: messageFieldController.text,
-                              mode: selectedMode,
-                              status: 'PENDING',
-                              providerId: widget.project.ownerId,
-                              projectId: widget.project.id,
-                            );
-                        final room = await ref
-                            .read(chatRoomProvider)
-                            .create(
-                              user1Id: widget.project.ownerId,
-                              user2Id: user.id,
-                              proposalId: proposal.id,
-                            );
-
-                        await ChatService.sendMessage(
-                          room.id,
-                          '${user.id}',
-                          '${widget.project.ownerId}',
-                          proposal.message,
-                        );
+                        if (error == null) {
+                          ref.read(goRouterProvider).pop();
+                        } else {
+                          showSnackbar(context, error);
+                        }
                       }
                     : null,
                 child: Text('Aplicar'),
@@ -259,5 +238,41 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
     }
 
     return ref.read(projectPaymentProvider).getByProject(widget.project.id);
+  }
+
+  Future<String?> createProposal() async {
+    String? error;
+
+    try {
+      final user = ref.read(authProvider)!;
+
+      final proposal = await ref
+          .read(proposalProvider)
+          .create(
+            message: messageFieldController.text,
+            mode: selectedMode,
+            status: 'PENDING',
+            providerId: widget.project.ownerId,
+            projectId: widget.project.id,
+          );
+      final room = await ref
+          .read(chatRoomProvider)
+          .create(
+            user1Id: widget.project.ownerId,
+            user2Id: user.id,
+            proposalId: proposal.id,
+          );
+
+      await ChatService.sendMessage(
+        room.id,
+        user.id,
+        widget.project.ownerId,
+        proposal.message,
+      );
+    } catch (err) {
+      error = 'Error: $err';
+    }
+
+    return error;
   }
 }

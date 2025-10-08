@@ -2,10 +2,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import './app_user.dart';
 
 abstract class AppUserRepository {
-  Future<AppUser?> getById(int id);
-  Future<AppUser?> getByEmail(String email);
+  Future<AppUser?> getById(String id);
   Future<AppUser?> update(
-    int id, {
+    String id, {
     String? firstName,
     String? lastName,
     String? email,
@@ -21,7 +20,7 @@ class SupabaseAppUserRepository implements AppUserRepository {
   const SupabaseAppUserRepository(this._client);
 
   @override
-  Future<AppUser?> getById(int id) async {
+  Future<AppUser?> getById(String id) async {
     final data = await _client
         .from('app_user')
         .select()
@@ -32,19 +31,8 @@ class SupabaseAppUserRepository implements AppUserRepository {
   }
 
   @override
-  Future<AppUser?> getByEmail(String email) async {
-    final data = await _client
-        .from('app_user')
-        .select()
-        .eq('email', email)
-        .maybeSingle();
-
-    return data != null ? _fromMap(data) : null;
-  }
-
-  @override
   Future<AppUser?> update(
-    int id, {
+    String id, {
     String? firstName,
     String? lastName,
     String? email,

@@ -15,14 +15,8 @@ class Project {
   /// Detailed project description.
   final String description;
 
-  /// Mode of the project (e.g., "fixed", "hourly").
-  final String mode;
-
   /// Optional total project budget.
   final num? budget;
-
-  /// Optional maximum hourly rate.
-  final num? maxHourlyRate;
 
   /// Current status of the project (e.g., "open", "in_progress").
   final String status;
@@ -31,7 +25,7 @@ class Project {
   final String category;
 
   /// Identifier of the project owner (user).
-  final int ownerId;
+  final String ownerId;
 
   /// Creates an immutable [Project] instance.
   const Project({
@@ -39,26 +33,9 @@ class Project {
     required this.createdAt,
     required this.title,
     required this.description,
-    required this.mode,
     this.budget,
-    this.maxHourlyRate,
     required this.status,
     required this.category,
     required this.ownerId,
   });
-
-  /// Converts the [Project] object into a map
-  /// suitable for database storage or JSON encoding.
-  Map<String, dynamic> toMap() => {
-    'id': id,
-    'created_at': createdAt.toIso8601String(),
-    'title': title,
-    'description': description,
-    'mode': mode,
-    'budget': budget,
-    'max_hourly_rate': maxHourlyRate,
-    'status': status,
-    'category': category,
-    'owner_id': ownerId,
-  };
 }

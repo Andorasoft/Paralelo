@@ -2,10 +2,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import './chat_room.dart';
 
 abstract class ChatRoomRepository {
-  Future<List<ChatRoom>> getForUser(int userId);
+  Future<List<ChatRoom>> getForUser(String userId);
   Future<ChatRoom> create({
-    required int user1Id,
-    required int user2Id,
+    required String user1Id,
+    required String user2Id,
     required int proposalId,
   });
 }
@@ -16,7 +16,7 @@ class SupabaseChatRoomRepository implements ChatRoomRepository {
   const SupabaseChatRoomRepository(this._client);
 
   @override
-  Future<List<ChatRoom>> getForUser(int userId) async {
+  Future<List<ChatRoom>> getForUser(String userId) async {
     final data = await _client
         .from('chat_room')
         .select()
@@ -27,8 +27,8 @@ class SupabaseChatRoomRepository implements ChatRoomRepository {
 
   @override
   Future<ChatRoom> create({
-    required int user1Id,
-    required int user2Id,
+    required String user1Id,
+    required String user2Id,
     required int proposalId,
   }) async {
     final data = await _client

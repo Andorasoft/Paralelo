@@ -10,8 +10,6 @@ import 'package:paralelo/features/projects/widgets/project_filter_form.dart';
 import 'package:paralelo/features/projects/widgets/project_card.dart';
 import 'package:paralelo/features/projects/widgets/search_form_field.dart';
 import 'package:paralelo/features/projects/widgets/project_sort_form.dart';
-import 'package:paralelo/features/user/controllers/app_user_provider.dart';
-import 'package:paralelo/features/user/models/app_user.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 
 class MarketplacePage extends ConsumerStatefulWidget {
@@ -29,13 +27,13 @@ class MarketplacePage extends ConsumerStatefulWidget {
 class _MarketplacePageState extends ConsumerState<MarketplacePage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
-  late Future<(AppUser, List<Project>)> _loadDataFuture;
+  late Future<List<Project>> loadDataFuture;
 
   @override
   void initState() {
     super.initState();
 
-    _loadDataFuture = _loadData();
+    loadDataFuture = loadData();
   }
 
   @override
@@ -91,13 +89,13 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
       ),
 
       body: FutureBuilder(
-        future: _loadDataFuture,
+        future: loadDataFuture,
         builder: (_, snapshot) {
           if (!snapshot.hasData) {
             return LoadingIndicator().center();
           }
 
-          final (user, projects) = snapshot.data!;
+          final projects = snapshot.data!;
 
           return ListView(
             children: [
@@ -132,12 +130,8 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
     ).hideKeyboardOnTap(context);
   }
 
-  Future<(AppUser, List<Project>)> _loadData() async {
-    final user = (await ref
-        .read(appUserProvider)
-        .getByEmail(ref.read(authProvider)!.email))!;
-    final projects = (await ref.read(projectProvider).getAll(user.id));
-
-    return (user, projects);
+  Future<List<Project>> loadData() async {
+    final user = ref.read(authProvider)!;
+    return await ref.read(projectProvider).getAll(user.id);
   }
 }

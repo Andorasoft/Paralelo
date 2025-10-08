@@ -16,13 +16,13 @@ class _ChatRoomProvider {
 
   const _ChatRoomProvider(this._repo);
 
-  Future<List<ChatRoom>> getForUser(int userId) {
+  Future<List<ChatRoom>> getForUser(String userId) {
     return _repo.getForUser(userId);
   }
 
   Future<ChatRoom> create({
-    required int user1Id,
-    required int user2Id,
+    required String user1Id,
+    required String user2Id,
     required int proposalId,
   }) {
     return _repo.create(

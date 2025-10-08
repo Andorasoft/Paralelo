@@ -132,8 +132,6 @@ class FCMService {
     void Function(RemoteMessage message)? onMessageOpenedApp,
     void Function(String token)? onTokenRefresh,
   }) async {
-    await instance.getDeviceToken();
-
     if (onTokenRefresh != null) {
       instance._listenTokenRefresh(onTokenRefresh);
     }

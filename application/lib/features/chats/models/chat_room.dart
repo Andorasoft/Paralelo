@@ -9,10 +9,10 @@ class ChatRoom {
   final DateTime createdAt;
 
   /// Identifier of the first participant (user).
-  final int user1Id;
+  final String user1Id;
 
   /// Identifier of the second participant (user).
-  final int user2Id;
+  final String user2Id;
 
   /// Identifier of the linked proposal (one chat per proposal).
   final int proposalId;

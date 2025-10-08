@@ -4,7 +4,7 @@
 /// storing personal details, contact information, and university affiliation.
 class AppUser {
   /// Unique identifier of the user (primary key).
-  final int id;
+  final String id;
 
   /// Date and time when the account was created.
   final DateTime createdAt;

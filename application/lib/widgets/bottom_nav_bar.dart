@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/features/user/controllers/app_user_provider.dart';
+import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
 import 'package:paralelo/features/calendar/views/calendar_page.dart';
 import 'package:paralelo/features/chats/views/chats_page.dart';
 import 'package:paralelo/features/home/views/home_page.dart';
@@ -12,23 +14,35 @@ import 'package:paralelo/features/projects/views/marketplace_page.dart';
 import 'package:paralelo/core/services.dart';
 import 'package:paralelo/core/router.dart';
 
-class BottomNavBar extends ConsumerWidget {
+class BottomNavBar extends ConsumerStatefulWidget {
   const BottomNavBar({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    FCMService.initialize(
-      onMessage: (msg) {
-        debugPrint("🔥 Foreground: ${msg.notification?.title}");
-      },
-      onMessageOpenedApp: (msg) {
-        debugPrint("👉 Abrieron notificación: ${msg.notification?.title}");
-      },
-      onTokenRefresh: (newToken) {
-        debugPrint("💾 Guardar token en Supabase: $newToken");
-      },
-    );
+  ConsumerState<ConsumerStatefulWidget> createState() {
+    return _BottomNavBarState();
+  }
+}
 
+class _BottomNavBarState extends ConsumerState<BottomNavBar> {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final user = await ref
+          .read(appUserProvider)
+          .getById(ref.read(authProvider)!.id);
+
+      final token = await FCMService.instance.getDeviceToken();
+
+      if (user!.deviceToken != token) {
+        await ref.read(appUserProvider).update(user.id, deviceToken: token);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Theme(
       data: Theme.of(
         context,
@@ -67,7 +81,7 @@ class BottomNavBar extends ConsumerWidget {
           BottomNavBarItem(
             label: 'Chats',
             icon: badges.Badge(
-              badgeContent: SizedBox.shrink(),
+              showBadge: false,
               badgeStyle: badges.BadgeStyle(
                 badgeColor: Theme.of(context).colorScheme.primary,
               ),
@@ -83,5 +97,11 @@ class BottomNavBar extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  void loadData(WidgetRef ref, String token) async {
+    await ref
+        .read(appUserProvider)
+        .update(ref.read(authProvider)!.id, deviceToken: token);
   }
 }

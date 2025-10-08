@@ -26,7 +26,7 @@ class _ProposalProvider {
     num? amount,
     num? hourlyRate,
     required String status,
-    required int providerId,
+    required String providerId,
     required int projectId,
   }) {
     return _repo.create(

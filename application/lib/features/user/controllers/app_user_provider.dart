@@ -16,16 +16,12 @@ class _AppUserProvider {
 
   const _AppUserProvider(this._repo);
 
-  Future<AppUser?> getById(int id) {
+  Future<AppUser?> getById(String id) {
     return _repo.getById(id);
   }
 
-  Future<AppUser?> getByEmail(String email) {
-    return _repo.getByEmail(email);
-  }
-
   Future<AppUser?> update(
-    int id, {
+    String id, {
     String? firstName,
     String? lastName,
     String? email,
