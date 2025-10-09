@@ -56,7 +56,7 @@ class MainApp extends ConsumerWidget {
       theme: Theme.of(context).app,
       themeMode: ThemeMode.light,
 
-      supportedLocales: const [Locale('es'), Locale('en')],
+      supportedLocales: const [Locale('es')],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

@@ -10,7 +10,7 @@ import 'package:paralelo/features/projects/models/project.dart';
 import 'package:paralelo/features/chats/controllers/chat_room_provider.dart';
 import 'package:paralelo/features/proposal/controllers/proposal_provider.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
-import 'package:paralelo/widgets/number_form_field.dart';
+import 'package:paralelo/widgets/number_input_form_field.dart';
 import 'package:paralelo/core/services.dart';
 import 'package:paralelo/core/router.dart';
 
@@ -170,7 +170,7 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                 Text(
                   'Tiempo estimado de entrega',
                 ).margin(const EdgeInsets.only(top: 16.0, bottom: 4.0)),
-                NumberFormField(
+                NumberInputFormField(
                   controller: timeFieldController,
                   focusNode: timeFieldFocusNode,
                   validator: (num? value) {

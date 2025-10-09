@@ -163,7 +163,10 @@ extension AppThemeData on ThemeData {
 
     bottomSheetTheme: BottomSheetThemeData(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadiusGeometry.circular(16.0),
+        borderRadius: BorderRadiusGeometry.only(
+          topLeft: Radius.circular(24.0),
+          topRight: Radius.circular(24.0),
+        ),
       ),
     ),
 

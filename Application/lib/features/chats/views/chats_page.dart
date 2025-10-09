@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lucide_icons/lucide_icons.dart';
 
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
-import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
 import 'package:paralelo/features/chats/controllers/chat_room_provider.dart';
 import 'package:paralelo/features/chats/models/chat_room.dart';
 import 'package:paralelo/features/chats/views/chat_room_page.dart';
-import 'package:paralelo/features/projects/widgets/search_form_field.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
+import 'package:paralelo/core/router.dart';
 
 class ChatsPage extends ConsumerStatefulWidget {
   static const routeName = 'ChatsPage';
@@ -43,7 +43,16 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
         spacing: 8.0,
 
         children: [
-          SearchFormField(onQuery: (query) {}),
+          SearchBar(
+            padding: WidgetStateProperty.all(
+              const EdgeInsets.symmetric(horizontal: 12.0),
+            ),
+
+            onSubmitted: (query) {},
+
+            leading: const Icon(LucideIcons.search),
+            hintText: 'Buscar conversaciones...',
+          ).size(height: 44.0),
           ListView(
             scrollDirection: Axis.horizontal,
 

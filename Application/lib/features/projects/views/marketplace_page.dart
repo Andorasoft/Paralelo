@@ -6,10 +6,9 @@ import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
 import 'package:paralelo/features/projects/controllers/project_provider.dart';
 import 'package:paralelo/features/projects/models/project.dart';
-import 'package:paralelo/features/projects/widgets/project_filter_form.dart';
+import 'package:paralelo/features/projects/widgets/project_filter_button.dart';
 import 'package:paralelo/features/projects/widgets/project_card.dart';
-import 'package:paralelo/features/projects/widgets/search_form_field.dart';
-import 'package:paralelo/features/projects/widgets/project_sort_form.dart';
+import 'package:paralelo/features/projects/widgets/project_sort_button.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 
 class MarketplacePage extends ConsumerStatefulWidget {
@@ -20,82 +19,72 @@ class MarketplacePage extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return _MarketplacePageState();
+    return MarketplacePageState();
   }
 }
 
-class _MarketplacePageState extends ConsumerState<MarketplacePage> {
-  final scaffoldKey = GlobalKey<ScaffoldState>();
+class MarketplacePageState extends ConsumerState<MarketplacePage> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  late Future<List<Project>> loadDataFuture;
+  late final Future<List<Project>> _loadDataFuture;
+  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
 
-    loadDataFuture = loadData();
+    _loadDataFuture = loadData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: scaffoldKey,
+      key: _scaffoldKey,
 
       appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          spacing: 8.0,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 8.0,
 
-          children: [
-            SearchFormField(onQuery: (query) {}).expanded(),
-            IconButton.filledTonal(
-              onPressed: () async {
-                final res =
-                    await showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(48.0),
 
-                          builder: (_) {
-                            return ProjectSortForm().useSafeArea();
-                          },
-                        )
-                        as String?;
+          child: Row(
+            spacing: 8.0,
 
-                if (res != null) debugPrint(res.toString());
-              },
-              icon: Icon(LucideIcons.arrowUpDown),
-            ),
-            IconButton.filledTonal(
-              onPressed: () async {
-                final res =
-                    await showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
+            children: [
+              SearchBar(
+                padding: WidgetStateProperty.all(
+                  const EdgeInsets.symmetric(horizontal: 12.0),
+                ),
 
-                          builder: (_) {
-                            return ProjectFilterForm().useSafeArea();
-                          },
-                        )
-                        as Map<String, dynamic>?;
+                onSubmitted: (query) {
+                  safeSetState(() => _searchQuery = query);
+                },
 
-                if (res != null) debugPrint(res.toString());
-              },
-              icon: Icon(LucideIcons.settings2),
-            ),
-          ],
+                leading: const Icon(LucideIcons.search),
+                hintText: 'Buscar proyectos...',
+              ).size(height: 44.0).expanded(),
+              ProjectSortButton(),
+              ProjectFilterButton(),
+            ],
+          ).margin(const EdgeInsets.symmetric(horizontal: 16.0)),
         ),
       ),
 
       body: FutureBuilder(
-        future: loadDataFuture,
+        future: _loadDataFuture,
         builder: (_, snapshot) {
           if (!snapshot.hasData) {
             return LoadingIndicator().center();
           }
 
-          final projects = snapshot.data!;
+          final projects = snapshot.data!
+              .where(
+                (p) => p.title.toLowerCase().contains(
+                  _searchQuery.trim().toLowerCase(),
+                ),
+              )
+              .toList();
 
           return ListView(
             children: [

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-class NumberFormField extends ConsumerStatefulWidget {
+class NumberInputFormField extends ConsumerStatefulWidget {
   final String? Function(num?)? validator;
   final NumberEditingController? controller;
   final FocusNode? focusNode;
@@ -11,7 +11,7 @@ class NumberFormField extends ConsumerStatefulWidget {
   final num? min;
   final num? max;
 
-  const NumberFormField({
+  const NumberInputFormField({
     super.key,
     this.validator,
     this.controller,
@@ -24,36 +24,34 @@ class NumberFormField extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return _NumerFormFieldState();
+    return NumerInputFormFieldState();
   }
 }
 
-class _NumerFormFieldState extends ConsumerState<NumberFormField> {
-  late final NumberEditingController _internalController;
-  NumberEditingController get effectiveController =>
-      widget.controller ?? _internalController;
+class NumerInputFormFieldState extends ConsumerState<NumberInputFormField> {
+  late final NumberEditingController _controller;
 
   @override
   void initState() {
     super.initState();
-    _internalController = NumberEditingController();
+
+    _controller = widget.controller ?? NumberEditingController();
   }
 
   @override
   void dispose() {
-    if (widget.controller == null) {
-      _internalController.dispose();
-    }
+    _controller.dispose();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: effectiveController.textController,
+      controller: _controller.textController,
       focusNode: widget.focusNode,
       validator: (value) {
-        final value = effectiveController.number;
+        final value = _controller.number;
         return widget.validator?.call(value);
       },
 
@@ -78,9 +76,10 @@ class _NumerFormFieldState extends ConsumerState<NumberFormField> {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  final current = effectiveController.number ?? 0;
+                  final current = _controller.number ?? 0;
                   final min = widget.min;
-                  effectiveController.number = (min != null && current <= min)
+
+                  _controller.number = (min != null && current <= min)
                       ? min
                       : current - 1;
                 },
@@ -88,9 +87,10 @@ class _NumerFormFieldState extends ConsumerState<NumberFormField> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  final current = effectiveController.number ?? 0;
+                  final current = _controller.number ?? 0;
                   final max = widget.max;
-                  effectiveController.number = (max != null && current >= max)
+
+                  _controller.number = (max != null && current >= max)
                       ? max
                       : current + 1;
                 },
