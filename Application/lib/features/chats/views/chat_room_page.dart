@@ -109,11 +109,13 @@ class ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                 recipientId: widget.recipientId,
                 text: _inputFieldController.text,
               );
+
+              _inputFieldController.text = "";
             },
             label: Icon(LucideIcons.send),
           ),
         ],
-      ).margin(const EdgeInsets.symmetric(horizontal: 16.0)).useSafeArea(),
+      ).useSafeArea().margin(const EdgeInsets.symmetric(horizontal: 16.0)),
     ).hideKeyboardOnTap(context);
   }
 }
