@@ -93,13 +93,17 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
                     .map(
                       (r) => InkWell(
                         onTap: () async {
+                          final user = ref.read(authProvider)!;
+
                           await ref
                               .read(goRouterProvider)
                               .push(
                                 ChatRoomPage.routePath,
                                 extra: {
                                   'room_id': r.id,
-                                  'recipient_id': r.user1Id,
+                                  'recipient_id': user.id == r.user1Id
+                                      ? r.user2Id
+                                      : r.user1Id,
                                 },
                               );
                         },
