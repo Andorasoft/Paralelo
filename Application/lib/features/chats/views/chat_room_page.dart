@@ -48,15 +48,16 @@ class ChatRoomPageState extends ConsumerState<ChatRoomPage> {
           onPressed: () {
             ref.read(goRouterProvider).pop();
           },
-          icon: Icon(LucideIcons.chevronLeft),
+          icon: const Icon(LucideIcons.chevronLeft),
         ),
 
         centerTitle: false,
+        titleSpacing: 8.0,
         title: FutureBuilder(
           future: ref.read(appUserProvider).getById(widget.recipientId),
           builder: (_, snapshot) {
             if (!snapshot.hasData) {
-              return CircularProgressIndicator.adaptive().center();
+              return const CircularProgressIndicator.adaptive().center();
             }
 
             final user = snapshot.data!;
