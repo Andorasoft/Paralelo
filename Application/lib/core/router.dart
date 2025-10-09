@@ -51,7 +51,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
       GoRoute(
         path: ChatRoomPage.routePath,
-        builder: (_, state) => ChatRoomPage(roomId: state.extra as String),
+        builder: (_, state) {
+          final data = state.extra as Map<String, dynamic>;
+
+          return ChatRoomPage(
+            roomId: data['room_id'],
+            recipientId: data['recipient_id'],
+          );
+        },
       ),
     ],
   );

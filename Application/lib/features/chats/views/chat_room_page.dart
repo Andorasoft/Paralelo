@@ -7,14 +7,20 @@ import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
 import 'package:paralelo/core/providers.dart';
 import 'package:paralelo/core/router.dart';
 import 'package:paralelo/core/services.dart';
+import 'package:paralelo/features/user/controllers/app_user_provider.dart';
 
 class ChatRoomPage extends ConsumerStatefulWidget {
   static const routeName = 'ChatRoomPage';
   static const routePath = '/chat-room';
 
   final String roomId;
+  final String recipientId;
 
-  const ChatRoomPage({super.key, required this.roomId});
+  const ChatRoomPage({
+    super.key,
+    required this.roomId,
+    required this.recipientId,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -37,24 +43,28 @@ class ChatRoomPageState extends ConsumerState<ChatRoomPage> {
 
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        leadingWidth: 0.0,
 
-        title: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          spacing: 8.0,
-
-          children: [
-            IconButton(
-              onPressed: () {
-                ref.read(goRouterProvider).pop();
-              },
-              icon: Icon(LucideIcons.chevronLeft),
-            ),
-            Text('J. R. C. C.'),
-          ],
+        leading: IconButton(
+          onPressed: () {
+            ref.read(goRouterProvider).pop();
+          },
+          icon: Icon(LucideIcons.chevronLeft),
         ),
+
+        centerTitle: false,
+        title: FutureBuilder(
+          future: ref.read(appUserProvider).getById(widget.recipientId),
+          builder: (_, snapshot) {
+            if (!snapshot.hasData) {
+              return CircularProgressIndicator.adaptive().center();
+            }
+
+            final user = snapshot.data!;
+
+            return Text('${user.firstName} ${user.lastName}');
+          },
+        ),
+
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(1.0),
           child: Divider(height: 1.0),
@@ -93,10 +103,10 @@ class ChatRoomPageState extends ConsumerState<ChatRoomPage> {
           FilledButton.icon(
             onPressed: () async {
               await ChatService.sendMessage(
-                widget.roomId,
-                ref.read(authProvider)!.id,
-                '',
-                _inputFieldController.text,
+                roomId: widget.roomId,
+                senderId: ref.read(authProvider)!.id,
+                recipientId: widget.recipientId,
+                text: _inputFieldController.text,
               );
             },
             label: Icon(LucideIcons.send),

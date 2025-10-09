@@ -34,12 +34,12 @@ class ChatService {
   /// [senderId] - ID of the sender.
   /// [recipientId] - ID of the recipient.
   /// [text] - Message text.
-  static Future<void> sendMessage(
-    String roomId,
-    String senderId,
-    String recipientId,
-    String text,
-  ) async {
+  static Future<void> sendMessage({
+    required String roomId,
+    required String senderId,
+    required String recipientId,
+    required String text,
+  }) async {
     await _firestore
         .collection('chats')
         .doc(roomId)

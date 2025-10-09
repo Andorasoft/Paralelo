@@ -95,7 +95,13 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
                         onTap: () async {
                           await ref
                               .read(goRouterProvider)
-                              .push(ChatRoomPage.routePath, extra: r.id);
+                              .push(
+                                ChatRoomPage.routePath,
+                                extra: {
+                                  'room_id': r.id,
+                                  'recipient_id': r.user1Id,
+                                },
+                              );
                         },
 
                         child: Text(r.createdAt.toIso8601String()),

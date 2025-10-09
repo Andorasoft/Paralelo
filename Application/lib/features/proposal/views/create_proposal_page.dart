@@ -256,10 +256,10 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
           );
 
       await ChatService.sendMessage(
-        room.id,
-        user.id,
-        widget.project.ownerId,
-        proposal.message,
+        roomId: room.id,
+        senderId: user.id,
+        recipientId: widget.project.ownerId,
+        text: proposal.message,
       );
     } catch (err) {
       error = 'Error: $err';
