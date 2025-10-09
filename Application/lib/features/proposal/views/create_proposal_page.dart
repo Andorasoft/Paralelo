@@ -29,51 +29,54 @@ class CreateProposalPage extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return _CreateProposalPageState();
+    return CreateProposalPageState();
   }
 }
 
-class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
-  final scaffoldKey = GlobalKey<ScaffoldState>();
-  final formKey = GlobalKey<FormState>();
+class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _formKey = GlobalKey<FormState>();
 
-  final messageFieldController = TextEditingController();
-  final amountFieldController = TextEditingController();
-  final timeFieldController = NumberEditingController(value: 1);
+  final _messageFieldController = TextEditingController();
+  final _messageFieldFocusNode = FocusNode();
 
-  late Future<ProjectPayment?> loadDataFuture;
+  final _amountFieldController = TextEditingController();
+  final _amountFieldFocusNode = FocusNode();
 
-  final messageFieldFocusNode = FocusNode();
-  final amountFieldFocusNode = FocusNode();
-  final timeFieldFocusNode = FocusNode();
+  final _timeFieldController = NumberEditingController(value: 1);
+  final _timeFieldFocusNode = FocusNode();
 
-  List<String> modes = ['Remote', 'In-person', 'Hybrid'];
-  String selectedMode = 'Remote';
+  late final Future<ProjectPayment?> _loadDataFuture;
+
+  final _modes = ['Remote', 'In-person', 'Hybrid'];
+  String _selectedMode = 'Remote';
 
   @override
   void initState() {
     super.initState();
 
-    loadDataFuture = loadData();
+    _loadDataFuture = loadData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: scaffoldKey,
+      key: _scaffoldKey,
 
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: IconButton(
+
+        leading: IconButton(
           onPressed: () {
             ref.read(goRouterProvider).pop();
           },
-          icon: Icon(LucideIcons.x),
-        ).align(AlignmentGeometry.centerLeft),
+          icon: const Icon(LucideIcons.x),
+        ),
       ),
 
       body: FutureBuilder(
-        future: loadDataFuture,
+        future: _loadDataFuture,
+
         builder: (_, snapshot) {
           if (!snapshot.hasData) {
             return LoadingIndicator().center();
@@ -81,12 +84,13 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
 
           final payment = snapshot.data!;
 
-          if (amountFieldController.text.isEmpty) {
-            amountFieldController.text = '${((payment.max + payment.min) / 2)}';
+          if (_amountFieldController.text.isEmpty) {
+            _amountFieldController.text =
+                '${((payment.max + payment.min) / 2)}';
           }
 
           return Form(
-            key: formKey,
+            key: _formKey,
 
             child: ListView(
               children: [
@@ -102,8 +106,8 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                   'Mensaje al solicitante',
                 ).margin(const EdgeInsets.only(top: 16.0, bottom: 4.0)),
                 TextFormField(
-                  controller: messageFieldController,
-                  focusNode: messageFieldFocusNode,
+                  controller: _messageFieldController,
+                  focusNode: _messageFieldFocusNode,
 
                   minLines: 4,
                   maxLines: null,
@@ -121,16 +125,16 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   spacing: 8.0,
 
-                  children: modes
+                  children: _modes
                       .map(
                         (m) => ChoiceChip(
                           label: Text(m).center(),
                           showCheckmark: false,
                           backgroundColor: Colors.transparent,
-                          selected: selectedMode == m,
+                          selected: _selectedMode == m,
 
                           onSelected: (_) {
-                            setState(() => selectedMode = m);
+                            setState(() => _selectedMode = m);
                           },
                         ).expanded(),
                       )
@@ -142,8 +146,8 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                     'Monto total (USD)',
                   ).margin(const EdgeInsets.only(top: 16.0, bottom: 4.0)),
                   TextFormField(
-                    controller: amountFieldController,
-                    focusNode: amountFieldFocusNode,
+                    controller: _amountFieldController,
+                    focusNode: _amountFieldFocusNode,
 
                     decoration: InputDecoration(
                       prefixIcon: Icon(LucideIcons.dollarSign),
@@ -156,8 +160,8 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                     'Tarifa por hora (USD)',
                   ).margin(const EdgeInsets.only(top: 16.0, bottom: 4.0)),
                   TextFormField(
-                    controller: amountFieldController,
-                    focusNode: amountFieldFocusNode,
+                    controller: _amountFieldController,
+                    focusNode: _amountFieldFocusNode,
 
                     decoration: InputDecoration(
                       prefixIcon: Icon(LucideIcons.dollarSign),
@@ -171,8 +175,8 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                   'Tiempo estimado de entrega',
                 ).margin(const EdgeInsets.only(top: 16.0, bottom: 4.0)),
                 NumberInputFormField(
-                  controller: timeFieldController,
-                  focusNode: timeFieldFocusNode,
+                  controller: _timeFieldController,
+                  focusNode: _timeFieldFocusNode,
                   validator: (num? value) {
                     if (value == null) {
                       return 'Por favor, ingresa un número válido';
@@ -198,35 +202,23 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
       ),
 
       bottomNavigationBar: FutureBuilder(
-        future: loadData(),
+        future: _loadDataFuture,
+
         builder: (_, snapshot) {
-          return Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            spacing: 16.0,
+          return FilledButton(
+            onPressed: snapshot.hasData
+                ? () async {
+                    final error = await createProposal();
 
-            children: [
-              OutlinedButton(
-                onPressed: snapshot.hasData ? () {} : null,
-                child: Text('Cancelar'),
-              ).expanded(),
-              FilledButton(
-                onPressed: snapshot.hasData
-                    ? () async {
-                        final error = await createProposal();
-
-                        if (error == null) {
-                          ref.read(goRouterProvider).pop();
-                        } else {
-                          showSnackbar(context, error);
-                        }
-                      }
-                    : null,
-                child: Text('Aplicar'),
-              ).expanded(),
-            ],
-          ).margin(const EdgeInsets.symmetric(horizontal: 16.0)).useSafeArea();
+                    if (error == null) {
+                      ref.read(goRouterProvider).pop();
+                    } else {
+                      showSnackbar(context, error);
+                    }
+                  }
+                : null,
+            child: const Text('Aplicar'),
+          ).margin(const EdgeInsets.all(16.0)).useSafeArea();
         },
       ),
     ).hideKeyboardOnTap(context);
@@ -249,8 +241,8 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
       final proposal = await ref
           .read(proposalProvider)
           .create(
-            message: messageFieldController.text,
-            mode: selectedMode,
+            message: _messageFieldController.text,
+            mode: _selectedMode,
             status: 'PENDING',
             providerId: widget.project.ownerId,
             projectId: widget.project.id,
