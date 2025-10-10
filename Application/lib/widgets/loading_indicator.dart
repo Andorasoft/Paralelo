@@ -5,8 +5,9 @@ import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 
 class LoadingIndicator extends ConsumerWidget {
   final String? message;
+  final bool showMessage;
 
-  const LoadingIndicator({super.key, this.message});
+  const LoadingIndicator({super.key, this.message, this.showMessage = true});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -18,7 +19,8 @@ class LoadingIndicator extends ConsumerWidget {
 
       children: [
         CircularProgressIndicator.adaptive().center(),
-        Text(message ?? 'Cargando...', textAlign: TextAlign.center),
+        if (showMessage)
+          Text(message ?? 'Cargando...', textAlign: TextAlign.center),
       ],
     );
   }

@@ -3,6 +3,7 @@ import './chat_room.dart';
 
 abstract class ChatRoomRepository {
   Future<List<ChatRoom>> getForUser(String userId);
+  Future<ChatRoom?> getById(String id);
   Future<ChatRoom> create({
     required String user1Id,
     required String user2Id,
@@ -23,6 +24,17 @@ class SupabaseChatRoomRepository implements ChatRoomRepository {
         .or('user1_id.eq.$userId,user2_id.eq.$userId');
 
     return data.map((i) => _fromMap(i)).toList();
+  }
+
+  @override
+  Future<ChatRoom?> getById(String id) async {
+    final data = await _client
+        .from('chat_room')
+        .select()
+        .eq('id', id)
+        .maybeSingle();
+
+    return data != null ? _fromMap(data) : null;
   }
 
   @override

@@ -20,6 +20,10 @@ class _ChatRoomProvider {
     return _repo.getForUser(userId);
   }
 
+  Future<ChatRoom?> getById(String id) {
+    return _repo.getById(id);
+  }
+
   Future<ChatRoom> create({
     required String user1Id,
     required String user2Id,

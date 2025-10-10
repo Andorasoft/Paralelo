@@ -21,7 +21,13 @@ class SupabaseProposalRepository implements ProposalRepository {
 
   @override
   Future<Proposal?> getById(int id) async {
-    return null;
+    final data = await _client
+        .from('proposal')
+        .select()
+        .eq('id', id)
+        .maybeSingle();
+
+    return data != null ? _fromMap(data) : null;
   }
 
   @override

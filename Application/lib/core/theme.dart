@@ -159,6 +159,8 @@ extension AppThemeData on ThemeData {
       systemOverlayStyle: SystemUiOverlayStyle.dark.copyWith(
         statusBarColor: Colors.transparent,
       ),
+
+      centerTitle: false,
     ),
 
     bottomSheetTheme: BottomSheetThemeData(
