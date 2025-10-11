@@ -5,7 +5,7 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/features/projects/views/project_details_page.dart';
 import 'package:paralelo/features/proposal/views/create_proposal_page.dart';
-import 'package:paralelo/features/projects/widgets/project_report_button.dart';
+import 'package:paralelo/features/reports/widgets/project_report_button.dart';
 import 'package:paralelo/features/projects/models/project.dart';
 import 'package:paralelo/core/router.dart';
 
@@ -121,7 +121,7 @@ class ProjectCard extends ConsumerWidget {
 
           Divider().margin(EdgeInsets.symmetric(vertical: 4.0)),
 
-          ProjectReportButton().center(),
+          ReportProjectButton().center(),
         ],
       ).margin(const EdgeInsets.all(16.0)),
     );

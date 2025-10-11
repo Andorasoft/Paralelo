@@ -4,16 +4,16 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 
-class ProjectReportButton extends ConsumerStatefulWidget {
-  const ProjectReportButton({super.key});
+class ReportProjectButton extends ConsumerStatefulWidget {
+  const ReportProjectButton({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return ProjectReportButtonState();
+    return ReportProjectButtonState();
   }
 }
 
-class ProjectReportButtonState extends ConsumerState<ProjectReportButton> {
+class ReportProjectButtonState extends ConsumerState<ReportProjectButton> {
   final _options = [
     {
       'title': 'Contenido inapropiado',

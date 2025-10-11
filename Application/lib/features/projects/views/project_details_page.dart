@@ -8,7 +8,7 @@ import 'package:paralelo/features/skills/controllers/project_skill_provider.dart
 import 'package:paralelo/features/projects/models/project.dart';
 import 'package:paralelo/features/projects/models/project_payment.dart';
 import 'package:paralelo/features/skills/models/project_skill.dart';
-import 'package:paralelo/features/projects/widgets/project_report_button.dart';
+import 'package:paralelo/features/reports/widgets/project_report_button.dart';
 import 'package:paralelo/features/proposal/views/create_proposal_page.dart';
 import 'package:paralelo/features/user/controllers/app_user_provider.dart';
 import 'package:paralelo/features/user/models/app_user.dart';
@@ -126,7 +126,7 @@ class ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
                                 .map((s) => Chip(label: Text(s.skill!.name)))
                                 .toList(),
                           ),
-                          const ProjectReportButton().center().margin(
+                          const ReportProjectButton().center().margin(
                             const EdgeInsets.only(top: 16.0),
                           ),
                         ],
