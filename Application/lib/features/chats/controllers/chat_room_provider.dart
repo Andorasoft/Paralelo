@@ -8,20 +8,23 @@ final chatRoomProvider = Provider((ref) {
   final client = Supabase.instance.client;
   final repo = SupabaseChatRoomRepository(client);
 
-  return _ChatRoomProvider(repo);
+  return ChatRoomProvider(repo);
 });
 
-class _ChatRoomProvider {
+class ChatRoomProvider {
   final ChatRoomRepository _repo;
 
-  const _ChatRoomProvider(this._repo);
+  const ChatRoomProvider(this._repo);
 
-  Future<List<ChatRoom>> getForUser(String userId) {
-    return _repo.getForUser(userId);
+  Future<List<ChatRoom>> getForUser(
+    String userId, {
+    bool includeRelations = false,
+  }) {
+    return _repo.getForUser(userId, includeRelations: includeRelations);
   }
 
-  Future<ChatRoom?> getById(String id) {
-    return _repo.getById(id);
+  Future<ChatRoom?> getById(String id, {bool includeRelations = false}) {
+    return _repo.getById(id, includeRelations: includeRelations);
   }
 
   Future<ChatRoom> create({

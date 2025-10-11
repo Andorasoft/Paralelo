@@ -40,4 +40,17 @@ class AppUser {
     this.universityId,
     this.deviceToken,
   });
+
+  factory AppUser.fromMap(Map<String, dynamic> map) {
+    return AppUser(
+      id: map['id'],
+      createdAt: DateTime.parse(map['created_at']),
+      firstName: map['first_name'],
+      lastName: map['last_name'],
+      email: map['email'],
+      pictureUrl: map['picture_url'],
+      universityId: map['university_id'],
+      deviceToken: map['device_token'],
+    );
+  }
 }

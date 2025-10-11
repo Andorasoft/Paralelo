@@ -27,7 +27,7 @@ class SupabaseAppUserRepository implements AppUserRepository {
         .eq('id', id)
         .maybeSingle();
 
-    return data != null ? _fromMap(data) : null;
+    return data != null ? AppUser.fromMap(data) : null;
   }
 
   @override
@@ -60,19 +60,6 @@ class SupabaseAppUserRepository implements AppUserRepository {
         .select()
         .maybeSingle();
 
-    return data != null ? _fromMap(data) : null;
-  }
-
-  AppUser _fromMap(Map<String, dynamic> map) {
-    return AppUser(
-      id: map['id'],
-      createdAt: DateTime.parse(map['created_at']),
-      firstName: map['first_name'],
-      lastName: map['last_name'],
-      email: map['email'],
-      pictureUrl: map['picture_url'],
-      universityId: map['university_id'],
-      deviceToken: map['device_token'],
-    );
+    return data != null ? AppUser.fromMap(data) : null;
   }
 }

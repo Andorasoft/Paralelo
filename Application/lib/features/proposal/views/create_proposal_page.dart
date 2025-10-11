@@ -55,7 +55,7 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
   void initState() {
     super.initState();
 
-    _loadDataFuture = loadData();
+    _loadDataFuture = _loadData();
   }
 
   @override
@@ -197,7 +197,7 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                 ),
               ],
             ),
-          ).margin(const EdgeInsets.symmetric(horizontal: 16.0));
+          ).margin(const EdgeInsets.symmetric(horizontal: 8.0));
         },
       ),
 
@@ -208,7 +208,7 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
           return FilledButton(
             onPressed: snapshot.hasData
                 ? () async {
-                    final error = await createProposal();
+                    final error = await _createProposal();
 
                     if (error == null) {
                       ref.read(goRouterProvider).pop();
@@ -218,21 +218,25 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                   }
                 : null,
             child: const Text('Aplicar'),
-          ).margin(const EdgeInsets.all(16.0)).useSafeArea();
+          ).margin(const EdgeInsets.all(8.0)).useSafeArea();
         },
       ),
     ).hideKeyboardOnTap(context);
   }
 
-  Future<ProjectPayment?> loadData() {
+  Future<ProjectPayment> _loadData() async {
     if (widget.projectPayment != null) {
       return Future.value(widget.projectPayment);
     }
 
-    return ref.read(projectPaymentProvider).getByProject(widget.project.id);
+    final payment = await ref
+        .read(projectPaymentProvider)
+        .getByProject(widget.project.id);
+
+    return payment!;
   }
 
-  Future<String?> createProposal() async {
+  Future<String?> _createProposal() async {
     String? error;
 
     try {

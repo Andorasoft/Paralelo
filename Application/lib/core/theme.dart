@@ -138,6 +138,9 @@ extension AppThemeData on ThemeData {
       hintStyle: WidgetStateProperty.all(
         TextStyle(fontSize: 16.0, color: Colors.grey.shade600),
       ),
+      padding: WidgetStateProperty.all(
+        const EdgeInsets.symmetric(horizontal: 12.0),
+      ),
 
       elevation: WidgetStateProperty.all(0.0),
     ),

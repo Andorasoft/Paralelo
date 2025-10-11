@@ -15,17 +15,11 @@ class Skill {
   const Skill({required this.id, required this.createdAt, required this.name});
 
   /// Builds a [Skill] object from a database map.
-  factory Skill.fromMap(Map<String, dynamic> map) => Skill(
-    id: map['id'],
-    createdAt: DateTime.parse(map['created_at']),
-    name: map['name'],
-  );
-
-  /// Converts the [Skill] object into a map
-  /// suitable for database storage or JSON encoding.
-  Map<String, dynamic> toMap() => {
-    'id': id,
-    'created_at': createdAt.toIso8601String(),
-    'name': name,
-  };
+  factory Skill.fromMap(Map<String, dynamic> map) {
+    return Skill(
+      id: map['id'],
+      createdAt: DateTime.parse(map['created_at']),
+      name: map['name'],
+    );
+  }
 }

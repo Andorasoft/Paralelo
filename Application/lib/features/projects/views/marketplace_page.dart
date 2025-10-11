@@ -26,7 +26,7 @@ class MarketplacePage extends ConsumerStatefulWidget {
 class MarketplacePageState extends ConsumerState<MarketplacePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  late final Future<List<Project>> _loadDataFuture;
+  late final Future<dynamic> _loadDataFuture;
   String _searchQuery = '';
 
   @override
@@ -46,7 +46,7 @@ class MarketplacePageState extends ConsumerState<MarketplacePage> {
         toolbarHeight: 8.0,
 
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(48.0),
+          preferredSize: const Size.fromHeight(48.0),
 
           child: Row(
             spacing: 8.0,
@@ -64,10 +64,10 @@ class MarketplacePageState extends ConsumerState<MarketplacePage> {
                 leading: const Icon(LucideIcons.search),
                 hintText: 'Buscar proyectos...',
               ).size(height: 44.0).expanded(),
-              ProjectSortButton(),
-              ProjectFilterButton(),
+              const ProjectSortButton(),
+              const ProjectFilterButton(),
             ],
-          ).margin(const EdgeInsets.symmetric(horizontal: 16.0)),
+          ).margin(const EdgeInsets.symmetric(horizontal: 8.0)),
         ),
       ),
 
@@ -75,10 +75,10 @@ class MarketplacePageState extends ConsumerState<MarketplacePage> {
         future: _loadDataFuture,
         builder: (_, snapshot) {
           if (!snapshot.hasData) {
-            return LoadingIndicator().center();
+            return const LoadingIndicator().center();
           }
 
-          final projects = snapshot.data!
+          final projects = (snapshot.data! as List<Project>)
               .where(
                 (p) => p.title.toLowerCase().contains(
                   _searchQuery.trim().toLowerCase(),
@@ -104,22 +104,22 @@ class MarketplacePageState extends ConsumerState<MarketplacePage> {
                 children: [
                   IconButton.filledTonal(
                     onPressed: null,
-                    icon: Icon(LucideIcons.chevronLeft),
+                    icon: const Icon(LucideIcons.chevronLeft),
                   ),
                   IconButton.filledTonal(
                     onPressed: () {},
-                    icon: Icon(LucideIcons.chevronRight),
+                    icon: const Icon(LucideIcons.chevronRight),
                   ),
                 ],
               ).margin(const EdgeInsets.symmetric(vertical: 28.0)),
             ],
-          ).margin(const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0));
+          ).margin(const EdgeInsets.all(8.0));
         },
       ),
     ).hideKeyboardOnTap(context);
   }
 
-  Future<List<Project>> loadData() async {
+  Future<dynamic> loadData() async {
     final user = ref.read(authProvider)!;
     return await ref.read(projectProvider).getAll(user.id);
   }

@@ -1,3 +1,6 @@
+import 'package:paralelo/features/projects/models/project.dart';
+import 'package:paralelo/features/user/models/app_user.dart';
+
 /// Represents a `proposal` entity from the database.
 ///
 /// Stores details of a proposal submitted by a provider to a project.
@@ -29,6 +32,11 @@ class Proposal {
   /// Identifier of the related project.
   final int projectId;
 
+  final AppUser? provider;
+
+  /// The [Project] object associated with this relation.
+  final Project? project;
+
   /// Creates an immutable [Proposal] instance.
   const Proposal({
     required this.id,
@@ -40,5 +48,27 @@ class Proposal {
     required this.status,
     required this.providerId,
     required this.projectId,
+    this.provider,
+    this.project,
   });
+
+  /// Builds a [Proposal] object from a database map.
+  factory Proposal.fromMap(Map<String, dynamic> map) {
+    return Proposal(
+      id: map['id'],
+      createdAt: DateTime.parse(map['created_at']),
+      message: map['message'],
+      mode: map['mode'],
+      amount: map['amount'],
+      hourlyRate: map['hourly_rate'],
+      status: map['status'],
+
+      providerId: map['provider_id'],
+      projectId: map['project_id'],
+      provider: map['provider'] != null
+          ? AppUser.fromMap(map['provider'])
+          : null,
+      project: map['project'] != null ? Project.fromMap(map['project']) : null,
+    );
+  }
 }

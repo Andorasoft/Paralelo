@@ -7,6 +7,10 @@ import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
 import 'package:paralelo/features/chats/controllers/chat_room_provider.dart';
 import 'package:paralelo/features/chats/models/chat_room.dart';
 import 'package:paralelo/features/chats/views/chat_room_page.dart';
+import 'package:paralelo/features/chats/widgets/chat_tile.dart';
+import 'package:paralelo/features/projects/controllers/project_provider.dart';
+import 'package:paralelo/features/projects/models/project.dart';
+import 'package:paralelo/utils/formatters.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/core/router.dart';
 
@@ -18,109 +22,128 @@ class ChatsPage extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return _ChatsPageState();
+    return ChatsPageState();
   }
 }
 
-class _ChatsPageState extends ConsumerState<ChatsPage> {
-  final scaffoldKey = GlobalKey<ScaffoldState>();
+class ChatsPageState extends ConsumerState<ChatsPage> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  final tabs = ['Todos', 'No leídos', 'Proyectos en curso'];
+  late final Future<dynamic> _loadDataFuture;
 
-  String selectedTab = 'Todos';
+  final _tabs = ['Todos', 'No leídos', 'Proyectos en curso'];
+
+  String _selectedTab = 'Todos';
+
+  @override
+  void initState() {
+    super.initState();
+
+    _loadDataFuture = _loadData();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: scaffoldKey,
+      key: _scaffoldKey,
 
-      appBar: AppBar(title: Text('Chats').align(AlignmentGeometry.centerLeft)),
+      appBar: AppBar(title: const Text('Chats')),
 
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: 8.0,
+      body: FutureBuilder(
+        future: _loadDataFuture,
+        builder: (_, snapshot) {
+          if (!snapshot.hasData) {
+            return const LoadingIndicator().center();
+          }
 
-        children: [
-          SearchBar(
-            padding: WidgetStateProperty.all(
-              const EdgeInsets.symmetric(horizontal: 12.0),
-            ),
+          final map = snapshot.data as List<Map<String, dynamic>>;
 
-            onSubmitted: (query) {},
+          return ListView(
+            scrollDirection: Axis.vertical,
 
-            leading: const Icon(LucideIcons.search),
-            hintText: 'Buscar conversaciones...',
-          ).size(height: 44.0),
-          ListView(
-            scrollDirection: Axis.horizontal,
+            children: [
+              SearchBar(
+                onSubmitted: (query) {},
 
-            children: tabs
-                .map(
-                  (t) => ChoiceChip(
-                    selected: selectedTab == t,
-                    showCheckmark: false,
-                    padding: EdgeInsets.zero,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadiusGeometry.circular(100.0),
-                    ),
+                leading: const Icon(LucideIcons.search),
+                hintText: 'Buscar conversaciones...',
+              ).size(height: 44.0),
+              Row(
+                spacing: 8.0,
 
-                    onSelected: (selected) {
-                      if (selected) safeSetState(() => selectedTab = t);
-                    },
-                    label: Text(t),
-                  ),
-                )
-                .divide(const SizedBox(width: 8.0)),
-          ).size(height: 36.0),
-          FutureBuilder(
-            future: loadData(),
-            builder: (_, snapshot) {
-              if (!snapshot.hasData) {
-                return LoadingIndicator();
-              }
-
-              final rooms = snapshot.data!;
-
-              return Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                spacing: 4.0,
-
-                children: rooms
+                children: _tabs
                     .map(
-                      (r) => InkWell(
-                        onTap: () async {
-                          final user = ref.read(authProvider)!;
+                      (t) => ChoiceChip(
+                        selected: _selectedTab == t,
 
-                          await ref
-                              .read(goRouterProvider)
-                              .push(
-                                ChatRoomPage.routePath,
-                                extra: {
-                                  'room_id': r.id,
-                                  'recipient_id': user.id == r.user1Id
-                                      ? r.user2Id
-                                      : r.user1Id,
-                                },
-                              );
+                        showCheckmark: false,
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadiusGeometry.circular(100.0),
+                        ),
+
+                        onSelected: (selected) {
+                          if (selected) {
+                            safeSetState(() => _selectedTab = t);
+                          }
                         },
-
-                        child: Text(r.createdAt.toIso8601String()),
+                        label: Text(t),
                       ),
                     )
                     .toList(),
-              );
-            },
-          ),
-        ],
-      ).margin(const EdgeInsets.symmetric(horizontal: 16.0)),
+              ).margin(const EdgeInsets.symmetric(vertical: 4.0)),
+              ...map
+                  .map((m) {
+                    final chat = m['chat'] as ChatRoom;
+                    final project = m['project'] as Project;
+                    final user = chat.user1Id == ref.read(authProvider)!.id
+                        ? chat.user2
+                        : chat.user1;
+
+                    return ChatTile(
+                      onTap: () async {
+                        await ref
+                            .read(goRouterProvider)
+                            .push(
+                              ChatRoomPage.routePath,
+                              extra: {
+                                'room_id': chat.id,
+                                'recipient_id': user.id,
+                              },
+                            );
+                      },
+                      title: '${user!.firstName} ${user.lastName}'.obscure(),
+                      subtitle: project.title,
+                    );
+                  })
+                  .divide(const Divider(height: 9.0)),
+            ],
+          ).margin(const EdgeInsets.symmetric(horizontal: 8.0));
+        },
+      ),
     ).hideKeyboardOnTap(context);
   }
 
-  Future<List<ChatRoom>> loadData() {
-    return ref.read(chatRoomProvider).getForUser(ref.read(authProvider)!.id);
+  Future<dynamic> _loadData() async {
+    final userId = ref.read(authProvider)!.id;
+
+    final chats = await ref
+        .read(chatRoomProvider)
+        .getForUser(userId, includeRelations: true);
+
+    final results = await Future.wait(
+      chats.map((chat) async {
+        final projectId = chat.proposal?.projectId;
+        if (projectId == null) return null;
+
+        final project = await ref
+            .read(projectProvider)
+            .getById(projectId, includeRelations: true);
+
+        return {'chat': chat, 'project': project};
+      }),
+    );
+
+    return results.whereType<Map<String, dynamic>>().toList();
   }
 }

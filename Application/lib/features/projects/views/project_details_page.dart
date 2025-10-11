@@ -4,14 +4,16 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/features/projects/controllers/project_payment_provider.dart';
-import 'package:paralelo/features/projects/controllers/project_skill_provider.dart';
+import 'package:paralelo/features/skills/controllers/project_skill_provider.dart';
 import 'package:paralelo/features/projects/models/project.dart';
 import 'package:paralelo/features/projects/models/project_payment.dart';
-import 'package:paralelo/features/projects/models/project_skill.dart';
+import 'package:paralelo/features/skills/models/project_skill.dart';
 import 'package:paralelo/features/projects/widgets/project_report_button.dart';
 import 'package:paralelo/features/proposal/views/create_proposal_page.dart';
 import 'package:paralelo/features/user/controllers/app_user_provider.dart';
 import 'package:paralelo/features/user/models/app_user.dart';
+import 'package:paralelo/features/user/widgets/user_rating.dart';
+import 'package:paralelo/utils/formatters.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/core/router.dart';
 
@@ -25,42 +27,48 @@ class ProjectDetailsPage extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return _ProjectDetailsPageState();
+    return ProjectDetailsPageState();
   }
 }
 
-class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
-  late Future<(Project, ProjectPayment, List<ProjectSkill>, AppUser)>
-  loadDataFuture;
+class ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  late final Future<dynamic> _loadDataFuture;
 
   @override
   void initState() {
     super.initState();
 
-    loadDataFuture = _loadData();
+    _loadDataFuture = _loadData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: IconButton(
+
+        leading: IconButton(
           onPressed: () {
             ref.read(goRouterProvider).pop();
           },
-          icon: Icon(LucideIcons.chevronLeft),
-        ).align(AlignmentGeometry.centerLeft),
+          icon: const Icon(LucideIcons.chevronLeft),
+        ),
       ),
 
       body: FutureBuilder(
-        future: loadDataFuture,
+        future: _loadDataFuture,
         builder: (_, snapshot) {
           if (!snapshot.hasData) {
-            return LoadingIndicator();
+            return const LoadingIndicator().center();
           }
 
-          final (project, projectPayment, projectSkills, user) = snapshot.data!;
+          final (project, projectPayment, skills, user) =
+              snapshot.data!
+                  as (Project, ProjectPayment, List<ProjectSkill>, AppUser);
 
           return ListView(
             children: [
@@ -72,58 +80,108 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
               ),
               Text('Publicado en ${project.createdAt.toLongDateString()}'),
 
-              Card(
-                elevation: 0.0,
-                margin: const EdgeInsets.symmetric(vertical: 24.0),
-                color: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(
-                    width: 1.0,
-                    color: Theme.of(context).colorScheme.primaryContainer,
+              Theme(
+                data: Theme.of(context).copyWith(
+                  cardTheme: CardThemeData(
+                    elevation: 0.0,
+                    color: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 1.0,
+                        color: Theme.of(context).colorScheme.primaryContainer,
+                      ),
+                      borderRadius: BorderRadiusGeometry.circular(8.0),
+                    ),
                   ),
-                  borderRadius: BorderRadiusGeometry.circular(8.0),
                 ),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  spacing: 12.0,
+                  spacing: 16.0,
 
                   children: [
-                    Text(
-                      '${projectPayment.currency} ${projectPayment.min} - ${projectPayment.max}',
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.end,
-                    ),
-                    Text(project.description),
+                    Card(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        spacing: 4.0,
 
-                    Text(
-                      'Required skills',
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                        children: [
+                          Text(
+                            '${projectPayment.currency} ${projectPayment.min} - ${projectPayment.max}',
+                            style: Theme.of(context).textTheme.labelLarge
+                                ?.copyWith(fontWeight: FontWeight.w600),
+                            textAlign: TextAlign.end,
+                          ).margin(const EdgeInsets.only(bottom: 12.0)),
+                          Text(project.description),
+
+                          Text(
+                            'Habilidades necesarias',
+                            style: Theme.of(context).textTheme.labelLarge
+                                ?.copyWith(fontWeight: FontWeight.w600),
+                          ).margin(const EdgeInsets.only(top: 12.0)),
+                          Wrap(
+                            spacing: 8.0,
+
+                            children: skills
+                                .map((s) => Chip(label: Text(s.skill!.name)))
+                                .toList(),
+                          ),
+                          const ProjectReportButton().center().margin(
+                            const EdgeInsets.only(top: 16.0),
+                          ),
+                        ],
+                      ).margin(const EdgeInsets.all(16.0)),
                     ),
-                    Wrap(
-                      children: projectSkills
-                          .map((s) => Chip(label: Text(s.skillId.toString())))
-                          .toList(),
+                    Card(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        spacing: 12.0,
+
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(100.0),
+
+                            child: Image.network(
+                              user.pictureUrl!,
+                              width: 40.0,
+                              height: 40.0,
+                            ),
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+
+                            children: [
+                              Text(
+                                '${user.firstName} ${user.lastName}'.obscure(),
+                                style: Theme.of(context).textTheme.labelLarge
+                                    ?.copyWith(fontWeight: FontWeight.w600),
+                              ),
+                              Text(
+                                '11 proyectos completados',
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.outline,
+                                    ),
+                              ),
+                            ],
+                          ).expanded(),
+                          UserRating(rating: 4.5),
+                        ],
+                      ).margin(const EdgeInsets.all(16.0)),
                     ),
                   ],
-                ).margin(const EdgeInsets.all(16.0)),
-              ),
-
-              Column(children: [Text('${user.firstName} ${user.lastName}')]),
-
-              ProjectReportButton().center(),
+                ),
+              ).margin(const EdgeInsets.only(top: 16.0)),
             ],
-          ).margin(const EdgeInsets.symmetric(horizontal: 16.0));
+          ).margin(const EdgeInsets.symmetric(horizontal: 8.0));
         },
       ),
 
       bottomNavigationBar: FutureBuilder(
-        future: loadDataFuture,
+        future: _loadDataFuture,
         builder: (_, snapshot) {
           return FilledButton(
             onPressed: snapshot.hasData
@@ -136,32 +194,24 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
                         );
                   }
                 : null,
-            style: Theme.of(context).filledButtonTheme.style?.copyWith(
-              shape: WidgetStateProperty.all(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100),
-                ),
-              ),
-            ),
             child: const Text('Ofrecer ayuda'),
-          ).margin(const EdgeInsets.symmetric(horizontal: 16)).useSafeArea();
+          ).margin(const EdgeInsets.all(8.0)).useSafeArea();
         },
-      ).margin(const EdgeInsets.symmetric(horizontal: 16.0)).useSafeArea(),
+      ),
     );
   }
 
-  Future<(Project, ProjectPayment, List<ProjectSkill>, AppUser)>
-  _loadData() async {
-    final payment = (await ref
+  Future<dynamic> _loadData() async {
+    final payment = await ref
         .read(projectPaymentProvider)
-        .getByProject(widget.project.id))!;
-    final skills = (await ref
+        .getByProject(widget.project.id);
+    final skills = await ref
         .read(projectSkillProvider)
-        .getByProject(widget.project.id));
-    final owner = (await ref
+        .getByProject(widget.project.id, includeRelations: true);
+    final owner = await ref
         .read(appUserProvider)
-        .getById(widget.project.ownerId))!;
+        .getById(widget.project.ownerId);
 
-    return (widget.project, payment, skills, owner);
+    return (widget.project, payment!, skills, owner!);
   }
 }

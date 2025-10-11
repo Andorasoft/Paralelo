@@ -1,3 +1,5 @@
+import './skill.dart';
+
 /// Represents a `project_skill` entity from the database.
 ///
 /// Links a project to a required skill, forming a many-to-many
@@ -15,11 +17,26 @@ class ProjectSkill {
   /// Identifier of the linked skill.
   final int skillId;
 
+  /// The [Skill] object associated with this relation.
+  final Skill? skill;
+
   /// Creates an immutable [ProjectSkill] instance.
   const ProjectSkill({
     required this.id,
     required this.createdAt,
     required this.projectId,
     required this.skillId,
+    this.skill,
   });
+
+  /// Builds a [ProjectSkill] object from a database map.
+  factory ProjectSkill.fromMap(Map<String, dynamic> map) {
+    return ProjectSkill(
+      id: map['id'],
+      createdAt: DateTime.parse(map['created_at']),
+      projectId: map['project_id'],
+      skillId: map['skill_id'],
+      skill: map['skill'] != null ? Skill.fromMap(map['skill']) : null,
+    );
+  }
 }

@@ -16,8 +16,8 @@ class _ProposalProvider {
 
   const _ProposalProvider(this._repo);
 
-  Future<Proposal?> getById(int id) {
-    return _repo.getById(id);
+  Future<Proposal?> getById(int id, {bool includeRelations = false}) {
+    return _repo.getById(id, includeRelations: includeRelations);
   }
 
   Future<Proposal> create({

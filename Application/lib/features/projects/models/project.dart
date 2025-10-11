@@ -1,3 +1,5 @@
+import 'package:paralelo/features/user/models/app_user.dart';
+
 /// Represents a `project` entity from the database.
 ///
 /// Stores general information about a project, including
@@ -27,6 +29,9 @@ class Project {
   /// Identifier of the project owner (user).
   final String ownerId;
 
+  /// The [AppUser] object associated with this relation.
+  final AppUser? owner;
+
   /// Creates an immutable [Project] instance.
   const Project({
     required this.id,
@@ -37,5 +42,22 @@ class Project {
     required this.status,
     required this.category,
     required this.ownerId,
+    this.owner,
   });
+
+  /// Builds a [Project] object from a database map.
+  factory Project.fromMap(Map<String, dynamic> map) {
+    return Project(
+      id: map['id'],
+      createdAt: DateTime.parse(map['created_at']),
+      title: map['title'],
+      description: map['description'],
+      budget: map['budget'],
+      status: map['status'],
+      category: map['category'],
+
+      ownerId: map['owner_id'],
+      owner: map['owner'] != null ? AppUser.fromMap(map['owner']) : null,
+    );
+  }
 }

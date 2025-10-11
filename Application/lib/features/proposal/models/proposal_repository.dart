@@ -2,7 +2,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import './proposal.dart';
 
 abstract class ProposalRepository {
-  Future<Proposal?> getById(int id);
+  Future<Proposal?> getById(int id, {required bool includeRelations});
+
   Future<Proposal> create({
     required String message,
     required String mode,
@@ -20,14 +21,14 @@ class SupabaseProposalRepository implements ProposalRepository {
   const SupabaseProposalRepository(this._client);
 
   @override
-  Future<Proposal?> getById(int id) async {
+  Future<Proposal?> getById(int id, {required bool includeRelations}) async {
     final data = await _client
         .from('proposal')
-        .select()
+        .select(includeRelations ? '*, project(*)' : '*')
         .eq('id', id)
         .maybeSingle();
 
-    return data != null ? _fromMap(data) : null;
+    return data != null ? Proposal.fromMap(data) : null;
   }
 
   @override
@@ -54,21 +55,6 @@ class SupabaseProposalRepository implements ProposalRepository {
         .select()
         .single();
 
-    return _fromMap(data);
-  }
-
-  /// Builds a [Proposal] object from a database map.
-  Proposal _fromMap(Map<String, dynamic> map) {
-    return Proposal(
-      id: map['id'],
-      createdAt: DateTime.parse(map['created_at']),
-      message: map['message'],
-      mode: map['mode'],
-      amount: map['amount'],
-      hourlyRate: map['hourly_rate'],
-      status: map['status'],
-      providerId: map['provider_id'],
-      projectId: map['project_id'],
-    );
+    return Proposal.fromMap(data);
   }
 }

@@ -8,19 +8,19 @@ final projectProvider = Provider((ref) {
   final client = Supabase.instance.client;
   final repo = SupabaseProjectRepository(client);
 
-  return _ProjectProvider(repo);
+  return ProjectProvider(repo);
 });
 
-class _ProjectProvider {
+class ProjectProvider {
   final ProjectRepository _repo;
 
-  const _ProjectProvider(this._repo);
+  const ProjectProvider(this._repo);
 
-  Future<List<Project>> getAll(String userId, {int? universityId}) {
-    return _repo.getAll(userId, universityId: universityId);
+  Future<List<Project>> getAll(String userId, {bool includeRelations = false}) {
+    return _repo.getAll(userId, includeRelations: includeRelations);
   }
 
-  Future<Project?> getById(int id) {
-    return _repo.getById(id);
+  Future<Project?> getById(int id, {bool includeRelations = false}) {
+    return _repo.getById(id, includeRelations: includeRelations);
   }
 }
