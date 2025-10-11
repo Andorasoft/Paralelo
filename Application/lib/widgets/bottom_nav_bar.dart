@@ -6,7 +6,7 @@ import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/features/user/controllers/app_user_provider.dart';
 import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
-import 'package:paralelo/features/calendar/views/calendar_page.dart';
+import 'package:paralelo/features/user/views/calendar_page.dart';
 import 'package:paralelo/features/chats/views/chats_page.dart';
 import 'package:paralelo/features/home/views/home_page.dart';
 import 'package:paralelo/features/projects/views/create_project_page.dart';
@@ -90,9 +90,9 @@ class _BottomNavBarState extends ConsumerState<BottomNavBar> {
             page: const ChatsPage(),
           ),
           BottomNavBarItem(
-            label: 'Agenda',
-            icon: Icon(TablerIcons.calendar_week, size: 28.0),
-            page: const CalendarPage(),
+            label: 'Mi cuenta',
+            icon: Icon(TablerIcons.user_circle, size: 28.0),
+            page: const ProfilePage(),
           ),
         ],
       ),
