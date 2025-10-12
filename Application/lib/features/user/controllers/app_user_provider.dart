@@ -8,13 +8,13 @@ final appUserProvider = Provider((ref) {
   final client = Supabase.instance.client;
   final repo = SupabaseAppUserRepository(client);
 
-  return _AppUserProvider(repo);
+  return AppUserProvider(repo);
 });
 
-class _AppUserProvider {
+class AppUserProvider {
   final AppUserRepository _repo;
 
-  const _AppUserProvider(this._repo);
+  const AppUserProvider(this._repo);
 
   Future<AppUser?> getById(String id) {
     return _repo.getById(id);

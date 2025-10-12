@@ -3,6 +3,7 @@ import './app_user.dart';
 
 abstract class AppUserRepository {
   Future<AppUser?> getById(String id);
+  
   Future<AppUser?> update(
     String id, {
     String? firstName,

@@ -79,6 +79,12 @@ class FCMService {
     return settings.authorizationStatus == AuthorizationStatus.authorized;
   }
 
+  Future<bool> checkPermission() async {
+    final settings = await _messaging.getNotificationSettings();
+
+    return settings.authorizationStatus == AuthorizationStatus.authorized;
+  }
+
   /// Retrieves the current device FCM token.
   ///
   /// Returns the token as a [String], or `null` if there was an error.

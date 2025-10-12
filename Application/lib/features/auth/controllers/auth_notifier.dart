@@ -8,13 +8,13 @@ final authProvider = StateNotifierProvider((ref) {
   final client = Supabase.instance.client;
   final repo = SupabaseAuthRepository(client);
 
-  return _AuthNotifier(repo);
+  return AuthNotifier(repo);
 });
 
-class _AuthNotifier extends StateNotifier<AuthUser?> {
+class AuthNotifier extends StateNotifier<AuthUser?> {
   final AuthRepository _repository;
 
-  _AuthNotifier(this._repository) : super(null) {
+  AuthNotifier(this._repository) : super(null) {
     _repository.currentUser().then((value) => state = value);
   }
 
@@ -23,7 +23,7 @@ class _AuthNotifier extends StateNotifier<AuthUser?> {
     String? password,
     String provider = 'email',
   }) async {
-    assert(['email', 'microsoft'].contains(provider), '');
+    assert(['email', 'microsoft'].contains(provider));
 
     switch (provider) {
       case 'email':

@@ -2,6 +2,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import './proposal.dart';
 
 abstract class ProposalRepository {
+  Future<bool> applied(int projectId);
+
   Future<Proposal?> getById(int id, {required bool includeRelations});
 
   Future<Proposal> create({
@@ -19,6 +21,18 @@ class SupabaseProposalRepository implements ProposalRepository {
   final SupabaseClient _client;
 
   const SupabaseProposalRepository(this._client);
+
+  @override
+  Future<bool> applied(int projectId) async {
+    final data = await _client
+        .from('proposal')
+        .select('id')
+        .eq('project_id', projectId)
+        .limit(1)
+        .maybeSingle();
+
+    return data != null;
+  }
 
   @override
   Future<Proposal?> getById(int id, {required bool includeRelations}) async {

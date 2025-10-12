@@ -12,8 +12,14 @@ import 'package:paralelo/core/router.dart';
 class ProjectCard extends ConsumerWidget {
   final Project project;
   final bool isPremium;
+  final bool applied;
 
-  const ProjectCard({super.key, required this.project, this.isPremium = false});
+  const ProjectCard({
+    super.key,
+    required this.project,
+    this.isPremium = false,
+    this.applied = false,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -101,11 +107,13 @@ class ProjectCard extends ConsumerWidget {
           ),
 
           OutlinedButton(
-            onPressed: () async {
-              await ref
-                  .read(goRouterProvider)
-                  .push(CreateProposalPage.routePath, extra: project);
-            },
+            onPressed: !applied
+                ? () async {
+                    await ref
+                        .read(goRouterProvider)
+                        .push(CreateProposalPage.routePath, extra: project);
+                  }
+                : null,
             style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
               shape: WidgetStateProperty.all(
                 RoundedRectangleBorder(

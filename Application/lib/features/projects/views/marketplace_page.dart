@@ -9,6 +9,7 @@ import 'package:paralelo/features/projects/models/project.dart';
 import 'package:paralelo/features/projects/widgets/project_filter_button.dart';
 import 'package:paralelo/features/projects/widgets/project_card.dart';
 import 'package:paralelo/features/projects/widgets/project_sort_button.dart';
+import 'package:paralelo/features/proposal/controllers/proposal_provider.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 
 class MarketplacePage extends ConsumerStatefulWidget {
@@ -27,13 +28,12 @@ class MarketplacePageState extends ConsumerState<MarketplacePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   late final Future<dynamic> _loadDataFuture;
-  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
 
-    _loadDataFuture = loadData();
+    _loadDataFuture = _loadData();
   }
 
   @override
@@ -57,10 +57,6 @@ class MarketplacePageState extends ConsumerState<MarketplacePage> {
                   const EdgeInsets.symmetric(horizontal: 12.0),
                 ),
 
-                onSubmitted: (query) {
-                  safeSetState(() => _searchQuery = query);
-                },
-
                 leading: const Icon(LucideIcons.search),
                 hintText: 'Buscar proyectos...',
               ).size(height: 44.0).expanded(),
@@ -78,49 +74,37 @@ class MarketplacePageState extends ConsumerState<MarketplacePage> {
             return const LoadingIndicator().center();
           }
 
-          final projects = (snapshot.data! as List<Project>)
-              .where(
-                (p) => p.title.toLowerCase().contains(
-                  _searchQuery.trim().toLowerCase(),
-                ),
-              )
-              .toList();
+          final map = snapshot.data as List<Map<String, dynamic>>;
 
-          return ListView(
-            children: [
-              ...projects.map(
-                (p) => ProjectCard(
-                  project: p,
-                  isPremium: (projects.indexOf(p) % 2) == 0,
-                ),
-              ),
+          return ListView.builder(
+            itemCount: map.length,
 
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                spacing: 128.0,
-
-                children: [
-                  IconButton.filledTonal(
-                    onPressed: null,
-                    icon: const Icon(LucideIcons.chevronLeft),
-                  ),
-                  IconButton.filledTonal(
-                    onPressed: () {},
-                    icon: const Icon(LucideIcons.chevronRight),
-                  ),
-                ],
-              ).margin(const EdgeInsets.symmetric(vertical: 28.0)),
-            ],
+            itemBuilder: (_, i) {
+              return ProjectCard(
+                project: map[i]['project'] as Project,
+                isPremium: (i % 2) == 0,
+                applied: map[i]['applied'] as bool,
+              );
+            },
           ).margin(const EdgeInsets.all(8.0));
         },
       ),
     ).hideKeyboardOnTap(context);
   }
 
-  Future<dynamic> loadData() async {
-    final user = ref.read(authProvider)!;
-    return await ref.read(projectProvider).getAll(user.id);
+  Future<List<Map<String, dynamic>>> _loadData() async {
+    final result = <Map<String, dynamic>>[];
+
+    final userId = ref.read(authProvider)!.id;
+    final projects = await ref.read(projectProvider).getAll(userId);
+    final appliedList = await Future.wait(
+      projects.map((p) => ref.read(proposalProvider).applied(p.id)),
+    );
+
+    for (var i = 0; i < projects.length; i++) {
+      result.add({'project': projects[i], 'applied': appliedList[i]});
+    }
+
+    return result;
   }
 }
