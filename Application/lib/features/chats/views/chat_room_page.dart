@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
@@ -14,11 +13,11 @@ import 'package:paralelo/features/proposal/models/proposal.dart';
 import 'package:paralelo/features/user/controllers/app_user_provider.dart';
 import 'package:paralelo/core/providers.dart';
 import 'package:paralelo/core/services.dart';
-import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/user/models/app_user.dart';
 import 'package:paralelo/features/user/widgets/user_rating.dart';
 import 'package:paralelo/utils/formatters.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
+import 'package:paralelo/widgets/navigation_button.dart';
 
 class ChatRoomPage extends ConsumerStatefulWidget {
   static const routeName = 'ChatRoomPage';
@@ -80,21 +79,9 @@ class ChatRoomPageState extends ConsumerState<ChatRoomPage> {
               automaticallyImplyLeading: false,
               toolbarHeight: 64.0,
 
-              leading: IconButton(
-                onPressed: () {
-                  ref.read(goRouterProvider).pop();
-                },
-                icon: const Icon(LucideIcons.chevronLeft),
-              ),
-
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                children: [
-                  Text('${user.firstName} ${user.lastName}'.obscure()),
-                  UserRating(rating: 4.5),
-                ],
-              ),
+              leading: const NavigationButton(),
+              title: Text('${user.firstName} ${user.lastName}'.obscure()),
+              actions: const [UserRating(rating: 4.5)],
 
               bottom: PreferredSize(
                 preferredSize: Size.fromHeight(36.0),

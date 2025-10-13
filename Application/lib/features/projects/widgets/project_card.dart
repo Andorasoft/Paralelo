@@ -13,12 +13,16 @@ class ProjectCard extends ConsumerWidget {
   final Project project;
   final bool isPremium;
   final bool applied;
+  final bool showOffertHelpButton;
+  final bool showReportButton;
 
   const ProjectCard({
     super.key,
     required this.project,
     this.isPremium = false,
     this.applied = false,
+    this.showOffertHelpButton = true,
+    this.showReportButton = true,
   });
 
   @override
@@ -106,30 +110,33 @@ class ProjectCard extends ConsumerWidget {
             ),
           ),
 
-          OutlinedButton(
-            onPressed: !applied
-                ? () async {
-                    await ref
-                        .read(goRouterProvider)
-                        .push(CreateProposalPage.routePath, extra: project);
-                  }
-                : null,
-            style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
-              shape: WidgetStateProperty.all(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadiusGeometry.circular(100.0),
+          if (showOffertHelpButton)
+            OutlinedButton(
+              onPressed: !applied
+                  ? () async {
+                      await ref
+                          .read(goRouterProvider)
+                          .push(CreateProposalPage.routePath, extra: project);
+                    }
+                  : null,
+              style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
+                shape: WidgetStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadiusGeometry.circular(100.0),
+                  ),
                 ),
               ),
-            ),
-            child: Text(
-              'Ofrecer ayuda',
-              style: TextStyle(fontWeight: FontWeight.normal),
-            ),
-          ).center().margin(const EdgeInsets.only(top: 32.0)),
+              child: Text(
+                'Ofrecer ayuda',
+                style: TextStyle(fontWeight: FontWeight.normal),
+              ),
+            ).center().margin(const EdgeInsets.only(top: 32.0)),
 
-          Divider().margin(EdgeInsets.symmetric(vertical: 4.0)),
+          if (showReportButton) ...[
+            Divider().margin(EdgeInsets.symmetric(vertical: 4.0)),
 
-          ReportProjectButton().center(),
+            ReportProjectButton().center(),
+          ],
         ],
       ).margin(const EdgeInsets.all(16.0)),
     );

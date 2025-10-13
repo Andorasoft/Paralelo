@@ -10,6 +10,7 @@ import 'package:paralelo/features/projects/models/project.dart';
 import 'package:paralelo/features/chats/controllers/chat_room_provider.dart';
 import 'package:paralelo/features/proposal/controllers/proposal_provider.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
+import 'package:paralelo/widgets/navigation_button.dart';
 import 'package:paralelo/widgets/number_input_form_field.dart';
 import 'package:paralelo/core/services.dart';
 import 'package:paralelo/core/router.dart';
@@ -66,12 +67,7 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
 
-        leading: IconButton(
-          onPressed: () {
-            ref.read(goRouterProvider).pop();
-          },
-          icon: const Icon(LucideIcons.x),
-        ),
+        leading: const NavigationButton(type: NavigationButtonType.close),
       ),
 
       body: FutureBuilder(
@@ -79,7 +75,7 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
 
         builder: (_, snapshot) {
           if (!snapshot.hasData) {
-            return LoadingIndicator().center();
+            return const LoadingIndicator().center();
           }
 
           final payment = snapshot.data!;

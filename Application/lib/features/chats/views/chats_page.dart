@@ -29,7 +29,7 @@ class ChatsPage extends ConsumerStatefulWidget {
 class ChatsPageState extends ConsumerState<ChatsPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  late final Future<dynamic> _loadDataFuture;
+  late final Future<List<_ChatProjectRelation>> _loadDataFuture;
 
   final _tabs = ['Todos', 'No leídos', 'Proyectos en curso'];
 
@@ -47,27 +47,35 @@ class ChatsPageState extends ConsumerState<ChatsPage> {
     return Scaffold(
       key: _scaffoldKey,
 
-      appBar: AppBar(title: const Text('Chats')),
+      appBar: AppBar(
+        titleSpacing: 8.0,
+
+        title: const Text('Chats'),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(44.0),
+          child: SearchBar(
+            onSubmitted: (query) {},
+
+            leading: const Icon(LucideIcons.search),
+            hintText: 'Buscar conversaciones...',
+          ).size(height: 44.0).margin(const EdgeInsets.all(4.0)),
+        ),
+      ),
 
       body: FutureBuilder(
         future: _loadDataFuture,
+
         builder: (_, snapshot) {
           if (!snapshot.hasData) {
             return const LoadingIndicator().center();
           }
 
-          final map = snapshot.data as List<Map<String, dynamic>>;
+          final list = snapshot.data as List<_ChatProjectRelation>;
 
           return ListView(
             scrollDirection: Axis.vertical,
 
             children: [
-              SearchBar(
-                onSubmitted: (query) {},
-
-                leading: const Icon(LucideIcons.search),
-                hintText: 'Buscar conversaciones...',
-              ).size(height: 44.0),
               Row(
                 spacing: 8.0,
 
@@ -75,6 +83,11 @@ class ChatsPageState extends ConsumerState<ChatsPage> {
                     .map(
                       (t) => ChoiceChip(
                         selected: _selectedTab == t,
+                        onSelected: (selected) {
+                          if (selected) {
+                            safeSetState(() => _selectedTab = t);
+                          }
+                        },
 
                         showCheckmark: false,
                         padding: EdgeInsets.zero,
@@ -82,23 +95,16 @@ class ChatsPageState extends ConsumerState<ChatsPage> {
                           borderRadius: BorderRadiusGeometry.circular(100.0),
                         ),
 
-                        onSelected: (selected) {
-                          if (selected) {
-                            safeSetState(() => _selectedTab = t);
-                          }
-                        },
                         label: Text(t),
                       ),
                     )
                     .toList(),
-              ).margin(const EdgeInsets.symmetric(vertical: 4.0)),
-              ...map
-                  .map((m) {
-                    final chat = m['chat'] as ChatRoom;
-                    final project = m['project'] as Project;
-                    final user = chat.user1Id == ref.read(authProvider)!.id
-                        ? chat.user2
-                        : chat.user1;
+              ),
+              ...list
+                  .map((i) {
+                    final user = i.chat.user1Id == ref.read(authProvider)!.id
+                        ? i.chat.user2
+                        : i.chat.user1;
 
                     return ChatTile(
                       onTap: () async {
@@ -107,13 +113,13 @@ class ChatsPageState extends ConsumerState<ChatsPage> {
                             .push(
                               ChatRoomPage.routePath,
                               extra: {
-                                'room_id': chat.id,
+                                'room_id': i.chat.id,
                                 'recipient_id': user.id,
                               },
                             );
                       },
                       title: '${user!.firstName} ${user.lastName}'.obscure(),
-                      subtitle: project.title,
+                      subtitle: i.project.title,
                     );
                   })
                   .divide(const Divider(height: 9.0)),
@@ -124,7 +130,7 @@ class ChatsPageState extends ConsumerState<ChatsPage> {
     ).hideKeyboardOnTap(context);
   }
 
-  Future<dynamic> _loadData() async {
+  Future<List<_ChatProjectRelation>> _loadData() async {
     final userId = ref.read(authProvider)!.id;
 
     final chats = await ref
@@ -140,10 +146,19 @@ class ChatsPageState extends ConsumerState<ChatsPage> {
             .read(projectProvider)
             .getById(projectId, includeRelations: true);
 
-        return {'chat': chat, 'project': project};
+        if (project == null) return null;
+
+        return _ChatProjectRelation(chat, project);
       }),
     );
 
-    return results.whereType<Map<String, dynamic>>().toList();
+    return results.whereType<_ChatProjectRelation>().toList();
   }
+}
+
+class _ChatProjectRelation {
+  final ChatRoom chat;
+  final Project project;
+
+  const _ChatProjectRelation(this.chat, this.project);
 }

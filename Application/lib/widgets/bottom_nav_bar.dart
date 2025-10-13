@@ -14,35 +14,21 @@ import 'package:paralelo/features/projects/views/marketplace_page.dart';
 import 'package:paralelo/core/services.dart';
 import 'package:paralelo/core/router.dart';
 
-class BottomNavBar extends ConsumerStatefulWidget {
+class BottomNavBar extends ConsumerWidget {
   const BottomNavBar({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() {
-    return _BottomNavBarState();
-  }
-}
-
-class _BottomNavBarState extends ConsumerState<BottomNavBar> {
-  @override
-  void initState() {
-    super.initState();
-
+  Widget build(BuildContext context, WidgetRef ref) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final user = await ref
-          .read(appUserProvider)
-          .getById(ref.read(authProvider)!.id);
-
+      final userId = ref.read(authProvider)!.id;
+      final user = await ref.read(appUserProvider).getById(userId);
       final token = await FCMService.instance.getDeviceToken();
 
-      if (user!.deviceToken != token) {
-        await ref.read(appUserProvider).update(user.id, deviceToken: token);
-      }
-    });
-  }
+      if (user!.deviceToken == token) return;
 
-  @override
-  Widget build(BuildContext context) {
+      await ref.read(appUserProvider).update(user.id, deviceToken: token);
+    });
+
     return Theme(
       data: Theme.of(
         context,
@@ -97,11 +83,5 @@ class _BottomNavBarState extends ConsumerState<BottomNavBar> {
         ],
       ),
     );
-  }
-
-  void loadData(WidgetRef ref, String token) async {
-    await ref
-        .read(appUserProvider)
-        .update(ref.read(authProvider)!.id, deviceToken: token);
   }
 }

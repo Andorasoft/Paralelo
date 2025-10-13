@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-class NumberInputFormField extends ConsumerStatefulWidget {
+class NumberInputFormField extends ConsumerWidget {
   final String? Function(num?)? validator;
-  final NumberEditingController? controller;
+  final NumberEditingController controller;
   final FocusNode? focusNode;
   final Widget? icon;
   final String? hintText;
@@ -14,7 +14,7 @@ class NumberInputFormField extends ConsumerStatefulWidget {
   const NumberInputFormField({
     super.key,
     this.validator,
-    this.controller,
+    required this.controller,
     this.focusNode,
     this.icon,
     this.hintText,
@@ -23,40 +23,17 @@ class NumberInputFormField extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() {
-    return NumerInputFormFieldState();
-  }
-}
-
-class NumerInputFormFieldState extends ConsumerState<NumberInputFormField> {
-  late final NumberEditingController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = widget.controller ?? NumberEditingController();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return TextFormField(
-      controller: _controller.textController,
-      focusNode: widget.focusNode,
+      controller: controller.textController,
+      focusNode: focusNode,
       validator: (value) {
-        final value = _controller.number;
-        return widget.validator?.call(value);
+        final value = controller.number;
+        return validator?.call(value);
       },
 
       decoration: InputDecoration(
-        prefixIcon: widget.icon,
+        prefixIcon: icon,
         suffixIcon: Theme(
           data: Theme.of(context).copyWith(
             elevatedButtonTheme: ElevatedButtonThemeData(
@@ -71,36 +48,35 @@ class NumerInputFormFieldState extends ConsumerState<NumberInputFormField> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
 
             children: [
               ElevatedButton(
                 onPressed: () {
-                  final current = _controller.number ?? 0;
-                  final min = widget.min;
+                  final current = controller.number ?? 0;
 
-                  _controller.number = (min != null && current <= min)
+                  controller.number =
+                      (min != null && current <= (min ?? double.minPositive))
                       ? min
                       : current - 1;
                 },
-                child: Icon(LucideIcons.minus),
+                child: const Icon(LucideIcons.minus),
               ),
               ElevatedButton(
                 onPressed: () {
-                  final current = _controller.number ?? 0;
-                  final max = widget.max;
+                  final current = controller.number ?? 0;
 
-                  _controller.number = (max != null && current >= max)
+                  controller.number =
+                      (max != null && current >= (max ?? double.maxFinite))
                       ? max
                       : current + 1;
                 },
-                child: Icon(LucideIcons.plus),
+                child: const Icon(LucideIcons.plus),
               ),
             ],
           ),
         ),
 
-        hintText: widget.hintText,
+        hintText: hintText,
       ),
 
       keyboardType: TextInputType.number,

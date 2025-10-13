@@ -7,6 +7,7 @@ import 'package:paralelo/features/auth/views/auth_page.dart';
 import 'package:paralelo/features/chats/views/chat_room_page.dart';
 import 'package:paralelo/features/projects/models/project.dart';
 import 'package:paralelo/features/projects/views/create_project_page.dart';
+import 'package:paralelo/features/projects/views/my_projects_page.dart';
 import 'package:paralelo/features/projects/views/project_details_page.dart';
 import 'package:paralelo/features/proposal/views/create_proposal_page.dart';
 import 'package:paralelo/widgets/bottom_nav_bar.dart';
@@ -41,6 +42,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: ProjectDetailsPage.routePath,
         builder: (_, state) =>
             ProjectDetailsPage(project: state.extra as Project),
+      ),
+      GoRoute(
+        path: MyProjectsPage.routePath,
+        builder: (_, _) => const MyProjectsPage(),
       ),
 
       GoRoute(

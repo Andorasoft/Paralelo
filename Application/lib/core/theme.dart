@@ -9,7 +9,7 @@ extension AppThemeData on ThemeData {
     applyElevationOverlayColor: false,
     useMaterial3: true,
 
-    textTheme: TextTheme(
+    textTheme: const TextTheme(
       labelSmall: TextStyle(fontSize: 10.0),
 
       labelMedium: TextStyle(fontSize: 12.0),
@@ -41,16 +41,18 @@ extension AppThemeData on ThemeData {
       displayLarge: TextStyle(fontSize: 58.0),
     ),
 
-    dividerTheme: DividerThemeData(color: const Color(0xFFE8ECF1)),
+    dividerTheme: const DividerThemeData(color: Color(0xFFE8ECF1)),
 
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
         shape: WidgetStateProperty.all(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
         ),
-        minimumSize: WidgetStateProperty.all(Size(double.minPositive, 44.0)),
+        minimumSize: WidgetStateProperty.all(
+          const Size(double.minPositive, 44.0),
+        ),
         textStyle: WidgetStateProperty.all(
-          TextStyle(fontWeight: FontWeight.w500, fontSize: 16.0),
+          const TextStyle(fontWeight: FontWeight.w500, fontSize: 16.0),
         ),
       ),
     ),
@@ -60,9 +62,11 @@ extension AppThemeData on ThemeData {
         shape: WidgetStateProperty.all(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
         ),
-        minimumSize: WidgetStateProperty.all(Size(double.minPositive, 44.0)),
+        minimumSize: WidgetStateProperty.all(
+          const Size(double.minPositive, 44.0),
+        ),
         textStyle: WidgetStateProperty.all(
-          TextStyle(fontWeight: FontWeight.w500, fontSize: 16.0),
+          const TextStyle(fontWeight: FontWeight.w500, fontSize: 16.0),
         ),
       ),
     ),
@@ -80,9 +84,11 @@ extension AppThemeData on ThemeData {
                 : Colors.black12,
           );
         }),
-        minimumSize: WidgetStateProperty.all(Size(double.minPositive, 44.0)),
+        minimumSize: WidgetStateProperty.all(
+          const Size(double.minPositive, 44.0),
+        ),
         textStyle: WidgetStateProperty.all(
-          TextStyle(fontWeight: FontWeight.w500, fontSize: 14.0),
+          const TextStyle(fontWeight: FontWeight.w500, fontSize: 14.0),
         ),
       ),
     ),
@@ -92,12 +98,14 @@ extension AppThemeData on ThemeData {
         shape: WidgetStateProperty.all(
           RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
         ),
-        minimumSize: WidgetStateProperty.all(Size(double.minPositive, 16.0)),
+        minimumSize: WidgetStateProperty.all(
+          const Size(double.minPositive, 16.0),
+        ),
         padding: WidgetStateProperty.all(
-          EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+          const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
         ),
         textStyle: WidgetStateProperty.all(
-          TextStyle(fontWeight: FontWeight.w500, fontSize: 14.0),
+          const TextStyle(fontWeight: FontWeight.w500, fontSize: 14.0),
         ),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
@@ -105,7 +113,7 @@ extension AppThemeData on ThemeData {
 
     iconButtonTheme: IconButtonThemeData(
       style: ButtonStyle(
-        minimumSize: WidgetStateProperty.all(Size(44.0, 44.0)),
+        minimumSize: WidgetStateProperty.all(const Size(44.0, 44.0)),
       ),
     ),
 
@@ -113,7 +121,7 @@ extension AppThemeData on ThemeData {
       isDense: true,
       alignLabelWithHint: false,
 
-      hintStyle: TextStyle(fontSize: 16.0, color: Colors.grey),
+      hintStyle: const TextStyle(fontSize: 16.0, color: Colors.grey),
 
       enabledBorder: OutlineInputBorder(
         borderSide: BorderSide(width: 1.0, color: Colors.grey.shade300),
@@ -145,16 +153,16 @@ extension AppThemeData on ThemeData {
       elevation: WidgetStateProperty.all(0.0),
     ),
 
-    chipTheme: ChipThemeData(
-      backgroundColor: const Color(0xFFf0f3f5),
+    chipTheme: const ChipThemeData(
+      backgroundColor: Color(0xFFf0f3f5),
       side: BorderSide.none,
 
       padding: EdgeInsets.symmetric(vertical: 8.0),
     ),
 
-    bottomAppBarTheme: BottomAppBarThemeData(color: const Color(0xFFFFFFFF)),
+    bottomAppBarTheme: const BottomAppBarThemeData(color: Color(0xFFFFFFFF)),
 
-    snackBarTheme: SnackBarThemeData(backgroundColor: const Color(0xFF44474F)),
+    snackBarTheme: const SnackBarThemeData(backgroundColor: Color(0xFF44474F)),
 
     appBarTheme: AppBarThemeData(
       backgroundColor: Colors.transparent,
@@ -163,10 +171,12 @@ extension AppThemeData on ThemeData {
         statusBarColor: Colors.transparent,
       ),
 
+      actionsPadding: const EdgeInsets.symmetric(horizontal: 8.0),
+      titleSpacing: 4.0,
       centerTitle: false,
     ),
 
-    bottomSheetTheme: BottomSheetThemeData(
+    bottomSheetTheme: const BottomSheetThemeData(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadiusGeometry.only(
           topLeft: Radius.circular(24.0),

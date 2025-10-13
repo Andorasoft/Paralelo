@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
+import 'package:paralelo/features/projects/views/my_projects_page.dart';
 import 'package:paralelo/features/settings/widgets/setting_option.dart';
 import 'package:paralelo/features/user/controllers/app_user_provider.dart';
 import 'package:paralelo/features/user/models/app_user.dart';
@@ -86,21 +88,25 @@ class SettingsPageState extends ConsumerState<SettingsPage> {
 
               children: [
                 Text(
-                  'Mi actividad',
+                  'Actividad',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.outline,
                   ),
                 ).margin(const EdgeInsets.only(left: 8.0)),
                 SettingOption.tile(
-                  onTap: () {},
+                  onTap: () async {
+                    await ref
+                        .read(goRouterProvider)
+                        .push(MyProjectsPage.routePath);
+                  },
 
-                  icon: const Icon(TablerIcons.user_circle),
+                  leading: const Icon(TablerIcons.user_circle),
                   title: 'Mis proyectos',
                 ),
                 SettingOption.tile(
                   onTap: () {},
 
-                  icon: const Icon(TablerIcons.user_circle),
+                  leading: const Icon(TablerIcons.user_circle),
                   title: 'Mis propuestas',
                 ),
               ],
@@ -120,7 +126,13 @@ class SettingsPageState extends ConsumerState<SettingsPage> {
                 SettingOption.tile(
                   onTap: () {},
 
-                  icon: const Icon(TablerIcons.globe_filled),
+                  leading: const Icon(TablerIcons.globe_filled),
+                  trailing: Text(
+                    'ES',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.grey.shade400,
+                    ),
+                  ),
                   title: 'Idioma',
                 ),
                 SettingOption.toggle(
@@ -138,7 +150,7 @@ class SettingsPageState extends ConsumerState<SettingsPage> {
                     ref.read(notifyNotifierProvider.notifier).setNotify(v);
                   },
 
-                  icon: const Icon(TablerIcons.bell_filled),
+                  leading: const Icon(TablerIcons.bell_filled),
                   title: 'Notificaciones',
                 ),
                 SettingOption.toggle(
@@ -149,7 +161,7 @@ class SettingsPageState extends ConsumerState<SettingsPage> {
                         .setTheme(v ? ThemeMode.dark : ThemeMode.light);
                   },
 
-                  icon: const Icon(TablerIcons.moon_filled),
+                  leading: const Icon(TablerIcons.moon_filled),
                   title: 'Modo oscuro',
                 ),
               ],
@@ -169,13 +181,13 @@ class SettingsPageState extends ConsumerState<SettingsPage> {
                 SettingOption.tile(
                   onTap: () {},
 
-                  icon: const Icon(TablerIcons.lock_filled),
+                  leading: const Icon(TablerIcons.lock_filled),
                   title: 'Cambiar contraseña',
                 ),
                 SettingOption.tile(
                   onTap: () {},
 
-                  icon: const Icon(TablerIcons.trash_filled),
+                  leading: const Icon(TablerIcons.trash_filled),
                   title: 'Eliminar mi cuenta',
                 ),
               ],
@@ -195,13 +207,13 @@ class SettingsPageState extends ConsumerState<SettingsPage> {
                 SettingOption.tile(
                   onTap: () {},
 
-                  icon: const Icon(TablerIcons.info_circle_filled),
+                  leading: const Icon(TablerIcons.info_circle_filled),
                   title: 'Centro de ayuda',
                 ),
                 SettingOption.tile(
                   onTap: () {},
 
-                  icon: const Icon(TablerIcons.message_filled),
+                  leading: const Icon(TablerIcons.message_filled),
                   title: 'Contáctanos',
                 ),
               ],

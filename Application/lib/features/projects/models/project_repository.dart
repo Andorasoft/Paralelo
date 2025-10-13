@@ -4,6 +4,11 @@ import './project.dart';
 abstract class ProjectRepository {
   Future<List<Project>> getAll(String userId, {required bool includeRelations});
 
+  Future<List<Project>> getForUser(
+    String userId, {
+    required bool includeRelations,
+  });
+
   Future<Project?> getById(int id, {required bool includeRelations});
 }
 
@@ -21,6 +26,19 @@ class SupabaseProjectRepository implements ProjectRepository {
         .from('project')
         .select(includeRelations ? '*, owner:app_user(*)' : '*')
         .neq('owner_id', userId);
+
+    return data.map((i) => Project.fromMap(i)).toList();
+  }
+
+  @override
+  Future<List<Project>> getForUser(
+    String userId, {
+    required bool includeRelations,
+  }) async {
+    final data = await _client
+        .from('project')
+        .select(includeRelations ? '*, owner:app_user(*)' : '*')
+        .eq('owner_id', userId);
 
     return data.map((i) => Project.fromMap(i)).toList();
   }

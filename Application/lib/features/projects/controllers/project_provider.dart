@@ -20,6 +20,13 @@ class ProjectProvider {
     return _repo.getAll(userId, includeRelations: includeRelations);
   }
 
+  Future<List<Project>> getForUser(
+    String userId, {
+    bool includeRelations = false,
+  }) {
+    return _repo.getForUser(userId, includeRelations: includeRelations);
+  }
+
   Future<Project?> getById(int id, {bool includeRelations = false}) {
     return _repo.getById(id, includeRelations: includeRelations);
   }

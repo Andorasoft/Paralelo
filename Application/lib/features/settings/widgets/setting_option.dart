@@ -6,7 +6,8 @@ class SettingOption extends ConsumerStatefulWidget {
   final void Function()? onTap;
   final void Function(bool)? onChanged;
 
-  final Widget? icon;
+  final Widget? leading;
+  final Widget? trailing;
 
   final String title;
   final bool value;
@@ -15,7 +16,8 @@ class SettingOption extends ConsumerStatefulWidget {
     super.key,
     required this.onTap,
     required this.title,
-    this.icon,
+    this.leading,
+    this.trailing,
   }) : onChanged = null,
        value = false;
 
@@ -24,7 +26,8 @@ class SettingOption extends ConsumerStatefulWidget {
     required this.onChanged,
     required this.title,
     required this.value,
-    this.icon,
+    this.leading,
+    this.trailing,
   }) : onTap = null;
 
   @override
@@ -48,7 +51,7 @@ class SettingOptionState extends ConsumerState<SettingOption> {
         borderRadius: BorderRadiusGeometry.circular(12.0),
       ),
 
-      leading: widget.icon != null
+      leading: widget.leading != null
           ? Container(
               padding: const EdgeInsets.all(4.0),
               width: 28.0,
@@ -65,23 +68,33 @@ class SettingOptionState extends ConsumerState<SettingOption> {
                     color: Theme.of(context).colorScheme.outline,
                   ),
                 ),
-                child: widget.icon!,
+                child: widget.leading!,
               ),
             )
           : null,
       title: Text(widget.title, style: Theme.of(context).textTheme.bodyMedium),
-      trailing: widget.onChanged != null
-          ? Switch.adaptive(
-              value: widget.value,
-              onChanged: (v) {
-                widget.onChanged?.call(v);
-              },
-            )
-          : Icon(
-              LucideIcons.chevronRight,
-              size: 20.0,
-              color: Colors.grey.shade400,
-            ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.end,
+        spacing: 4.0,
+
+        children: [
+          if (widget.trailing != null) widget.trailing!,
+
+          widget.onChanged != null
+              ? Switch.adaptive(
+                  value: widget.value,
+                  onChanged: (v) {
+                    widget.onChanged?.call(v);
+                  },
+                )
+              : Icon(
+                  LucideIcons.chevronRight,
+                  size: 20.0,
+                  color: Colors.grey.shade400,
+                ),
+        ],
+      ),
     );
   }
 }

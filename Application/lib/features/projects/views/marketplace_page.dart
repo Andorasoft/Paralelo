@@ -96,7 +96,9 @@ class MarketplacePageState extends ConsumerState<MarketplacePage> {
     final result = <Map<String, dynamic>>[];
 
     final userId = ref.read(authProvider)!.id;
-    final projects = await ref.read(projectProvider).getAll(userId);
+    final projects = await ref
+        .read(projectProvider)
+        .getAll(userId, includeRelations: true);
     final appliedList = await Future.wait(
       projects.map((p) => ref.read(proposalProvider).applied(p.id)),
     );
