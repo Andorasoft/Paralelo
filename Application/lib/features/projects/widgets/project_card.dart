@@ -1,5 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
@@ -7,26 +9,25 @@ import 'package:paralelo/features/projects/views/project_details_page.dart';
 import 'package:paralelo/features/proposal/views/create_proposal_page.dart';
 import 'package:paralelo/features/reports/widgets/project_report_button.dart';
 import 'package:paralelo/features/projects/models/project.dart';
+import 'package:paralelo/core/providers.dart';
 import 'package:paralelo/core/router.dart';
 
 class ProjectCard extends ConsumerWidget {
   final Project project;
   final bool isPremium;
   final bool applied;
-  final bool showOffertHelpButton;
-  final bool showReportButton;
 
   const ProjectCard({
     super.key,
     required this.project,
     this.isPremium = false,
     this.applied = false,
-    this.showOffertHelpButton = true,
-    this.showReportButton = true,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final userId = ref.read(authProvider)!.id;
+
     return Card(
       elevation: 0.0,
       color: Colors.transparent,
@@ -37,7 +38,7 @@ class ProjectCard extends ConsumerWidget {
               ? Theme.of(context).colorScheme.primary
               : Theme.of(context).colorScheme.primaryContainer,
         ),
-        borderRadius: BorderRadiusGeometry.circular(8.0),
+        borderRadius: BorderRadius.circular(8.0),
       ),
 
       child: Column(
@@ -54,7 +55,12 @@ class ProjectCard extends ConsumerWidget {
 
             children: [
               Text(
-                timeago.format(project.createdAt, locale: 'es').capitalize()!,
+                timeago
+                    .format(
+                      project.createdAt,
+                      locale: ref.read(localeNotifierProvider).languageCode,
+                    )
+                    .capitalize()!,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: Theme.of(context).colorScheme.outline,
                 ),
@@ -67,12 +73,12 @@ class ProjectCard extends ConsumerWidget {
                     Theme.of(context).colorScheme.primary,
                   ),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadiusGeometry.circular(100.0),
+                    borderRadius: BorderRadius.circular(100.0),
                   ),
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.zero,
                   label: Text(
-                    'Secure payment',
+                    'chip.secure_payment'.tr(),
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimary,
                     ),
@@ -88,7 +94,7 @@ class ProjectCard extends ConsumerWidget {
             },
             style: Theme.of(context).textButtonTheme.style?.copyWith(
               overlayColor: WidgetStateProperty.all(Colors.transparent),
-              minimumSize: WidgetStateProperty.all(Size(0.0, 0.0)),
+              minimumSize: WidgetStateProperty.all(Size.zero),
               padding: WidgetStateProperty.all(EdgeInsets.zero),
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               alignment: AlignmentGeometry.centerLeft,
@@ -110,7 +116,7 @@ class ProjectCard extends ConsumerWidget {
             ),
           ),
 
-          if (showOffertHelpButton)
+          if (userId != project.ownerId)
             OutlinedButton(
               onPressed: !applied
                   ? () async {
@@ -122,20 +128,20 @@ class ProjectCard extends ConsumerWidget {
               style: Theme.of(context).outlinedButtonTheme.style?.copyWith(
                 shape: WidgetStateProperty.all(
                   RoundedRectangleBorder(
-                    borderRadius: BorderRadiusGeometry.circular(100.0),
+                    borderRadius: BorderRadius.circular(100.0),
                   ),
                 ),
               ),
               child: Text(
-                'Ofrecer ayuda',
-                style: TextStyle(fontWeight: FontWeight.normal),
+                'button.offer_help'.tr(),
+                style: const TextStyle(fontWeight: FontWeight.normal),
               ),
             ).center().margin(const EdgeInsets.only(top: 32.0)),
 
-          if (showReportButton) ...[
-            Divider().margin(EdgeInsets.symmetric(vertical: 4.0)),
+          if (userId != project.ownerId) ...[
+            const Divider().margin(const EdgeInsets.symmetric(vertical: 4.0)),
 
-            ReportProjectButton().center(),
+            const ReportProjectButton().center(),
           ],
         ],
       ).margin(const EdgeInsets.all(16.0)),

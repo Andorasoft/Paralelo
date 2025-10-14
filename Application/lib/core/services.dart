@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 /// Background handler for FCM messages.
 /// This will be triggered when the app is in the background or terminated.
@@ -79,6 +80,16 @@ class FCMService {
     return settings.authorizationStatus == AuthorizationStatus.authorized;
   }
 
+  /// Checks the current notification permission status.
+  ///
+  /// Returns `true` if the user has granted notification permissions,
+  /// otherwise returns `false`.
+  ///
+  /// On iOS, this method does **not** prompt the user — it only retrieves
+  /// the current authorization status from the system.
+  ///
+  /// On Android, this typically returns `true` unless the user has
+  /// explicitly disabled notifications for the app.
   Future<bool> checkPermission() async {
     final settings = await _messaging.getNotificationSettings();
 

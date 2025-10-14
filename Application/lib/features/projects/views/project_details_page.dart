@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -33,7 +34,7 @@ class ProjectDetailsPage extends ConsumerStatefulWidget {
 class ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  late final Future<dynamic> _loadDataFuture;
+  late final Future<(ProjectPayment, List<ProjectSkill>)> _loadDataFuture;
 
   @override
   void initState() {
@@ -56,7 +57,7 @@ class ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
 
         actions: [
           if (userId == widget.project.ownerId)
-            TextButton(onPressed: () {}, child: const Text('Editar')),
+            TextButton(onPressed: () {}, child: Text('button.edit'.tr())),
         ],
       ),
 
@@ -67,8 +68,7 @@ class ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
             return const LoadingIndicator().center();
           }
 
-          final (payment, skills) =
-              snapshot.data as (ProjectPayment, List<ProjectSkill>);
+          final (payment, skills) = snapshot.data!;
 
           return ListView(
             children: [
@@ -201,14 +201,14 @@ class ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
                         );
                   }
                 : null,
-            child: const Text('Ofrecer ayuda'),
+            child: Text('button.offer_help'.tr()),
           ).margin(const EdgeInsets.all(8.0)).useSafeArea();
         },
       ),
     );
   }
 
-  Future<dynamic> _loadData() async {
+  Future<(ProjectPayment, List<ProjectSkill>)> _loadData() async {
     final payment = await ref
         .read(projectPaymentProvider)
         .getByProject(widget.project.id);

@@ -41,6 +41,11 @@
 			<string>UIInterfaceOrientationPortrait</string>
 			<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		</array>
+		<key>CFBundleLocalizations</key>
+		<array>
+			<string>en</string>
+			<string>es</string>
+		</array>
 		<key>NSUserNotificationUsageDescription</key>
 		<string>Esta aplicación desea enviarte notificaciones.</string>
 	</dict>

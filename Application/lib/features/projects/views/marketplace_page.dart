@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -6,7 +7,6 @@ import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
 import 'package:paralelo/features/projects/controllers/project_provider.dart';
 import 'package:paralelo/features/projects/models/project.dart';
-import 'package:paralelo/features/projects/widgets/project_filter_button.dart';
 import 'package:paralelo/features/projects/widgets/project_card.dart';
 import 'package:paralelo/features/projects/widgets/project_sort_button.dart';
 import 'package:paralelo/features/proposal/controllers/proposal_provider.dart';
@@ -58,10 +58,10 @@ class MarketplacePageState extends ConsumerState<MarketplacePage> {
                 ),
 
                 leading: const Icon(LucideIcons.search),
-                hintText: 'Buscar proyectos...',
+                hintText: 'input.search_projects'.tr(),
               ).size(height: 44.0).expanded(),
               const ProjectSortButton(),
-              const ProjectFilterButton(),
+              // const ProjectFilterButton(),
             ],
           ).margin(const EdgeInsets.symmetric(horizontal: 8.0)),
         ),

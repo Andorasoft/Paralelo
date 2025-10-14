@@ -1,0 +1,96 @@
+{
+  "nav": {
+    "home": "Home",
+    "search": "Search",
+    "chats": "Chats",
+    "account": "My Account"
+  },
+  "modal": {
+    "language": {
+      "title": "Change language"
+    },
+    "report": {
+      "title": "Report project",
+      "submit": "Send report",
+      "options": {
+        "inappropriate": {
+          "title": "Inappropriate content",
+          "description": "The project requests thesis writing, fraudulent academic work, or other improper use."
+        },
+        "scam": {
+          "title": "Scam or fraud",
+          "description": "The project provides false conditions or seeks to exploit students."
+        },
+        "offensive": {
+          "title": "Offensive language",
+          "description": "Offensive language, discrimination, or harassment."
+        },
+        "terms_violation": {
+          "title": "Terms violation",
+          "description": "Violates the terms of use, forbidden categories, or posting rules."
+        },
+        "abusive_budget": {
+          "title": "Abusive budget",
+          "description": "The project offers unfairly low payments or exploitative conditions."
+        }
+      }
+    },
+    "sort": {
+      "title": "Sort by",
+      "options": {
+        "last_updated": "Last updated",
+        "first_updated": "First updated",
+        "a_to_z": "A-Z",
+        "z_to_a": "Z-A"
+      }
+    },
+    "notification": {
+      "title": "Turn on notifications",
+      "content": "You have notifications turned off.\nTo receive important alerts, turn them on in your device settings."
+    }
+  },
+  "button": {
+    "logout": "Logout",
+    "logint": "Login",
+    "reset": "Reset",
+    "report_post": "Report post",
+    "back": "Back",
+    "close": "Close",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "open_settings": "Open settings",
+    "show_proposal": "Show proposal",
+    "offer_help": "Offer help"
+  },
+  "setting": {
+    "sections": {
+      "activity": "Activity",
+      "preferences": "Preferences",
+      "account": "Account",
+      "support": "Support"
+    },
+    "options": {
+      "my_projects": "My projects",
+      "my_proposals": "My proposals",
+      "my_skills": "My skills",
+      "language": "Language",
+      "notifications": "Notifications",
+      "dark_mode": "Dark mode",
+      "change_password": "Change password",
+      "delete_account": "Delete my account",
+      "help_center": "Help center",
+      "contact_us": "Contact us"
+    }
+  },
+  "input": {
+    "search_projects": "Search projects...",
+    "search_chats": "Search chats..."
+  },
+  "chip": {
+    "secure_payment": "Secure payment",
+    "all": "All",
+    "unread": "Unread",
+    "ongoing_projects": "Ongoing projects"
+  },
+  "all_rights_reserved": "All rights reserved"
+}

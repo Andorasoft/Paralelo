@@ -1,9 +1,10 @@
+import 'package:app_settings/app_settings.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
 
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
-import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
 import 'package:paralelo/features/projects/views/my_projects_page.dart';
 import 'package:paralelo/features/settings/widgets/setting_option.dart';
@@ -13,9 +14,11 @@ import 'package:paralelo/features/user/widgets/user_presenter.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/core/providers.dart';
 import 'package:paralelo/core/services.dart';
+import 'package:paralelo/core/modals.dart';
+import 'package:paralelo/core/router.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
-  static const routeName = 'SettingsPage';
+  static const routeName = 'settingPage';
   static const routePath = '/settings';
 
   const SettingsPage({super.key});
@@ -57,7 +60,7 @@ class SettingsPageState extends ConsumerState<SettingsPage> {
               onPressed: () async {
                 await ref.read(authProvider.notifier).logout();
               },
-              child: const Text('Cerrar sesión'),
+              child: Text('button.logout'.tr()),
             ).align(AlignmentGeometry.centerRight),
 
             SizedBox(
@@ -88,7 +91,7 @@ class SettingsPageState extends ConsumerState<SettingsPage> {
 
               children: [
                 Text(
-                  'Actividad',
+                  'setting.sections.activity'.tr(),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.outline,
                   ),
@@ -100,14 +103,20 @@ class SettingsPageState extends ConsumerState<SettingsPage> {
                         .push(MyProjectsPage.routePath);
                   },
 
-                  leading: const Icon(TablerIcons.user_circle),
-                  title: 'Mis proyectos',
+                  leading: const Icon(TablerIcons.briefcase_filled),
+                  title: 'setting.options.my_projects'.tr(),
                 ),
                 SettingOption.tile(
                   onTap: () {},
 
-                  leading: const Icon(TablerIcons.user_circle),
-                  title: 'Mis propuestas',
+                  leading: const Icon(TablerIcons.file_filled),
+                  title: 'setting.options.my_proposals'.tr(),
+                ),
+                SettingOption.tile(
+                  onTap: () {},
+
+                  leading: const Icon(TablerIcons.star_filled),
+                  title: 'setting.options.my_skills'.tr(),
                 ),
               ],
             ),
@@ -118,40 +127,54 @@ class SettingsPageState extends ConsumerState<SettingsPage> {
 
               children: [
                 Text(
-                  'Preferencias',
+                  'setting.sections.preferences'.tr(),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.outline,
                   ),
                 ).margin(const EdgeInsets.only(left: 8.0)),
                 SettingOption.tile(
-                  onTap: () {},
+                  onTap: () async {
+                    final notifier = ref.read(localeNotifierProvider.notifier);
+
+                    final locale = await showLocaleSelectorModalBottomSheet(
+                      context,
+                      value: notifier.getLocale().languageCode,
+                    );
+
+                    if (locale == null) return;
+
+                    notifier.setLocale(locale);
+                    await context.setLocale(notifier.getLocale());
+                  },
 
                   leading: const Icon(TablerIcons.globe_filled),
                   trailing: Text(
-                    'ES',
+                    ref
+                        .read(localeNotifierProvider.notifier)
+                        .getLocale()
+                        .languageCode
+                        .toUpperCase(),
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Colors.grey.shade400,
                     ),
                   ),
-                  title: 'Idioma',
+                  title: 'setting.options.language'.tr(),
                 ),
                 SettingOption.toggle(
                   value: notify,
 
                   onChanged: (v) async {
-                    var granted = await FCMService.instance.checkPermission();
+                    final granted = await _handleNotificationPermission(
+                      context,
+                    );
 
-                    if (!granted) {
-                      granted = await FCMService.instance.requestPermissions();
-
-                      if (!granted) return;
-                    }
+                    if (!granted) return;
 
                     ref.read(notifyNotifierProvider.notifier).setNotify(v);
                   },
 
                   leading: const Icon(TablerIcons.bell_filled),
-                  title: 'Notificaciones',
+                  title: 'setting.options.notifications'.tr(),
                 ),
                 SettingOption.toggle(
                   value: theme == ThemeMode.dark,
@@ -162,7 +185,7 @@ class SettingsPageState extends ConsumerState<SettingsPage> {
                   },
 
                   leading: const Icon(TablerIcons.moon_filled),
-                  title: 'Modo oscuro',
+                  title: 'setting.options.dark_mode'.tr(),
                 ),
               ],
             ),
@@ -173,7 +196,7 @@ class SettingsPageState extends ConsumerState<SettingsPage> {
 
               children: [
                 Text(
-                  'Cuenta',
+                  'setting.sections.account'.tr(),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.outline,
                   ),
@@ -182,13 +205,13 @@ class SettingsPageState extends ConsumerState<SettingsPage> {
                   onTap: () {},
 
                   leading: const Icon(TablerIcons.lock_filled),
-                  title: 'Cambiar contraseña',
+                  title: 'setting.options.change_password'.tr(),
                 ),
                 SettingOption.tile(
                   onTap: () {},
 
                   leading: const Icon(TablerIcons.trash_filled),
-                  title: 'Eliminar mi cuenta',
+                  title: 'setting.options.delete_account'.tr(),
                 ),
               ],
             ),
@@ -199,7 +222,7 @@ class SettingsPageState extends ConsumerState<SettingsPage> {
 
               children: [
                 Text(
-                  'Soporte',
+                  'setting.sections.support'.tr(),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Theme.of(context).colorScheme.outline,
                   ),
@@ -208,13 +231,13 @@ class SettingsPageState extends ConsumerState<SettingsPage> {
                   onTap: () {},
 
                   leading: const Icon(TablerIcons.info_circle_filled),
-                  title: 'Centro de ayuda',
+                  title: 'setting.options.help_center'.tr(),
                 ),
                 SettingOption.tile(
                   onTap: () {},
 
                   leading: const Icon(TablerIcons.message_filled),
-                  title: 'Contáctanos',
+                  title: 'setting.options.contact_us'.tr(),
                 ),
               ],
             ),
@@ -224,8 +247,8 @@ class SettingsPageState extends ConsumerState<SettingsPage> {
 
               TextSpan(
                 children: [
-                  TextSpan(text: '© 2025 Andorasoft\n'),
-                  TextSpan(text: 'Todos los derechos reservados'),
+                  const TextSpan(text: '© 2025 Andorasoft\n'),
+                  TextSpan(text: 'all_rights_reserved'.tr()),
                 ],
 
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -243,5 +266,50 @@ class SettingsPageState extends ConsumerState<SettingsPage> {
     final userId = ref.read(authProvider)!.id;
 
     return (await ref.read(appUserProvider).getById(userId))!;
+  }
+
+  Future<bool> _handleNotificationPermission(BuildContext context) async {
+    var granted = await FCMService.instance.checkPermission();
+
+    if (!granted) {
+      granted = await FCMService.instance.requestPermissions();
+    }
+
+    if (!granted) {
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+
+        builder: (ctx) {
+          return AlertDialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+
+            title: Text('modal.notification.title'.tr()),
+
+            content: Text('modal.notification.content'.tr()),
+
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+
+                child: Text('button.cancel'.tr()),
+              ),
+              TextButton(
+                onPressed: () async {
+                  await AppSettings.openAppSettings();
+                  Navigator.pop(context, true);
+                },
+
+                child: Text('button.open_settings'.tr()),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    return granted;
   }
 }

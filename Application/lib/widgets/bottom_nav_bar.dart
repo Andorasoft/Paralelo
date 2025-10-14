@@ -1,4 +1,5 @@
 import 'package:badges/badges.dart' as badges;
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
@@ -42,6 +43,7 @@ class BottomNavBar extends ConsumerWidget {
           end: Alignment.topCenter,
           colors: [Color(0xFFF7F6FA), Colors.white],
         ),
+        height: 56.0,
 
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
@@ -50,34 +52,34 @@ class BottomNavBar extends ConsumerWidget {
           highlightElevation: 0.0,
           elevation: 2.0,
 
-          child: Icon(TablerIcons.plus),
+          child: const Icon(TablerIcons.plus),
         ),
 
         items: [
           BottomNavBarItem(
-            label: 'Inicio',
-            icon: Icon(TablerIcons.smart_home, size: 28.0),
+            label: 'nav.home'.tr(),
+            icon: const Icon(TablerIcons.smart_home, size: 28.0),
             page: const HomePage(),
           ),
           BottomNavBarItem(
-            label: 'Buscar',
-            icon: Icon(TablerIcons.search, size: 28.0),
+            label: 'nav.search'.tr(),
+            icon: const Icon(TablerIcons.search, size: 28.0),
             page: const MarketplacePage(),
           ),
           BottomNavBarItem(
-            label: 'Chats',
+            label: 'nav.chats'.tr(),
             icon: badges.Badge(
               showBadge: false,
               badgeStyle: badges.BadgeStyle(
                 badgeColor: Theme.of(context).colorScheme.primary,
               ),
-              child: Icon(TablerIcons.message_2, size: 28.0),
+              child: const Icon(TablerIcons.message_2, size: 28.0),
             ),
             page: const ChatsPage(),
           ),
           BottomNavBarItem(
-            label: 'Mi cuenta',
-            icon: Icon(TablerIcons.user_circle, size: 28.0),
+            label: 'nav.account'.tr(),
+            icon: const Icon(TablerIcons.user_circle, size: 28.0),
             page: const SettingsPage(),
           ),
         ],

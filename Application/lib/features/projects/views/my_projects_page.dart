@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -43,7 +44,7 @@ class MyProjectsPageState extends ConsumerState<MyProjectsPage> {
 
         leading: const NavigationButton(),
 
-        title: const Text('Mis proyectos'),
+        title: Text('setting.options.my_projects'.tr()),
       ),
 
       body: FutureBuilder(
@@ -56,15 +57,7 @@ class MyProjectsPageState extends ConsumerState<MyProjectsPage> {
           final projects = snapshot.data as List<Project>;
 
           return ListView(
-            children: projects
-                .map(
-                  (p) => ProjectCard(
-                    project: p,
-                    showOffertHelpButton: false,
-                    showReportButton: false,
-                  ),
-                )
-                .toList(),
+            children: projects.map((p) => ProjectCard(project: p)).toList(),
           ).margin(const EdgeInsets.all(8.0));
         },
       ),

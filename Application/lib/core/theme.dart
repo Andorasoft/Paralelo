@@ -178,11 +178,21 @@ extension AppThemeData on ThemeData {
 
     bottomSheetTheme: const BottomSheetThemeData(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadiusGeometry.only(
+        borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24.0),
           topRight: Radius.circular(24.0),
         ),
       ),
+    ),
+
+    listTileTheme: ListTileThemeData(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+    ),
+
+    radioTheme: const RadioThemeData(
+      splashRadius: 12.0,
+      visualDensity: VisualDensity.compact,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     ),
 
     colorScheme: ColorScheme.fromSeed(

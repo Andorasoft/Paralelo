@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -31,9 +32,9 @@ class ChatsPageState extends ConsumerState<ChatsPage> {
 
   late final Future<List<_ChatProjectRelation>> _loadDataFuture;
 
-  final _tabs = ['Todos', 'No leídos', 'Proyectos en curso'];
+  final _tabs = ['all', 'unread', 'ongoing_projects'];
 
-  String _selectedTab = 'Todos';
+  String _selectedTab = 'all';
 
   @override
   void initState() {
@@ -50,14 +51,14 @@ class ChatsPageState extends ConsumerState<ChatsPage> {
       appBar: AppBar(
         titleSpacing: 8.0,
 
-        title: const Text('Chats'),
+        title: Text('nav.chats'.tr()),
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(44.0),
+          preferredSize: const Size.fromHeight(44.0),
           child: SearchBar(
             onSubmitted: (query) {},
 
             leading: const Icon(LucideIcons.search),
-            hintText: 'Buscar conversaciones...',
+            hintText: 'input.search_chats'.tr(),
           ).size(height: 44.0).margin(const EdgeInsets.all(4.0)),
         ),
       ),
@@ -81,21 +82,21 @@ class ChatsPageState extends ConsumerState<ChatsPage> {
 
                 children: _tabs
                     .map(
-                      (t) => ChoiceChip(
-                        selected: _selectedTab == t,
+                      (key) => ChoiceChip(
+                        selected: _selectedTab == key,
                         onSelected: (selected) {
                           if (selected) {
-                            safeSetState(() => _selectedTab = t);
+                            safeSetState(() => _selectedTab = key);
                           }
                         },
 
                         showCheckmark: false,
                         padding: EdgeInsets.zero,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadiusGeometry.circular(100.0),
+                          borderRadius: BorderRadius.circular(100.0),
                         ),
 
-                        label: Text(t),
+                        label: Text('chip.$key'.tr()),
                       ),
                     )
                     .toList(),

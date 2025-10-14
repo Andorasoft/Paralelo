@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -13,7 +14,9 @@ class NavigationButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Tooltip(
-      message: type == NavigationButtonType.back ? 'Atrás' : 'Cerrar',
+      message: type == NavigationButtonType.back
+          ? 'button.back'.tr()
+          : 'button.close'.tr(),
 
       child: IconButton(
         onPressed: () => ref.read(goRouterProvider).pop(),
