@@ -1,0 +1,18 @@
+{
+  "rooms": {
+    "<AUTO_UUID>": {
+      "messages": {
+        "<AUTO_ID>": {
+          "text": "<MESSAGE_TEXT>",
+          "sender": "<SENDER_UUID>",
+          "recipient": "<RECIPIENT_UUID>",
+          "timestamp": "<ISO_TIMESTAMP>"
+        }
+      },
+      "unread": {
+        "user1": false,
+        "user2": true
+      }
+    }
+  }
+}
