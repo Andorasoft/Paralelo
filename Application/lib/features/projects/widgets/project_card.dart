@@ -1,7 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
+import 'package:paralelo/features/auth/controllers/auth_provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
@@ -27,6 +27,7 @@ class ProjectCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userId = ref.read(authProvider)!.id;
+    final locale = ref.read(preferencesProvider).locale;
 
     return Card(
       elevation: 0.0,
@@ -56,10 +57,7 @@ class ProjectCard extends ConsumerWidget {
             children: [
               Text(
                 timeago
-                    .format(
-                      project.createdAt,
-                      locale: ref.read(localeNotifierProvider).languageCode,
-                    )
+                    .format(project.createdAt, locale: locale.languageCode)
                     .capitalize()!,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: Theme.of(context).colorScheme.outline,

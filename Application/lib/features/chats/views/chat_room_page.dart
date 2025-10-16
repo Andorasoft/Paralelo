@@ -4,18 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
-import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
+import 'package:paralelo/features/auth/controllers/auth_provider.dart';
 import 'package:paralelo/features/chats/controllers/chat_room_provider.dart';
 import 'package:paralelo/features/chats/models/chat_room.dart';
 import 'package:paralelo/features/chats/widgets/message_bubble.dart';
 import 'package:paralelo/features/chats/widgets/message_input_bar.dart';
 import 'package:paralelo/features/proposal/controllers/proposal_provider.dart';
 import 'package:paralelo/features/proposal/models/proposal.dart';
-import 'package:paralelo/features/user/controllers/app_user_provider.dart';
+import 'package:paralelo/features/user/controllers/user_provider.dart';
 import 'package:paralelo/core/providers.dart';
 import 'package:paralelo/core/services.dart';
-import 'package:paralelo/features/user/models/app_user.dart';
-import 'package:paralelo/features/user/widgets/user_rating.dart';
+import 'package:paralelo/features/user/models/user.dart';
+import 'package:paralelo/features/user/widgets/user_rating_presenter.dart';
 import 'package:paralelo/utils/formatters.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
@@ -27,11 +27,7 @@ class ChatRoomPage extends ConsumerStatefulWidget {
   final String roomId;
   final String recipientId;
 
-  const ChatRoomPage({
-    super.key,
-    required this.roomId,
-    required this.recipientId,
-  });
+  const ChatRoomPage({super.key, required this.roomId, required this.recipientId});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -42,7 +38,7 @@ class ChatRoomPage extends ConsumerStatefulWidget {
 class ChatRoomPageState extends ConsumerState<ChatRoomPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  late final Future<(AppUser, ChatRoom, Proposal)> _loadDataFuture;
+  late final Future<(User, ChatRoom, Proposal)> _loadDataFuture;
 
   @override
   void initState() {
@@ -81,8 +77,8 @@ class ChatRoomPageState extends ConsumerState<ChatRoomPage> {
               toolbarHeight: 64.0,
 
               leading: const NavigationButton(),
-              title: Text('${user.firstName} ${user.lastName}'.obscure()),
-              actions: const [UserRating(rating: 4.5)],
+              title: Text(user.displayName.obscure()),
+              actions: const [UserRatingPresenter(rating: 4.5)],
 
               bottom: PreferredSize(
                 preferredSize: Size.fromHeight(36.0),
@@ -95,16 +91,10 @@ class ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                       Theme.of(context).colorScheme.surfaceContainer,
                     ),
                     shape: WidgetStateProperty.all(
-                      const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.zero,
-                      ),
+                      const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                     ),
-                    minimumSize: WidgetStateProperty.all(
-                      const Size.fromHeight(36.0),
-                    ),
-                    maximumSize: WidgetStateProperty.all(
-                      const Size.fromHeight(36.0),
-                    ),
+                    minimumSize: WidgetStateProperty.all(const Size.fromHeight(36.0)),
+                    maximumSize: WidgetStateProperty.all(const Size.fromHeight(36.0)),
                   ),
 
                   child: Text('button.show_proposal'.tr()),
@@ -129,11 +119,8 @@ class ChatRoomPageState extends ConsumerState<ChatRoomPage> {
 
                     return MessageBubble(
                       content: msg['text'] as String,
-                      date:
-                          (msg['created_at'] as Timestamp?)?.toDate() ??
-                          DateTime.now(),
-                      isFromCurrentUser:
-                          msg['recipient_id'] == widget.recipientId,
+                      date: (msg['created_at'] as Timestamp?)?.toDate() ?? DateTime.now(),
+                      isFromCurrentUser: msg['recipient_id'] == widget.recipientId,
                     );
                   },
 
@@ -161,8 +148,8 @@ class ChatRoomPageState extends ConsumerState<ChatRoomPage> {
     ).hideKeyboardOnTap(context);
   }
 
-  Future<(AppUser, ChatRoom, Proposal)> _loadData() async {
-    final user = await ref.read(appUserProvider).getById(widget.recipientId);
+  Future<(User, ChatRoom, Proposal)> _loadData() async {
+    final user = await ref.read(userProvider).getById(widget.recipientId);
     final room = await ref.read(chatRoomProvider).getById(widget.roomId);
     final proposal = await ref.read(proposalProvider).getById(room!.proposalId);
 

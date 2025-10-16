@@ -1,45 +1,45 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:paralelo/core/imports.dart';
+import 'package:paralelo/features/user/exports.dart';
 
-class UserPresenter extends ConsumerStatefulWidget {
-  final String pictureUrl;
-  final String name;
-  final String email;
+class UserPresenter extends ConsumerWidget {
+  final User user;
 
-  const UserPresenter({
-    super.key,
-    required this.pictureUrl,
-    required this.name,
-    required this.email,
-  });
+  const UserPresenter({super.key, required this.user});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() {
-    return UserPresenterState();
-  }
-}
-
-class UserPresenterState extends ConsumerState<UserPresenter> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       mainAxisSize: MainAxisSize.min,
 
       children: [
-        ClipRRect(
-          borderRadius: BorderRadiusGeometry.circular(100.0),
+        if (user.pictureUrl.isNullOrEmpty)
+          SvgPicture.asset('assets/images/user.svg', width: 64.0, height: 64.0)
+        else
+          ClipRRect(
+            borderRadius: BorderRadius.circular(100.0),
+            child: Image.network(user.pictureUrl!, width: 64.0, height: 64.0),
+          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 4.0,
 
-          child: Image.network(widget.pictureUrl, width: 64.0, height: 64.0),
-        ),
-        Text(
-          widget.name,
-          style: Theme.of(
-            context,
-          ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+          children: [
+            Text(
+              user.displayName,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+            ),
+            if (user.verified)
+              Icon(
+                TablerIcons.rosette_discount_check_filled,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+          ],
         ).margin(const EdgeInsets.only(top: 8.0)),
         Text(
-          widget.email,
+          user.email,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colorScheme.outline,
           ),

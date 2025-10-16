@@ -1,17 +1,15 @@
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
-import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
+import 'package:paralelo/core/imports.dart';
+import 'package:paralelo/features/auth/controllers/auth_provider.dart';
 import 'package:paralelo/features/chats/controllers/chat_room_provider.dart';
 import 'package:paralelo/features/chats/models/chat_room.dart';
 import 'package:paralelo/features/chats/views/chat_room_page.dart';
 import 'package:paralelo/features/chats/widgets/chat_tile.dart';
 import 'package:paralelo/features/projects/controllers/project_provider.dart';
 import 'package:paralelo/features/projects/models/project.dart';
+import 'package:paralelo/features/proposal/controllers/proposal_provider.dart';
 import 'package:paralelo/utils/formatters.dart';
+import 'package:paralelo/widgets/empty_indicator.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/core/router.dart';
 
@@ -23,30 +21,28 @@ class ChatsPage extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return ChatsPageState();
+    return _ChatsPageState();
   }
 }
 
-class ChatsPageState extends ConsumerState<ChatsPage> {
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
+class _ChatsPageState extends ConsumerState<ChatsPage> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  late final Future<List<(ChatRoom, Project)>> loadDataFuture;
 
-  late final Future<List<_ChatProjectRelation>> _loadDataFuture;
-
-  final _tabs = ['all', 'unread', 'ongoing_projects'];
-
-  String _selectedTab = 'all';
+  final tabs = ['all', 'unread', 'ongoing_projects'];
+  String selectedTab = 'all';
 
   @override
   void initState() {
     super.initState();
 
-    _loadDataFuture = _loadData();
+    loadDataFuture = loadData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
+      key: scaffoldKey,
 
       appBar: AppBar(
         titleSpacing: 8.0,
@@ -64,14 +60,18 @@ class ChatsPageState extends ConsumerState<ChatsPage> {
       ),
 
       body: FutureBuilder(
-        future: _loadDataFuture,
+        future: loadDataFuture,
 
         builder: (_, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState != ConnectionState.done) {
             return const LoadingIndicator().center();
           }
 
-          final list = snapshot.data as List<_ChatProjectRelation>;
+          if (!snapshot.hasData || (snapshot.data?.isEmpty ?? true)) {
+            return const EmptyIndicator().center();
+          }
+
+          final list = snapshot.data!;
 
           return ListView(
             scrollDirection: Axis.vertical,
@@ -80,13 +80,13 @@ class ChatsPageState extends ConsumerState<ChatsPage> {
               Row(
                 spacing: 8.0,
 
-                children: _tabs
+                children: tabs
                     .map(
                       (key) => ChoiceChip(
-                        selected: _selectedTab == key,
+                        selected: selectedTab == key,
                         onSelected: (selected) {
                           if (selected) {
-                            safeSetState(() => _selectedTab = key);
+                            safeSetState(() => selectedTab = key);
                           }
                         },
 
@@ -103,24 +103,19 @@ class ChatsPageState extends ConsumerState<ChatsPage> {
               ),
               ...list
                   .map((i) {
-                    final user = i.chat.user1Id == ref.read(authProvider)!.id
-                        ? i.chat.user2
-                        : i.chat.user1;
+                    final (room, project) = i;
+                    final user = room.user1Id == ref.read(authProvider)!.id
+                        ? room.user2Id
+                        : room.user1Id;
 
                     return ChatTile(
                       onTap: () async {
                         await ref
                             .read(goRouterProvider)
-                            .push(
-                              ChatRoomPage.routePath,
-                              extra: {
-                                'room_id': i.chat.id,
-                                'recipient_id': user.id,
-                              },
-                            );
+                            .push(ChatRoomPage.routePath, extra: (room, user));
                       },
-                      title: '${user!.firstName} ${user.lastName}'.obscure(),
-                      subtitle: i.project.title,
+                      title: user.obscure(),
+                      subtitle: project.title,
                     );
                   })
                   .divide(const Divider(height: 9.0)),
@@ -131,35 +126,40 @@ class ChatsPageState extends ConsumerState<ChatsPage> {
     ).hideKeyboardOnTap(context);
   }
 
-  Future<List<_ChatProjectRelation>> _loadData() async {
+  Future<List<(ChatRoom, Project)>> loadData() async {
     final userId = ref.read(authProvider)!.id;
+    final chatRepo = ref.read(chatRoomProvider);
+    final proposalRepo = ref.read(proposalProvider);
+    final projectRepo = ref.read(projectProvider);
 
-    final chats = await ref
-        .read(chatRoomProvider)
-        .getForUser(userId, includeRelations: true);
+    final chats = await chatRepo.getForUser(userId);
 
-    final results = await Future.wait(
-      chats.map((chat) async {
-        final projectId = chat.proposal?.projectId;
-        if (projectId == null) return null;
+    if (chats.isEmpty) return [];
 
-        final project = await ref
-            .read(projectProvider)
-            .getById(projectId, includeRelations: true);
+    // Obtener todas las proposal IDs únicas
+    final proposalIds = chats.map((c) => c.proposalId).toSet().toList();
+    final proposals = await proposalRepo.getByIds(proposalIds);
 
-        if (project == null) return null;
+    // Obtener todos los project IDs únicos de esas proposals
+    final projectIds = proposals.map((p) => p.projectId).toSet().toList();
+    final projects = await projectRepo.getByIds(projectIds);
 
-        return _ChatProjectRelation(chat, project);
-      }),
-    );
+    // Mapear por ID para acceso rápido
+    final proposalMap = {for (var p in proposals) p.id: p};
+    final projectMap = {for (var p in projects) p.id: p};
 
-    return results.whereType<_ChatProjectRelation>().toList();
+    // Armar resultado final
+    return chats
+        .map((chat) {
+          final proposal = proposalMap[chat.proposalId];
+          if (proposal == null) return null;
+
+          final project = projectMap[proposal.projectId];
+          if (project == null) return null;
+
+          return (chat, project);
+        })
+        .whereType<(ChatRoom, Project)>()
+        .toList();
   }
-}
-
-class _ChatProjectRelation {
-  final ChatRoom chat;
-  final Project project;
-
-  const _ChatProjectRelation(this.chat, this.project);
 }

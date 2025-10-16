@@ -5,6 +5,7 @@ import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 
 class ModalBottomSheet extends ConsumerStatefulWidget {
   final Widget child;
+  final Key? formKey;
   final PreferredSizeWidget? title;
   final PreferredSizeWidget? bottom;
 
@@ -12,6 +13,14 @@ class ModalBottomSheet extends ConsumerStatefulWidget {
     super.key,
     required this.child,
     this.title,
+    this.bottom,
+  }) : formKey = null;
+
+  const ModalBottomSheet.form({
+    super.key,
+    required this.child,
+    required this.formKey,
+    required this.title,
     this.bottom,
   });
 
@@ -44,7 +53,10 @@ class ModalBottomSheetState extends ConsumerState<ModalBottomSheet> {
               child: widget.title!,
             ),
 
-          widget.child,
+          if (widget.formKey != null)
+            Form(key: widget.formKey, child: widget.child)
+          else
+            widget.child,
 
           if (widget.bottom.isNotNull) widget.bottom!,
         ],

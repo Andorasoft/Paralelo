@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class UserRating extends ConsumerStatefulWidget {
+class UserRatingPresenter extends ConsumerStatefulWidget {
   final double rating;
 
-  const UserRating({super.key, required this.rating});
+  const UserRatingPresenter({super.key, required this.rating});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return UserRatingState();
+    return _UserRatingPresenterState();
   }
 }
 
-class UserRatingState extends ConsumerState<UserRating> {
+class _UserRatingPresenterState extends ConsumerState<UserRatingPresenter> {
   @override
   Widget build(BuildContext context) {
     return Row(

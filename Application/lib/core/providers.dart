@@ -1,107 +1,86 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import './services.dart';
+import 'package:paralelo/core/imports.dart';
+import 'services.dart';
 
 final messagesProvider =
     StreamProvider.family<List<Map<String, dynamic>>, String>((_, roomId) {
       return ChatService.messagesStream(roomId);
     });
 
-final themeNotifierProvider = StateNotifierProvider((_) {
-  return ThemeStateNotifier().._loadTheme();
-});
+final preferencesProvider =
+    StateNotifierProvider<PreferencesNotifier, PreferencesState>(
+      (ref) => PreferencesNotifier(),
+    );
 
-final localeNotifierProvider = StateNotifierProvider((_) {
-  return LocaleStateNotifier().._loadLocale();
-});
+class PreferencesState {
+  final ThemeMode theme;
+  final Locale locale;
+  final bool notifications;
 
-final notifyNotifierProvider = StateNotifierProvider((_) {
-  return NotificationStateNotifier().._loadNotification();
-});
+  const PreferencesState({
+    required this.theme,
+    required this.locale,
+    required this.notifications,
+  });
+}
 
-class ThemeStateNotifier extends StateNotifier<ThemeMode> {
-  final kThemeModeKey = '__theme_mode__';
+class PreferencesNotifier extends StateNotifier<PreferencesState> {
+  static const _kThemeKey = '__theme_mode__';
+  static const _kLocaleKey = '__locale_mode__';
+  static const _kNotifKey = '__notifications_enabled__';
 
   late final SharedPreferences _prefs;
 
-  ThemeStateNotifier() : super(ThemeMode.light);
+  PreferencesNotifier()
+    : super(
+        const PreferencesState(
+          theme: ThemeMode.light,
+          locale: Locale('es'),
+          notifications: false,
+        ),
+      ) {
+    _init();
+  }
 
-  void _loadTheme() async {
+  Future<void> _init() async {
     _prefs = await SharedPreferences.getInstance();
 
-    final isDark = _prefs.getBool(kThemeModeKey);
+    final isDark = _prefs.getBool(_kThemeKey);
+    final lang = _prefs.getString(_kLocaleKey);
+    final notif = _prefs.getBool(_kNotifKey);
 
-    if (isDark == null) return;
-
-    state = isDark ? ThemeMode.dark : ThemeMode.light;
+    state = PreferencesState(
+      theme: isDark == null
+          ? ThemeMode.light
+          : (isDark ? ThemeMode.dark : ThemeMode.light),
+      locale: Locale(lang ?? 'es'),
+      notifications: notif ?? false,
+    );
   }
 
   void setTheme(ThemeMode mode) {
-    if (mode == ThemeMode.system) {
-      _prefs.remove(kThemeModeKey);
-    } else {
-      _prefs.setBool(kThemeModeKey, mode == ThemeMode.dark);
-    }
-
-    state = mode;
-  }
-
-  ThemeMode getTheme() {
-    return state;
-  }
-}
-
-class LocaleStateNotifier extends StateNotifier<Locale> {
-  final kLocaleModeKey = '__locale_mode__';
-
-  late final SharedPreferences _prefs;
-
-  LocaleStateNotifier() : super(const Locale('es'));
-
-  void _loadLocale() async {
-    _prefs = await SharedPreferences.getInstance();
-
-    final code = _prefs.getString(kLocaleModeKey);
-
-    if (code == null) return;
-
-    state = Locale(code);
+    _prefs.setBool(_kThemeKey, mode == ThemeMode.dark);
+    state = PreferencesState(
+      theme: mode,
+      locale: state.locale,
+      notifications: state.notifications,
+    );
   }
 
   void setLocale(String code) {
-    _prefs.setString(kLocaleModeKey, code);
-    state = Locale(code);
+    _prefs.setString(_kLocaleKey, code);
+    state = PreferencesState(
+      theme: state.theme,
+      locale: Locale(code),
+      notifications: state.notifications,
+    );
   }
 
-  Locale getLocale() {
-    return state;
-  }
-}
-
-class NotificationStateNotifier extends StateNotifier<bool> {
-  final kNotificationKey = '__notification_enabled__';
-
-  late final SharedPreferences _prefs;
-
-  NotificationStateNotifier() : super(false);
-
-  void _loadNotification() async {
-    _prefs = await SharedPreferences.getInstance();
-
-    final notify = _prefs.getBool(kNotificationKey);
-
-    if (notify == null) return;
-
-    state = notify;
-  }
-
-  void setNotify(bool enabled) {
-    _prefs.setBool(kNotificationKey, enabled);
-    state = enabled;
-  }
-
-  bool getNotify() {
-    return state;
+  void setNotifications(bool enabled) {
+    _prefs.setBool(_kNotifKey, enabled);
+    state = PreferencesState(
+      theme: state.theme,
+      locale: state.locale,
+      notifications: enabled,
+    );
   }
 }

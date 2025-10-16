@@ -1,7 +1,6 @@
 /// Represents a `user_rating` entity from the database.
 ///
-/// Stores ratings and comments that users give to each other
-/// after completing a project or service.
+/// Stores feedback and numeric scores between users.
 class UserRating {
   /// Unique identifier of the rating record.
   final int id;
@@ -9,22 +8,21 @@ class UserRating {
   /// Timestamp when the rating was created.
   final DateTime createdAt;
 
-  /// Numeric score given by the rater (e.g., 1–5).
+  /// Numeric score given by the rater.
   final num score;
 
-  /// Optional comment or feedback provided with the rating.
+  /// Optional comment.
   final String? comment;
 
-  /// UUID of the user who gave the rating.
+  /// UUID of the rater.
   final String raterId;
 
-  /// UUID of the user who received the rating.
+  /// UUID of the rated user.
   final String ratedId;
 
-  /// Identifier of the related project (if applicable).
-  final int? projectId;
+  /// Related project ID.
+  final int projectId;
 
-  /// Creates an immutable [UserRating] instance.
   const UserRating({
     required this.id,
     required this.createdAt,
@@ -32,7 +30,7 @@ class UserRating {
     this.comment,
     required this.raterId,
     required this.ratedId,
-    this.projectId,
+    required this.projectId,
   });
 
   /// Builds a [UserRating] object from a database map.

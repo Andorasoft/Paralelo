@@ -1,15 +1,12 @@
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
-import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
+import 'package:paralelo/core/imports.dart';
+import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/projects/controllers/project_provider.dart';
 import 'package:paralelo/features/projects/models/project.dart';
 import 'package:paralelo/features/projects/widgets/project_card.dart';
 import 'package:paralelo/features/projects/widgets/project_sort_button.dart';
 import 'package:paralelo/features/proposal/controllers/proposal_provider.dart';
+import 'package:paralelo/widgets/empty_indicator.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 
 class MarketplacePage extends ConsumerStatefulWidget {
@@ -20,26 +17,25 @@ class MarketplacePage extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return MarketplacePageState();
+    return _MarketplacePageState();
   }
 }
 
-class MarketplacePageState extends ConsumerState<MarketplacePage> {
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  late final Future<dynamic> _loadDataFuture;
+class _MarketplacePageState extends ConsumerState<MarketplacePage> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  late Future<(int, int, List<(Project, bool)>)> loadDataFuture;
 
   @override
   void initState() {
     super.initState();
 
-    _loadDataFuture = _loadData();
+    loadDataFuture = loadData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
+      key: scaffoldKey,
 
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -68,45 +64,79 @@ class MarketplacePageState extends ConsumerState<MarketplacePage> {
       ),
 
       body: FutureBuilder(
-        future: _loadDataFuture,
+        future: loadDataFuture,
+
         builder: (_, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState != ConnectionState.done) {
             return const LoadingIndicator().center();
           }
 
-          final map = snapshot.data as List<Map<String, dynamic>>;
+          if (!snapshot.hasData) {
+            return const EmptyIndicator().center();
+          }
 
-          return ListView.builder(
-            itemCount: map.length,
+          final (current, total, list) = snapshot.data!;
 
-            itemBuilder: (_, i) {
-              return ProjectCard(
-                project: map[i]['project'] as Project,
-                isPremium: (i % 2) == 0,
-                applied: map[i]['applied'] as bool,
-              );
-            },
-          ).margin(const EdgeInsets.all(8.0));
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                ...list.map((i) {
+                  final (project, applied) = i;
+
+                  return ProjectCard(project: project);
+                }),
+
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 128.0,
+
+                  children: [
+                    IconButton.filledTonal(
+                      onPressed: current != 1
+                          ? () {
+                              loadDataFuture = loadData(index: current - 1);
+                              safeSetState(() {});
+                            }
+                          : null,
+
+                      icon: const Icon(LucideIcons.chevronLeft),
+                    ),
+                    IconButton.filledTonal(
+                      onPressed: current != total
+                          ? () {
+                              loadDataFuture = loadData(index: current + 1);
+                              safeSetState(() {});
+                            }
+                          : null,
+
+                      icon: const Icon(LucideIcons.chevronRight),
+                    ),
+                  ],
+                ).margin(const EdgeInsets.only(top: 32.0)),
+              ],
+            ).margin(const EdgeInsets.all(12.0)),
+          );
         },
       ),
     ).hideKeyboardOnTap(context);
   }
 
-  Future<List<Map<String, dynamic>>> _loadData() async {
-    final result = <Map<String, dynamic>>[];
-
+  Future<(int, int, List<(Project, bool)>)> loadData({int index = 1}) async {
     final userId = ref.read(authProvider)!.id;
-    final projects = await ref
+
+    final (page, pages, projects) = await ref
         .read(projectProvider)
-        .getAll(userId, includeRelations: true);
+        .getPaginated(excludedUserId: userId, page: index);
+
     final appliedList = await Future.wait(
       projects.map((p) => ref.read(proposalProvider).applied(p.id)),
     );
 
-    for (var i = 0; i < projects.length; i++) {
-      result.add({'project': projects[i], 'applied': appliedList[i]});
-    }
-
-    return result;
+    return (
+      page,
+      pages,
+      [for (var i = 0; i < projects.length; i++) (projects[i], appliedList[i])],
+    );
   }
 }

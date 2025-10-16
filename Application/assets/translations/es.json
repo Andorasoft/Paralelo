@@ -92,5 +92,6 @@
     "unread": "No leídos",
     "ongoing_projects": "Proyectos en curso"
   },
-  "all_rights_reserved": "Todos los derechos reservados"
+  "all_rights_reserved": "Todos los derechos reservados",
+  "empty": "No hay datos para mostrar"
 }

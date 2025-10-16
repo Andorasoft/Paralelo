@@ -1,12 +1,10 @@
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
-import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
+import 'package:paralelo/core/imports.dart';
+import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/projects/controllers/project_provider.dart';
 import 'package:paralelo/features/projects/models/project.dart';
 import 'package:paralelo/features/projects/widgets/project_card.dart';
+import 'package:paralelo/widgets/empty_indicator.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
 
@@ -18,26 +16,25 @@ class MyProjectsPage extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return MyProjectsPageState();
+    return _MyProjectsPageState();
   }
 }
 
-class MyProjectsPageState extends ConsumerState<MyProjectsPage> {
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  late final Future<dynamic> _loadDataFuture;
+class _MyProjectsPageState extends ConsumerState<MyProjectsPage> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  late final Future<List<Project>> loadDataFuture;
 
   @override
   void initState() {
     super.initState();
 
-    _loadDataFuture = _loadData();
+    loadDataFuture = loadData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
+      key: scaffoldKey,
 
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -48,13 +45,17 @@ class MyProjectsPageState extends ConsumerState<MyProjectsPage> {
       ),
 
       body: FutureBuilder(
-        future: _loadDataFuture,
+        future: loadDataFuture,
         builder: (_, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState != ConnectionState.done) {
             return const LoadingIndicator().center();
           }
 
-          final projects = snapshot.data as List<Project>;
+          if (!snapshot.hasData || (snapshot.data?.isEmpty ?? true)) {
+            return const EmptyIndicator().center();
+          }
+
+          final projects = snapshot.data!;
 
           return ListView(
             children: projects.map((p) => ProjectCard(project: p)).toList(),
@@ -64,7 +65,7 @@ class MyProjectsPageState extends ConsumerState<MyProjectsPage> {
     );
   }
 
-  Future<List<Project>> _loadData() async {
+  Future<List<Project>> loadData() async {
     final userId = ref.read(authProvider)!.id;
     return await ref.read(projectProvider).getForUser(userId);
   }

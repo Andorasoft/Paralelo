@@ -82,5 +82,4 @@ flutter:
   assets:
     - assets/translations/
     - assets/images/
-    - assets/svg/
     - .env

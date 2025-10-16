@@ -47,4 +47,11 @@ extension StringExtensions on String {
     final initials = parts.map((p) => '${p[0].toUpperCase()}.').join(' ');
     return initials;
   }
+
+  String extractDomain() {
+    if (isEmpty || !contains('@')) {
+      throw ArgumentError('Correo no válido');
+    }
+    return split('@').last;
+  }
 }

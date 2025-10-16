@@ -1,17 +1,18 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
-import './proposal.dart';
+import 'package:paralelo/core/imports.dart';
+import 'package:paralelo/features/proposal/models/proposal.dart';
 
 abstract class ProposalRepository {
   Future<bool> applied(int projectId);
 
-  Future<Proposal?> getById(int id, {required bool includeRelations});
+  Future<Proposal?> getById(int id);
+
+  Future<List<Proposal>> getByIds(List<int> ids);
 
   Future<Proposal> create({
     required String message,
     required String mode,
     num? amount,
     num? hourlyRate,
-    required String status,
     required String providerId,
     required int projectId,
   });
@@ -35,14 +36,24 @@ class SupabaseProposalRepository implements ProposalRepository {
   }
 
   @override
-  Future<Proposal?> getById(int id, {required bool includeRelations}) async {
+  Future<Proposal?> getById(int id) async {
     final data = await _client
         .from('proposal')
-        .select(includeRelations ? '*, project(*)' : '*')
+        .select()
         .eq('id', id)
         .maybeSingle();
 
     return data != null ? Proposal.fromMap(data) : null;
+  }
+
+  @override
+  Future<List<Proposal>> getByIds(List<int> ids) async {
+    final data = await _client
+        .from('proposal')
+        .select()
+        .filter('id', 'in', '(${ids.join(',')})');
+
+    return data.map((i) => Proposal.fromMap(i)).toList();
   }
 
   @override
@@ -51,7 +62,6 @@ class SupabaseProposalRepository implements ProposalRepository {
     required String mode,
     num? amount,
     num? hourlyRate,
-    required String status,
     required String providerId,
     required int projectId,
   }) async {
@@ -62,7 +72,6 @@ class SupabaseProposalRepository implements ProposalRepository {
           'mode': mode,
           'amount': amount,
           'hourly_rate': hourlyRate,
-          'status': status,
           'provider_id': providerId,
           'project_id': projectId,
         })

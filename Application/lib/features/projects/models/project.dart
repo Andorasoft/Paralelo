@@ -1,9 +1,6 @@
-import 'package:paralelo/features/user/models/app_user.dart';
-
 /// Represents a `project` entity from the database.
 ///
-/// Stores general information about a project, including
-/// title, description, budget, status, and owner.
+/// Stores project details created by users.
 class Project {
   /// Unique identifier of the project.
   final int id;
@@ -11,53 +8,44 @@ class Project {
   /// Timestamp when the project was created.
   final DateTime createdAt;
 
-  /// Project title.
+  /// Title of the project.
   final String title;
 
-  /// Detailed project description.
+  /// Description of the project.
   final String description;
 
-  /// Optional total project budget.
-  final num? budget;
-
-  /// Current status of the project (e.g., "open", "in_progress").
+  /// Current status of the project.
   final String status;
 
-  /// Project category (e.g., "Tutoring", "Writing").
-  final String category;
+  /// Optional additional requirement text.
+  final String? requirement;
 
-  /// Identifier of the project owner (user).
+  /// UUID of the project owner.
   final String ownerId;
 
-  /// The [AppUser] object associated with this relation.
-  final AppUser? owner;
+  /// Optional category identifier.
+  final int? categoryId;
 
-  /// Creates an immutable [Project] instance.
   const Project({
     required this.id,
     required this.createdAt,
     required this.title,
     required this.description,
-    this.budget,
     required this.status,
-    required this.category,
+    this.requirement,
     required this.ownerId,
-    this.owner,
+    this.categoryId,
   });
 
   /// Builds a [Project] object from a database map.
-  factory Project.fromMap(Map<String, dynamic> map) {
-    return Project(
-      id: map['id'],
-      createdAt: DateTime.parse(map['created_at']),
-      title: map['title'],
-      description: map['description'],
-      budget: map['budget'],
-      status: map['status'],
-      category: map['category'],
-
-      ownerId: map['owner_id'],
-      owner: map['owner'] != null ? AppUser.fromMap(map['owner']) : null,
-    );
-  }
+  factory Project.fromMap(Map<String, dynamic> map) => Project(
+    id: map['id'],
+    createdAt: DateTime.parse(map['created_at']),
+    title: map['title'],
+    description: map['description'],
+    status: map['status'],
+    requirement: map['requirement'],
+    ownerId: map['owner_id'],
+    categoryId: map['category_id'],
+  );
 }

@@ -1,16 +1,9 @@
-import 'package:easy_localization/easy_localization.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
-import 'package:paralelo/firebase_options.dart';
+import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/core/providers.dart';
-import 'package:paralelo/core/services.dart';
 import 'package:paralelo/core/router.dart';
+import 'package:paralelo/core/services.dart';
 import 'package:paralelo/core/theme.dart';
+import 'package:paralelo/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,7 +40,7 @@ void main() async {
       fallbackLocale: const Locale('es'),
       path: 'assets/translations',
 
-      child: const ProviderScope(child: MainApp()),
+      child: ProviderScope(child: MainApp()),
     ),
   );
 }
@@ -58,7 +51,7 @@ class MainApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(goRouterProvider);
-    final locale = ref.watch(localeNotifierProvider);
+    final prefs = ref.watch(preferencesProvider);
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
@@ -69,7 +62,7 @@ class MainApp extends ConsumerWidget {
 
       localizationsDelegates: context.localizationDelegates,
       supportedLocales: context.supportedLocales,
-      locale: locale,
+      locale: prefs.locale,
 
       routerConfig: router,
     );

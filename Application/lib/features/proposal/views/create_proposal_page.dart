@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
-import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
+import 'package:paralelo/features/auth/controllers/auth_provider.dart';
 import 'package:paralelo/features/projects/controllers/project_payment_provider.dart';
 import 'package:paralelo/features/projects/models/project_payment.dart';
 import 'package:paralelo/features/projects/models/project.dart';
@@ -243,7 +243,6 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
           .create(
             message: _messageFieldController.text,
             mode: _selectedMode,
-            status: 'PENDING',
             providerId: widget.project.ownerId,
             projectId: widget.project.id,
           );

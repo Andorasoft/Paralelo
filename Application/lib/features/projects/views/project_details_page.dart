@@ -1,9 +1,6 @@
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
-import 'package:paralelo/features/auth/controllers/auth_notifier.dart';
+import 'package:paralelo/core/imports.dart';
+import 'package:paralelo/features/auth/controllers/auth_provider.dart';
 import 'package:paralelo/features/projects/controllers/project_payment_provider.dart';
 import 'package:paralelo/features/skills/controllers/project_skill_provider.dart';
 import 'package:paralelo/features/projects/models/project.dart';
@@ -11,7 +8,7 @@ import 'package:paralelo/features/projects/models/project_payment.dart';
 import 'package:paralelo/features/skills/models/project_skill.dart';
 import 'package:paralelo/features/reports/widgets/project_report_button.dart';
 import 'package:paralelo/features/proposal/views/create_proposal_page.dart';
-import 'package:paralelo/features/user/widgets/user_rating.dart';
+import 'package:paralelo/features/user/exports.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
 import 'package:paralelo/utils/formatters.dart';
@@ -27,20 +24,19 @@ class ProjectDetailsPage extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return ProjectDetailsPageState();
+    return _ProjectDetailsPageState();
   }
 }
 
-class ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  late final Future<(ProjectPayment, List<ProjectSkill>)> _loadDataFuture;
+class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  late final Future<(User, ProjectPayment, List<ProjectSkill>)> loadDataFuture;
 
   @override
   void initState() {
     super.initState();
 
-    _loadDataFuture = _loadData();
+    loadDataFuture = loadData();
   }
 
   @override
@@ -48,7 +44,7 @@ class ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
     final userId = ref.read(authProvider)!.id;
 
     return Scaffold(
-      key: _scaffoldKey,
+      key: scaffoldKey,
 
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -62,13 +58,13 @@ class ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
       ),
 
       body: FutureBuilder(
-        future: _loadDataFuture,
+        future: loadDataFuture,
         builder: (_, snapshot) {
           if (!snapshot.hasData) {
             return const LoadingIndicator().center();
           }
 
-          final (payment, skills) = snapshot.data!;
+          final (owner, payment, skills) = snapshot.data!;
 
           return ListView(
             children: [
@@ -101,6 +97,8 @@ class ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
 
                   children: [
                     Card(
+                      margin: EdgeInsets.zero,
+
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -138,6 +136,8 @@ class ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
 
                     if (userId != widget.project.ownerId)
                       Card(
+                        margin: EdgeInsets.zero,
+
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           spacing: 12.0,
@@ -146,22 +146,46 @@ class ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(100.0),
 
-                              child: Image.network(
-                                widget.project.owner!.pictureUrl!,
-                                width: 40.0,
-                                height: 40.0,
-                              ),
+                              child: owner.pictureUrl == null
+                                  ? SvgPicture.asset(
+                                      'assets/images/user.svg',
+                                      width: 40.0,
+                                      height: 40.0,
+                                    )
+                                  : Image.network(
+                                      owner.pictureUrl!,
+                                      width: 40.0,
+                                      height: 40.0,
+                                    ),
                             ),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
 
                               children: [
-                                Text(
-                                  '${widget.project.owner!.firstName} ${widget.project.owner!.lastName}'
-                                      .obscure(),
-                                  style: Theme.of(context).textTheme.labelLarge
-                                      ?.copyWith(fontWeight: FontWeight.w600),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  spacing: 4.0,
+
+                                  children: [
+                                    Text(
+                                      owner.displayName.obscure(),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelLarge
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                                    if (owner.verified)
+                                      Icon(
+                                        TablerIcons
+                                            .rosette_discount_check_filled,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.secondary,
+                                      ),
+                                  ],
                                 ),
                                 Text(
                                   '11 proyectos completados',
@@ -174,7 +198,7 @@ class ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
                                 ),
                               ],
                             ).expanded(),
-                            UserRating(rating: 4.5),
+                            UserRatingPresenter(rating: 4.5),
                           ],
                         ).margin(const EdgeInsets.all(16.0)),
                       ),
@@ -182,40 +206,48 @@ class ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
                 ),
               ).margin(const EdgeInsets.only(top: 16.0)),
             ],
-          ).margin(const EdgeInsets.symmetric(horizontal: 8.0));
+          ).margin(const EdgeInsets.symmetric(horizontal: 12.0));
         },
       ),
 
       bottomNavigationBar: FutureBuilder(
-        future: _loadDataFuture,
+        future: loadDataFuture,
 
         builder: (_, snapshot) {
           return FilledButton(
-            onPressed: snapshot.hasData && userId != widget.project.ownerId
-                ? () async {
-                    await ref
-                        .read(goRouterProvider)
-                        .push(
-                          CreateProposalPage.routePath,
-                          extra: widget.project,
-                        );
-                  }
-                : null,
-            child: Text('button.offer_help'.tr()),
-          ).margin(const EdgeInsets.all(8.0)).useSafeArea();
+                onPressed: snapshot.hasData && userId != widget.project.ownerId
+                    ? () async {
+                        await ref
+                            .read(goRouterProvider)
+                            .push(
+                              CreateProposalPage.routePath,
+                              extra: widget.project,
+                            );
+                      }
+                    : null,
+                child: Text('button.offer_help'.tr()),
+              )
+              .margin(
+                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+              )
+              .useSafeArea();
         },
       ),
     );
   }
 
-  Future<(ProjectPayment, List<ProjectSkill>)> _loadData() async {
-    final payment = await ref
-        .read(projectPaymentProvider)
-        .getByProject(widget.project.id);
-    final skills = await ref
-        .read(projectSkillProvider)
-        .getByProject(widget.project.id, includeRelations: true);
+  Future<(User, ProjectPayment, List<ProjectSkill>)> loadData() async {
+    final projectId = widget.project.id;
+    final ownerId = widget.project.ownerId;
 
-    return (payment!, skills);
+    final (owner, payment, skills) = await (
+      ref.read(userProvider).getById(ownerId),
+      ref.read(projectPaymentProvider).getByProject(projectId),
+      ref
+          .read(projectSkillProvider)
+          .getByProject(projectId, includeRelations: true),
+    ).wait;
+
+    return (owner!, payment!, skills);
   }
 }
