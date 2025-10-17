@@ -5,34 +5,41 @@ import 'package:paralelo/features/projects/exports.dart';
 
 class ReportProjectButton extends ConsumerWidget {
   final Project project;
+  final bool? disabled;
 
-  const ReportProjectButton({super.key, required this.project});
+  const ReportProjectButton({super.key, required this.project, this.disabled});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return TextButton.icon(
-      onPressed: () async {
-        final reason = await showProjectReportModalBottomSheet(context);
+      onPressed: (disabled ?? false)
+          ? null
+          : () async {
+              final reason = await showProjectReportModalBottomSheet(context);
 
-        if (reason == null) return;
+              if (reason == null) return;
 
-        showSnackbar(
-          context,
-          'Proyecto reportado por ${(reason).toLowerCase()}',
-        );
-      },
+              showSnackbar(
+                context,
+                'Proyecto reportado por ${(reason).toLowerCase()}',
+              );
+            },
 
-      icon: Icon(
-        LucideIcons.flag,
-        color: Theme.of(context).colorScheme.outline,
+      style: Theme.of(context).textButtonTheme.style?.copyWith(
+        iconColor: WidgetStateProperty.resolveWith<Color>((states) {
+          return !states.contains(WidgetState.disabled)
+              ? Theme.of(context).colorScheme.outline
+              : Theme.of(context).colorScheme.outlineVariant;
+        }),
+        foregroundColor: WidgetStateProperty.resolveWith<Color>((states) {
+          return !states.contains(WidgetState.disabled)
+              ? Theme.of(context).colorScheme.outline
+              : Theme.of(context).colorScheme.outlineVariant;
+        }),
       ),
-      label: Text(
-        'button.report_post'.tr(),
-        style: TextStyle(
-          fontWeight: FontWeight.normal,
-          color: Theme.of(context).colorScheme.outline,
-        ),
-      ),
+
+      icon: const Icon(LucideIcons.flag),
+      label: Text('button.report_post'.tr()),
     );
   }
 }

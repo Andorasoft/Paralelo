@@ -2,7 +2,7 @@ import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/projects/exports.dart';
-import 'package:paralelo/features/proposal/widgets/create_proposal_button.dart';
+import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/features/reports/exports.dart';
 import 'package:paralelo/features/skills/exports.dart';
 
@@ -10,6 +10,7 @@ class ProjectInfoPresenter extends ConsumerWidget {
   final void Function()? onTap;
   final bool? isCompact;
   final bool? applied;
+  final bool? reported;
   final int? maxLines;
 
   final Project project;
@@ -24,6 +25,7 @@ class ProjectInfoPresenter extends ConsumerWidget {
     this.skills,
     this.isCompact,
     this.applied,
+    this.reported,
     this.maxLines,
   });
 
