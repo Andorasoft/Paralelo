@@ -60,10 +60,9 @@ class BottomNavBar extends ConsumerWidget {
             BottomNavBarItem(
               label: 'nav.chats'.tr(),
               icon: Badge(
-                showBadge: false,
-                badgeStyle: BadgeStyle(
-                  badgeColor: Theme.of(context).colorScheme.primary,
-                ),
+                isLabelVisible: false,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+
                 child: const Icon(TablerIcons.message_2, size: 28.0),
               ),
               page: const ChatsPage(),

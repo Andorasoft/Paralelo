@@ -1,6 +1,6 @@
 export 'package:easy_localization/easy_localization.dart';
 export 'package:firebase_core/firebase_core.dart';
-export 'package:flutter/material.dart' hide TextDirection, Badge;
+export 'package:flutter/material.dart' hide TextDirection;
 export 'package:flutter/services.dart' hide TextDirection;
 export 'package:flutter_dotenv/flutter_dotenv.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,6 +10,5 @@ export 'package:shared_preferences/shared_preferences.dart';
 export 'package:lucide_icons/lucide_icons.dart';
 export 'package:app_settings/app_settings.dart';
 export 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
-export 'package:badges/badges.dart' show Badge, BadgeStyle, BadgePosition;
 export 'package:cloud_firestore/cloud_firestore.dart';
 export 'package:firebase_messaging/firebase_messaging.dart';
