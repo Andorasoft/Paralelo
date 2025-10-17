@@ -93,5 +93,8 @@
     "ongoing_projects": "Ongoing projects"
   },
   "all_rights_reserved": "All rights reserved",
-  "empty": "No data to display"
+  "empty": "No data to display",
+  "requirement": "Requirement",
+  "required_skills": "Required skills",
+  "hour": "HOUR"
 }

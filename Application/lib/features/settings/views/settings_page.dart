@@ -128,7 +128,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     if (locale == null) return;
 
                     notifier.setLocale(locale);
+
                     await context.setLocale(Locale(locale));
+
+                    final userId = ref.read(authProvider)!.id;
+                    await ref
+                        .read(userPreferenceProvider)
+                        .update(userId, language: locale);
                   },
 
                   leading: const Icon(TablerIcons.globe_filled),
@@ -143,14 +149,21 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 SettingOption.toggle(
                   value: prefs.notifications,
 
-                  onChanged: (v) async {
-                    final granted = await _handleNotificationPermission(
-                      context,
-                    );
+                  onChanged: (checked) async {
+                    if (checked) {
+                      final granted = await _handleNotificationPermission(
+                        context,
+                      );
 
-                    if (!granted) return;
+                      if (!granted) return;
+                    }
 
-                    notifier.setNotifications(v);
+                    notifier.setNotifications(checked);
+
+                    final userId = ref.read(authProvider)!.id;
+                    await ref
+                        .read(userPreferenceProvider)
+                        .update(userId, notificationsEnabled: checked);
                   },
 
                   leading: const Icon(TablerIcons.bell_filled),

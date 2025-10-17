@@ -1,9 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/auth/controllers/auth_provider.dart';
 import 'package:paralelo/features/chats/controllers/chat_room_provider.dart';
 import 'package:paralelo/features/chats/models/chat_room.dart';
@@ -27,24 +23,36 @@ class ChatRoomPage extends ConsumerStatefulWidget {
   final String roomId;
   final String recipientId;
 
-  const ChatRoomPage({super.key, required this.roomId, required this.recipientId});
+  const ChatRoomPage({
+    super.key,
+    required this.roomId,
+    required this.recipientId,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return ChatRoomPageState();
+    return _ChatRoomPageState();
   }
 }
 
-class ChatRoomPageState extends ConsumerState<ChatRoomPage> {
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  late final Future<(User, ChatRoom, Proposal)> _loadDataFuture;
+class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  late final Future<(User, ChatRoom, Proposal)> loadDataFuture;
 
   @override
   void initState() {
     super.initState();
 
-    _loadDataFuture = _loadData();
+    loadDataFuture = _loadData();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final userId = ref.read(authProvider)!.id;
+
+      await ChatService.instance.markAsRead(
+        roomId: widget.roomId,
+        userId: userId,
+      );
+    });
   }
 
   @override
@@ -52,14 +60,14 @@ class ChatRoomPageState extends ConsumerState<ChatRoomPage> {
     final messagesAsync = ref.watch(messagesProvider(widget.roomId));
 
     return Scaffold(
-      key: _scaffoldKey,
+      key: scaffoldKey,
       resizeToAvoidBottomInset: true,
 
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(100.0),
 
         child: FutureBuilder(
-          future: _loadDataFuture,
+          future: loadDataFuture,
 
           builder: (_, snapshot) {
             if (!snapshot.hasData) {
@@ -91,10 +99,16 @@ class ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                       Theme.of(context).colorScheme.surfaceContainer,
                     ),
                     shape: WidgetStateProperty.all(
-                      const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                      const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                      ),
                     ),
-                    minimumSize: WidgetStateProperty.all(const Size.fromHeight(36.0)),
-                    maximumSize: WidgetStateProperty.all(const Size.fromHeight(36.0)),
+                    minimumSize: WidgetStateProperty.all(
+                      const Size.fromHeight(36.0),
+                    ),
+                    maximumSize: WidgetStateProperty.all(
+                      const Size.fromHeight(36.0),
+                    ),
                   ),
 
                   child: Text('button.show_proposal'.tr()),
@@ -119,8 +133,10 @@ class ChatRoomPageState extends ConsumerState<ChatRoomPage> {
 
                     return MessageBubble(
                       content: msg['text'] as String,
-                      date: (msg['created_at'] as Timestamp?)?.toDate() ?? DateTime.now(),
-                      isFromCurrentUser: msg['recipient_id'] == widget.recipientId,
+                      date:
+                          (msg['timestamp'] as Timestamp?)?.toDate() ??
+                          DateTime.now(),
+                      isFromCurrentUser: msg['recipient'] == widget.recipientId,
                     );
                   },
 
@@ -135,7 +151,7 @@ class ChatRoomPageState extends ConsumerState<ChatRoomPage> {
           MessageInputBar(
             onSubmitted: (message) async {
               final user = ref.read(authProvider)!;
-              await ChatService.sendMessage(
+              await ChatService.instance.sendMessage(
                 roomId: widget.roomId,
                 senderId: user.id,
                 recipientId: widget.recipientId,

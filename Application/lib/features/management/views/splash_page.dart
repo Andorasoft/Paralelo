@@ -39,6 +39,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
       notifier.setTheme(prefs.darkMode ? ThemeMode.dark : ThemeMode.light);
       notifier.setNotifications(prefs.notificationsEnabled);
 
+      await context.setLocale(Locale(prefs.language));
       await ref.read(goRouterProvider).pushReplacement('/');
     });
   }

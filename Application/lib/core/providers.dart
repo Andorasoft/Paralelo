@@ -3,8 +3,15 @@ import 'services.dart';
 
 final messagesProvider =
     StreamProvider.family<List<Map<String, dynamic>>, String>((_, roomId) {
-      return ChatService.messagesStream(roomId);
+      return ChatService.instance.messagesStream(roomId);
     });
+
+final unreadProvider = StreamProvider.family<Map<String, dynamic>?, String>((
+  _,
+  roomId,
+) {
+  return ChatService.instance.unreadStream(roomId);
+});
 
 final preferencesProvider =
     StateNotifierProvider<PreferencesNotifier, PreferencesState>(

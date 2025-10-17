@@ -195,10 +195,10 @@ create table
 -- ENUM-LIKE FIELDS (reference only)
 -- ============================================================
 -- project.status                   → 'OPEN', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'
+-- proposal.mode                    → 'REMOTE', 'IN_PERSON', 'HYBRID'
 -- proposal.status                  → 'PENDING', 'ACCEPTED', 'REJECTED', 'CANCELLED'
 -- proposal.estimated_duration_unit → 'HOURS', 'DAYS'
 -- project_payment.type             → 'FIXED', 'HOURLY'
 -- report.status                    → 'OPEN', 'IN_REVIEW', 'RESOLVED', 'CLOSED'
 -- application.platform             → 'IOS', 'ANDROID'
 -- user_preference.language         → 'es', 'en'
--- category.name                    → 'DEVELOPMENT', 'DESIGN', 'WRITING', 'MARKETING'

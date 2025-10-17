@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
-import 'package:paralelo/features/auth/controllers/auth_provider.dart';
+import 'package:paralelo/core/imports.dart';
+import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/projects/controllers/project_payment_provider.dart';
 import 'package:paralelo/features/projects/models/project_payment.dart';
 import 'package:paralelo/features/projects/models/project.dart';
@@ -20,49 +17,45 @@ class CreateProposalPage extends ConsumerStatefulWidget {
   static const routePath = '/create-proposal';
 
   final Project project;
-  final ProjectPayment? projectPayment;
+  final ProjectPayment? payment;
 
-  const CreateProposalPage({
-    super.key,
-    required this.project,
-    this.projectPayment,
-  });
+  const CreateProposalPage({super.key, required this.project, this.payment});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return CreateProposalPageState();
+    return _CreateProposalPageState();
   }
 }
 
-class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
-  final _formKey = GlobalKey<FormState>();
+class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  final formKey = GlobalKey<FormState>();
+  late final Future<ProjectPayment?> loadDataFuture;
 
-  final _messageFieldController = TextEditingController();
-  final _messageFieldFocusNode = FocusNode();
+  final messageFieldController = TextEditingController();
+  final messageFieldFocusNode = FocusNode();
 
-  final _amountFieldController = TextEditingController();
-  final _amountFieldFocusNode = FocusNode();
+  final amountFieldController = TextEditingController();
+  final amountFieldFocusNode = FocusNode();
 
-  final _timeFieldController = NumberEditingController(value: 1);
-  final _timeFieldFocusNode = FocusNode();
+  final timeFieldController = NumberEditingController(value: 1);
+  final timeFieldFocusNode = FocusNode();
 
-  late final Future<ProjectPayment?> _loadDataFuture;
-
-  final _modes = ['Remote', 'In-person', 'Hybrid'];
-  String _selectedMode = 'Remote';
+  final modes = ['REMOTE', 'IN_PERSON', 'HYBRID'];
+  String selectedMode = 'REMOTE';
 
   @override
   void initState() {
     super.initState();
 
-    _loadDataFuture = _loadData();
+    loadDataFuture = loadData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
+      key: scaffoldKey,
+      resizeToAvoidBottomInset: true,
 
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -71,7 +64,7 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
       ),
 
       body: FutureBuilder(
-        future: _loadDataFuture,
+        future: loadDataFuture,
 
         builder: (_, snapshot) {
           if (!snapshot.hasData) {
@@ -80,13 +73,13 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
 
           final payment = snapshot.data!;
 
-          if (_amountFieldController.text.isEmpty) {
-            _amountFieldController.text =
-                '${((payment.max + payment.min) / 2)}';
+          if (amountFieldController.text.isEmpty) {
+            amountFieldController.text = ((payment.max + payment.min) / 2)
+                .toStringAsFixed(2);
           }
 
           return Form(
-            key: _formKey,
+            key: formKey,
 
             child: ListView(
               children: [
@@ -102,8 +95,8 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                   'Mensaje al solicitante',
                 ).margin(const EdgeInsets.only(top: 16.0, bottom: 4.0)),
                 TextFormField(
-                  controller: _messageFieldController,
-                  focusNode: _messageFieldFocusNode,
+                  controller: messageFieldController,
+                  focusNode: messageFieldFocusNode,
 
                   minLines: 4,
                   maxLines: null,
@@ -121,16 +114,16 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   spacing: 8.0,
 
-                  children: _modes
+                  children: modes
                       .map(
                         (m) => ChoiceChip(
                           label: Text(m).center(),
                           showCheckmark: false,
                           backgroundColor: Colors.transparent,
-                          selected: _selectedMode == m,
+                          selected: selectedMode == m,
 
                           onSelected: (_) {
-                            setState(() => _selectedMode = m);
+                            setState(() => selectedMode = m);
                           },
                         ).expanded(),
                       )
@@ -142,8 +135,8 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                     'Monto total (USD)',
                   ).margin(const EdgeInsets.only(top: 16.0, bottom: 4.0)),
                   TextFormField(
-                    controller: _amountFieldController,
-                    focusNode: _amountFieldFocusNode,
+                    controller: amountFieldController,
+                    focusNode: amountFieldFocusNode,
 
                     decoration: InputDecoration(
                       prefixIcon: Icon(LucideIcons.dollarSign),
@@ -156,8 +149,8 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                     'Tarifa por hora (USD)',
                   ).margin(const EdgeInsets.only(top: 16.0, bottom: 4.0)),
                   TextFormField(
-                    controller: _amountFieldController,
-                    focusNode: _amountFieldFocusNode,
+                    controller: amountFieldController,
+                    focusNode: amountFieldFocusNode,
 
                     decoration: InputDecoration(
                       prefixIcon: Icon(LucideIcons.dollarSign),
@@ -171,8 +164,8 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                   'Tiempo estimado de entrega',
                 ).margin(const EdgeInsets.only(top: 16.0, bottom: 4.0)),
                 NumberInputFormField(
-                  controller: _timeFieldController,
-                  focusNode: _timeFieldFocusNode,
+                  controller: timeFieldController,
+                  focusNode: timeFieldFocusNode,
                   validator: (num? value) {
                     if (value == null) {
                       return 'Por favor, ingresa un número válido';
@@ -198,13 +191,13 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
       ),
 
       bottomNavigationBar: FutureBuilder(
-        future: _loadDataFuture,
+        future: loadDataFuture,
 
         builder: (_, snapshot) {
           return FilledButton(
             onPressed: snapshot.hasData
                 ? () async {
-                    final error = await _createProposal();
+                    final error = await createProposal(snapshot.data!);
 
                     if (error == null) {
                       ref.read(goRouterProvider).pop();
@@ -220,9 +213,9 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
     ).hideKeyboardOnTap(context);
   }
 
-  Future<ProjectPayment> _loadData() async {
-    if (widget.projectPayment != null) {
-      return Future.value(widget.projectPayment);
+  Future<ProjectPayment> loadData() async {
+    if (widget.payment != null) {
+      return Future.value(widget.payment);
     }
 
     final payment = await ref
@@ -232,17 +225,27 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
     return payment!;
   }
 
-  Future<String?> _createProposal() async {
+  Future<String?> createProposal(ProjectPayment payment) async {
+    final userId = ref.read(authProvider)!.id;
     String? error;
 
-    try {
-      final user = ref.read(authProvider)!;
+    final hourlyRate = payment.type == 'HOURLY'
+        ? num.parse(amountFieldController.text)
+        : null;
+    final fixedRate = payment.type == 'FIXED'
+        ? num.parse(amountFieldController.text)
+        : null;
 
+    try {
       final proposal = await ref
           .read(proposalProvider)
           .create(
-            message: _messageFieldController.text,
-            mode: _selectedMode,
+            message: messageFieldController.text,
+            mode: selectedMode,
+            amount: fixedRate,
+            hourlyRate: hourlyRate,
+            estimatedDurationValue: timeFieldController.value!,
+            estimatedDurationUnit: payment.type == 'HOURLY' ? 'HOURS' : 'DAYS',
             providerId: widget.project.ownerId,
             projectId: widget.project.id,
           );
@@ -250,13 +253,13 @@ class CreateProposalPageState extends ConsumerState<CreateProposalPage> {
           .read(chatRoomProvider)
           .create(
             user1Id: widget.project.ownerId,
-            user2Id: user.id,
+            user2Id: userId,
             proposalId: proposal.id,
           );
 
-      await ChatService.sendMessage(
+      await ChatService.instance.sendMessage(
         roomId: room.id,
-        senderId: user.id,
+        senderId: userId,
         recipientId: widget.project.ownerId,
         text: proposal.message,
       );

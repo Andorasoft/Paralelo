@@ -10,4 +10,6 @@ export 'package:shared_preferences/shared_preferences.dart';
 export 'package:lucide_icons/lucide_icons.dart';
 export 'package:app_settings/app_settings.dart';
 export 'package:flutter_tabler_icons/flutter_tabler_icons.dart';
-export 'package:badges/badges.dart' show Badge, BadgeStyle;
+export 'package:badges/badges.dart' show Badge, BadgeStyle, BadgePosition;
+export 'package:cloud_firestore/cloud_firestore.dart';
+export 'package:firebase_messaging/firebase_messaging.dart';

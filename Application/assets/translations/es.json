@@ -93,5 +93,8 @@
     "ongoing_projects": "Proyectos en curso"
   },
   "all_rights_reserved": "Todos los derechos reservados",
-  "empty": "No hay datos para mostrar"
+  "empty": "No hay datos para mostrar",
+  "requirement": "Requisito",
+  "required_skills": "Habilidades necesarias",
+  "hour": "HORA"
 }

@@ -5,6 +5,13 @@ abstract class UserPreferenceRepository {
   Future<UserPreference?> getForUser(String userId);
 
   Future<UserPreference> create({required String userId});
+
+  Future<UserPreference?> update(
+    String userId, {
+    String? language,
+    bool? darkMode,
+    bool? notificationsEnabled,
+  });
 }
 
 class SupabaseUserPreferenceRepository implements UserPreferenceRepository {
@@ -32,5 +39,32 @@ class SupabaseUserPreferenceRepository implements UserPreferenceRepository {
         .single();
 
     return UserPreference.fromMap(data);
+  }
+
+  @override
+  Future<UserPreference?> update(
+    String userId, {
+    String? language,
+    bool? darkMode,
+    bool? notificationsEnabled,
+  }) async {
+    final updates = <String, dynamic>{};
+
+    if (language != null) updates['language'] = language;
+    if (darkMode != null) updates['dark_mode'] = darkMode;
+    if (notificationsEnabled != null) {
+      updates['notifications_enabled'] = notificationsEnabled;
+    }
+
+    if (updates.isEmpty) return await getForUser(userId);
+
+    final data = await _client
+        .from('user_preference')
+        .update(updates)
+        .eq('user_id', userId)
+        .select()
+        .maybeSingle();
+
+    return data != null ? UserPreference.fromMap(data) : null;
   }
 }

@@ -19,11 +19,9 @@ abstract class UserRepository {
   /// Updates a [User] with the provided fields.
   Future<User?> update(
     String id, {
-    String? firstName,
-    String? lastName,
+    String? displayName,
     String? email,
     String? pictureUrl,
-    int? universityId,
     String? deviceToken,
   });
 }
@@ -69,20 +67,16 @@ class SupabaseUserRepository implements UserRepository {
   @override
   Future<User?> update(
     String id, {
-    String? firstName,
-    String? lastName,
+    String? displayName,
     String? email,
     String? pictureUrl,
-    int? universityId,
     String? deviceToken,
   }) async {
     final updates = <String, dynamic>{};
 
-    if (firstName != null) updates['first_name'] = firstName;
-    if (lastName != null) updates['last_name'] = lastName;
+    if (displayName != null) updates['display_name'] = displayName;
     if (email != null) updates['email'] = email;
     if (pictureUrl != null) updates['picture_url'] = pictureUrl;
-    if (universityId != null) updates['university_id'] = universityId;
     if (deviceToken != null) updates['device_token'] = deviceToken;
 
     if (updates.isEmpty) return await getById(id);

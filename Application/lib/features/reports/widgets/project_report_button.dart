@@ -1,23 +1,15 @@
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/core/modals.dart';
+import 'package:paralelo/features/projects/exports.dart';
 
-class ReportProjectButton extends ConsumerStatefulWidget {
-  const ReportProjectButton({super.key});
+class ReportProjectButton extends ConsumerWidget {
+  final Project project;
+
+  const ReportProjectButton({super.key, required this.project});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() {
-    return ReportProjectButtonState();
-  }
-}
-
-class ReportProjectButtonState extends ConsumerState<ReportProjectButton> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return TextButton.icon(
       onPressed: () async {
         final reason = await showProjectReportModalBottomSheet(context);

@@ -24,7 +24,7 @@ class User {
   final String? deviceToken;
 
   /// Identifier of the university associated with the user.
-  final int? universityId;
+  final int universityId;
 
   const User({
     required this.id,
@@ -34,7 +34,7 @@ class User {
     required this.verified,
     this.pictureUrl,
     this.deviceToken,
-    this.universityId,
+    required this.universityId,
   });
 
   /// Builds an [User] object from a database map.

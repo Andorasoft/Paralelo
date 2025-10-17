@@ -13,6 +13,8 @@ abstract class ProposalRepository {
     required String mode,
     num? amount,
     num? hourlyRate,
+    required num estimatedDurationValue,
+    required String estimatedDurationUnit,
     required String providerId,
     required int projectId,
   });
@@ -62,6 +64,8 @@ class SupabaseProposalRepository implements ProposalRepository {
     required String mode,
     num? amount,
     num? hourlyRate,
+    required num estimatedDurationValue,
+    required String estimatedDurationUnit,
     required String providerId,
     required int projectId,
   }) async {
@@ -72,6 +76,8 @@ class SupabaseProposalRepository implements ProposalRepository {
           'mode': mode,
           'amount': amount,
           'hourly_rate': hourlyRate,
+          'estimated_duration_value': estimatedDurationValue,
+          'estimated_duration_unit': estimatedDurationUnit,
           'provider_id': providerId,
           'project_id': projectId,
         })

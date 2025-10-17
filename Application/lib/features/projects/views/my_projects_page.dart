@@ -1,9 +1,11 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
+import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/projects/controllers/project_provider.dart';
 import 'package:paralelo/features/projects/models/project.dart';
-import 'package:paralelo/features/projects/widgets/project_card.dart';
+import 'package:paralelo/features/projects/views/project_details_page.dart';
+import 'package:paralelo/features/projects/widgets/project_info_presenter.dart';
 import 'package:paralelo/widgets/empty_indicator.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
@@ -58,8 +60,21 @@ class _MyProjectsPageState extends ConsumerState<MyProjectsPage> {
           final projects = snapshot.data!;
 
           return ListView(
-            children: projects.map((p) => ProjectCard(project: p)).toList(),
-          ).margin(const EdgeInsets.all(8.0));
+            children: projects
+                .map(
+                  (i) => ProjectInfoPresenter(
+                    project: i,
+                    maxLines: 5,
+
+                    onTap: () async {
+                      await ref
+                          .read(goRouterProvider)
+                          .push(ProjectDetailsPage.routePath, extra: i);
+                    },
+                  ),
+                )
+                .divide(const SizedBox(height: 8.0)),
+          ).margin(const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0));
         },
       ),
     );

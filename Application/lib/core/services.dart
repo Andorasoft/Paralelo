@@ -1,7 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'imports.dart';
 
 /// Background handler for FCM messages.
 /// This will be triggered when the app is in the background or terminated.
@@ -12,45 +9,81 @@ Future<void> _messagingBackgroundHandler(RemoteMessage message) async {
 
 /// Service for managing chat messages with Firestore.
 class ChatService {
-  static final _firestore = FirebaseFirestore.instance;
+  /// Singleton instance.
+  static final instance = ChatService._internal();
 
+  final _firestore = FirebaseFirestore.instance;
+
+  /// Private constructor for Singleton.
   ChatService._internal();
 
   /// Returns a stream of messages for a given chat room.
   ///
-  /// [roomId] - ID of the chat room to listen to.
-  static Stream<List<Map<String, dynamic>>> messagesStream(String roomId) {
+  /// [roomId] - ID (UUID) of the chat room to listen to.
+  Stream<List<Map<String, dynamic>>> messagesStream(String roomId) {
     return _firestore
-        .collection('chats')
+        .collection('rooms')
         .doc(roomId)
         .collection('messages')
-        .orderBy('created_at', descending: true)
+        .orderBy('timestamp', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
   }
 
-  /// Sends a new message to a chat room.
+  /// Stream that emits unread map for a given chat room.
+  Stream<Map<String, dynamic>?> unreadStream(String roomId) {
+    return _firestore
+        .collection('rooms')
+        .doc(roomId)
+        .snapshots()
+        .map((doc) => doc.data()?['unread'] as Map<String, dynamic>?);
+  }
+
+  /// Sends a new message to a chat room and updates unread flags.
   ///
   /// [roomId] - ID of the chat room.
-  /// [senderId] - ID of the sender.
-  /// [recipientId] - ID of the recipient.
+  /// [senderId] - ID of the sender (UUID).
+  /// [recipientId] - ID of the recipient (UUID).
   /// [text] - Message text.
-  static Future<void> sendMessage({
+  Future<void> sendMessage({
     required String roomId,
     required String senderId,
     required String recipientId,
     required String text,
   }) async {
-    await _firestore
-        .collection('chats')
-        .doc(roomId)
-        .collection('messages')
-        .add({
-          'text': text,
-          'sender_id': senderId,
-          'recipient_id': recipientId,
-          'created_at': FieldValue.serverTimestamp(),
-        });
+    final roomRef = _firestore.collection('rooms').doc(roomId);
+    final messagesRef = roomRef.collection('messages');
+
+    // Add message
+    await messagesRef.add({
+      'text': text,
+      'sender': senderId,
+      'recipient': recipientId,
+      'timestamp': FieldValue.serverTimestamp(), // matches JSON format
+    });
+
+    // Update unread status in room document
+    await roomRef.set({
+      'unread': {
+        senderId: false, // the sender has read
+        recipientId: true, // recipient has new unread message
+      },
+    }, SetOptions(merge: true));
+  }
+
+  /// Marks messages as read for a specific user in a room.
+  Future<void> markAsRead({
+    required String roomId,
+    required String userId,
+  }) async {
+    final roomRef = _firestore.collection('rooms').doc(roomId);
+    await roomRef.update({'unread.$userId': false});
+  }
+
+  /// Returns the unread status for a chat room.
+  Future<Map<String, dynamic>?> getUnreadStatus(String roomId) async {
+    final doc = await _firestore.collection('rooms').doc(roomId).get();
+    return doc.data()?['unread'] as Map<String, dynamic>?;
   }
 }
 
