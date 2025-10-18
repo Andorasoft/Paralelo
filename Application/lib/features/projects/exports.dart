@@ -14,4 +14,6 @@ export 'views/my_projects_page.dart';
 export 'views/project_details_page.dart';
 
 export 'widgets/project_filter_button.dart';
+export 'widgets/project_info_presenter.dart';
+export 'widgets/project_owner_presenter.dart';
 export 'widgets/project_sort_button.dart';

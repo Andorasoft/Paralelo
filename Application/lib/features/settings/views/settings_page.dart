@@ -90,13 +90,13 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   },
 
                   leading: const Icon(TablerIcons.briefcase_filled),
-                  title: 'setting.options.my_projects'.tr(),
+                  title: 'setting.options.published_projects'.tr(),
                 ),
                 SettingOption.tile(
                   onTap: () {},
 
                   leading: const Icon(TablerIcons.file_filled),
-                  title: 'setting.options.my_proposals'.tr(),
+                  title: 'setting.options.proposals_submitted'.tr(),
                 ),
                 SettingOption.tile(
                   onTap: () {},

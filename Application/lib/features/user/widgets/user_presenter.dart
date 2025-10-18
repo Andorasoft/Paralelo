@@ -1,6 +1,7 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/user/exports.dart';
+import 'package:paralelo/widgets/person_picture.dart';
 
 class UserPresenter extends ConsumerWidget {
   final User user;
@@ -13,13 +14,7 @@ class UserPresenter extends ConsumerWidget {
       mainAxisSize: MainAxisSize.min,
 
       children: [
-        if (user.pictureUrl.isNullOrEmpty)
-          SvgPicture.asset('assets/images/user.svg', width: 64.0, height: 64.0)
-        else
-          ClipRRect(
-            borderRadius: BorderRadius.circular(100.0),
-            child: Image.network(user.pictureUrl!, width: 64.0, height: 64.0),
-          ),
+        PersonPicture(source: user.pictureUrl ?? '', size: 64.0),
         Row(
           mainAxisSize: MainAxisSize.min,
           spacing: 4.0,

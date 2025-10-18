@@ -1,21 +1,15 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
-import 'package:paralelo/features/auth/controllers/auth_provider.dart';
-import 'package:paralelo/features/projects/controllers/project_payment_provider.dart';
-import 'package:paralelo/features/projects/widgets/project_info_presenter.dart';
-import 'package:paralelo/features/projects/widgets/project_owner_presenter.dart';
-import 'package:paralelo/features/skills/controllers/project_skill_provider.dart';
-import 'package:paralelo/features/projects/models/project.dart';
-import 'package:paralelo/features/projects/models/project_payment.dart';
-import 'package:paralelo/features/skills/models/project_skill.dart';
-import 'package:paralelo/features/proposal/views/create_proposal_page.dart';
+import 'package:paralelo/core/router.dart';
+import 'package:paralelo/features/auth/exports.dart';
+import 'package:paralelo/features/projects/exports.dart';
+import 'package:paralelo/features/skills/exports.dart';
+import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
-import 'package:paralelo/core/router.dart';
 
 class ProjectDetailsPage extends ConsumerStatefulWidget {
-  static const routeName = 'ProjectDetailsPage';
   static const routePath = '/project-details';
 
   final Project project;

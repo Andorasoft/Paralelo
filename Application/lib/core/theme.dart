@@ -171,7 +171,7 @@ extension AppThemeData on ThemeData {
         statusBarColor: Colors.transparent,
       ),
 
-      actionsPadding: const EdgeInsets.symmetric(horizontal: 8.0),
+      actionsPadding: const EdgeInsets.symmetric(horizontal: 16.0),
       titleSpacing: 4.0,
       centerTitle: false,
     ),

@@ -70,8 +70,9 @@
       "support": "Soporte"
     },
     "options": {
-      "my_projects": "Mis proyectos",
-      "my_proposals": "Mis propuestas",
+      "published_projects": "Proyectos publicados",
+      "proposals_submitted": "Propuestas enviadas",
+      "reports_generated": "Reportes generados",
       "my_skills": "Mis habilidades",
       "language": "Idioma",
       "notifications": "Notificaciones",
@@ -96,5 +97,33 @@
   "empty": "No hay datos para mostrar",
   "requirement": "Requisito",
   "required_skills": "Habilidades necesarias",
-  "hour": "HORA"
+  "hour": "HORA",
+  "hello": "Hola",
+  "const": {
+    "project_status": {
+      "open": "Abierto",
+      "in_progress": "En curso",
+      "completed": "Completado",
+      "canceled": "Cancelado"
+    },
+    "proposal_mode": {
+      "remote": "Remoto",
+      "in_person": "Presencial",
+      "hybrid": "Híbrido"
+    },
+    "proposal_status": {
+      "pending": "Pendiente",
+      "accepted": "Aceptado",
+      "rejected": "Rechazado",
+      "canceled": "Cancelado"
+    },
+    "proposal_estimated_duration_unit": {
+      "hours": "Horas",
+      "days": "Días"
+    },
+    "project_payment_type": {
+      "fixed": "Por proyecto",
+      "hourly": "Por hora"
+    }
+  }
 }

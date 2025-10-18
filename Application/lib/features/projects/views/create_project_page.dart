@@ -1,37 +1,33 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:paralelo/core/constants.dart';
+import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
 
 class CreateProjectPage extends ConsumerStatefulWidget {
-  static const routeName = 'CreateProjectPage';
   static const routePath = '/create-project';
 
   const CreateProjectPage({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return CreateProjectPageState();
+    return _CreateProjectPageState();
   }
 }
 
-class CreateProjectPageState extends ConsumerState<CreateProjectPage> {
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
-  final _formKey = GlobalKey<FormState>();
+class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
+      key: scaffoldKey,
 
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        centerTitle: true,
 
         leading: const NavigationButton(type: NavigationButtonType.close),
-
-        centerTitle: true,
         title: Text('Publish a project'),
       ),
 
@@ -39,7 +35,7 @@ class CreateProjectPageState extends ConsumerState<CreateProjectPage> {
         scrollDirection: Axis.vertical,
 
         child: Form(
-          key: _formKey,
+          key: formKey,
 
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -94,24 +90,31 @@ class CreateProjectPageState extends ConsumerState<CreateProjectPage> {
               ),
 
               Text('Budget type').margin(const EdgeInsets.only(top: 12.0)),
-              DropdownButtonFormField<int>(
-                initialValue: 1,
+              DropdownButtonFormField<String>(
+                initialValue: ProjectPaymentType.fixed,
                 onChanged: (v) {},
 
-                items: [
-                  DropdownMenuItem(value: 1, child: Text('Project')),
-                  DropdownMenuItem(value: 2, child: Text('Hourly')),
-                ],
+                items: ProjectPaymentType.values
+                    .map(
+                      (i) => DropdownMenuItem(
+                        value: i,
+                        child: Text(ProjectPaymentType.labels[i]!),
+                      ),
+                    )
+                    .toList(),
               ),
             ],
           ),
-        ).margin(const EdgeInsets.all(8.0)),
+        ).margin(const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0)),
       ),
 
-      bottomNavigationBar: FilledButton(
-        onPressed: () {},
-        child: const Text('Publish project'),
-      ).margin(const EdgeInsets.symmetric(horizontal: 8.0)).useSafeArea(),
+      bottomNavigationBar:
+          FilledButton(
+            onPressed: () {},
+            child: const Text('Publish project'),
+          ).useSafeArea().margin(
+            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          ),
     ).hideKeyboardOnTap(context);
   }
 }

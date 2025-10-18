@@ -1,20 +1,15 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
-import 'package:paralelo/features/auth/controllers/auth_provider.dart';
-import 'package:paralelo/features/chats/controllers/chat_room_provider.dart';
-import 'package:paralelo/features/chats/models/chat_room.dart';
-import 'package:paralelo/features/chats/widgets/message_bubble.dart';
-import 'package:paralelo/features/chats/widgets/message_input_bar.dart';
-import 'package:paralelo/features/proposal/controllers/proposal_provider.dart';
-import 'package:paralelo/features/proposal/models/proposal.dart';
-import 'package:paralelo/features/user/controllers/user_provider.dart';
+import 'package:paralelo/features/auth/exports.dart';
+import 'package:paralelo/features/chats/exports.dart';
+import 'package:paralelo/features/proposal/exports.dart';
+import 'package:paralelo/features/user/exports.dart';
 import 'package:paralelo/core/providers.dart';
 import 'package:paralelo/core/services.dart';
-import 'package:paralelo/features/user/models/user.dart';
-import 'package:paralelo/features/user/widgets/user_rating_presenter.dart';
 import 'package:paralelo/utils/formatters.dart';
-import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
+import 'package:paralelo/widgets/skeleton.dart';
+import 'package:paralelo/widgets/skeleton_block.dart';
 
 class ChatRoomPage extends ConsumerStatefulWidget {
   static const routeName = 'ChatRoomPage';
@@ -37,13 +32,13 @@ class ChatRoomPage extends ConsumerStatefulWidget {
 
 class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  late final Future<(User, ChatRoom, Proposal)> loadDataFuture;
+  late final Future<(User, Proposal)> loadDataFuture;
 
   @override
   void initState() {
     super.initState();
 
-    loadDataFuture = _loadData();
+    loadDataFuture = loadData();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final userId = ref.read(authProvider)!.id;
@@ -64,21 +59,38 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
       resizeToAvoidBottomInset: true,
 
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(100.0),
+        preferredSize: const Size.fromHeight(100.0),
 
         child: FutureBuilder(
           future: loadDataFuture,
-
           builder: (_, snapshot) {
             if (!snapshot.hasData) {
-              return AppBar(
-                automaticallyImplyLeading: false,
+              return Skeleton(
+                child: AppBar(
+                  automaticallyImplyLeading: false,
+                  toolbarHeight: 64.0,
 
-                title: const LoadingIndicator(showMessage: false).center(),
+                  leading: const SkeletonBlock(
+                    width: 40.0,
+                    height: 40.0,
+                    radius: 100.0,
+                  ).center(),
+                  title: const SkeletonBlock(width: 94.0, height: 20.0),
+                  actions: const [SkeletonBlock(width: 32.0, height: 20.0)],
+
+                  bottom: const PreferredSize(
+                    preferredSize: Size.fromHeight(36.0),
+                    child: SkeletonBlock(
+                      width: double.infinity,
+                      height: 36.0,
+                      radius: 0.0,
+                    ),
+                  ),
+                ),
               );
             }
 
-            final (user, _, _) = snapshot.data!;
+            final (user, proposal) = snapshot.data!;
 
             return AppBar(
               automaticallyImplyLeading: false,
@@ -89,29 +101,9 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
               actions: const [UserRatingPresenter(rating: 4.5)],
 
               bottom: PreferredSize(
-                preferredSize: Size.fromHeight(36.0),
-
-                child: TextButton(
-                  onPressed: () {},
-
-                  style: Theme.of(context).textButtonTheme.style?.copyWith(
-                    backgroundColor: WidgetStateProperty.all(
-                      Theme.of(context).colorScheme.surfaceContainer,
-                    ),
-                    shape: WidgetStateProperty.all(
-                      const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.zero,
-                      ),
-                    ),
-                    minimumSize: WidgetStateProperty.all(
-                      const Size.fromHeight(36.0),
-                    ),
-                    maximumSize: WidgetStateProperty.all(
-                      const Size.fromHeight(36.0),
-                    ),
-                  ),
-
-                  child: Text('button.show_proposal'.tr()),
+                preferredSize: const Size.fromHeight(36.0),
+                child: ShowProposalButton(
+                  proposalId: proposal.id,
                 ).size(height: 36.0),
               ),
             );
@@ -148,27 +140,31 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                 error: (e, _) => Text('Error: $e').center(),
               )
               .expanded(),
+
           MessageInputBar(
             onSubmitted: (message) async {
-              final user = ref.read(authProvider)!;
+              final userId = ref.read(authProvider)!.id;
+
               await ChatService.instance.sendMessage(
                 roomId: widget.roomId,
-                senderId: user.id,
+                senderId: userId,
                 recipientId: widget.recipientId,
                 text: message,
               );
             },
-          ),
+          ).useSafeArea(),
         ],
-      ).useSafeArea().margin(const EdgeInsets.all(8.0)),
+      ).margin(const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0)),
     ).hideKeyboardOnTap(context);
   }
 
-  Future<(User, ChatRoom, Proposal)> _loadData() async {
-    final user = await ref.read(userProvider).getById(widget.recipientId);
-    final room = await ref.read(chatRoomProvider).getById(widget.roomId);
+  Future<(User, Proposal)> loadData() async {
+    final (user, room) = await (
+      ref.read(userProvider).getById(widget.recipientId),
+      ref.read(chatRoomProvider).getById(widget.roomId),
+    ).wait;
     final proposal = await ref.read(proposalProvider).getById(room!.proposalId);
 
-    return (user!, room, proposal!);
+    return (user!, proposal!);
   }
 }

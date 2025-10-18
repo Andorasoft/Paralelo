@@ -1,19 +1,17 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/core/constants.dart';
 import 'package:paralelo/core/imports.dart';
+import 'package:paralelo/core/services.dart';
+import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/exports.dart';
-import 'package:paralelo/features/projects/controllers/project_payment_provider.dart';
-import 'package:paralelo/features/projects/models/project_payment.dart';
-import 'package:paralelo/features/projects/models/project.dart';
-import 'package:paralelo/features/chats/controllers/chat_room_provider.dart';
-import 'package:paralelo/features/proposal/controllers/proposal_provider.dart';
+import 'package:paralelo/features/projects/exports.dart';
+import 'package:paralelo/features/chats/exports.dart';
+import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
 import 'package:paralelo/widgets/number_input_form_field.dart';
-import 'package:paralelo/core/services.dart';
-import 'package:paralelo/core/router.dart';
 
 class CreateProposalPage extends ConsumerStatefulWidget {
-  static const routeName = 'CreateProposalPage';
   static const routePath = '/create-proposal';
 
   final Project project;
@@ -41,7 +39,6 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
   final timeFieldController = NumberEditingController(value: 1);
   final timeFieldFocusNode = FocusNode();
 
-  final modes = ['REMOTE', 'IN_PERSON', 'HYBRID'];
   String selectedMode = 'REMOTE';
 
   @override
@@ -114,16 +111,16 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   spacing: 8.0,
 
-                  children: modes
+                  children: ProposalMode.values
                       .map(
-                        (m) => ChoiceChip(
-                          label: Text(m).center(),
+                        (i) => ChoiceChip(
+                          label: Text(ProposalMode.labels[i]!).center(),
                           showCheckmark: false,
                           backgroundColor: Colors.transparent,
-                          selected: selectedMode == m,
+                          selected: selectedMode == i,
 
                           onSelected: (_) {
-                            setState(() => selectedMode = m);
+                            setState(() => selectedMode = i);
                           },
                         ).expanded(),
                       )
@@ -246,7 +243,7 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
             hourlyRate: hourlyRate,
             estimatedDurationValue: timeFieldController.value!,
             estimatedDurationUnit: payment.type == 'HOURLY' ? 'HOURS' : 'DAYS',
-            providerId: widget.project.ownerId,
+            providerId: userId,
             projectId: widget.project.id,
           );
       final room = await ref

@@ -2,16 +2,12 @@ import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/exports.dart';
-import 'package:paralelo/features/projects/controllers/project_provider.dart';
-import 'package:paralelo/features/projects/models/project.dart';
-import 'package:paralelo/features/projects/views/project_details_page.dart';
-import 'package:paralelo/features/projects/widgets/project_info_presenter.dart';
+import 'package:paralelo/features/projects/exports.dart';
 import 'package:paralelo/widgets/empty_indicator.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
 
 class MyProjectsPage extends ConsumerStatefulWidget {
-  static const routeName = 'MyProjectsPage';
   static const routePath = '/my-projects';
 
   const MyProjectsPage({super.key});
@@ -43,7 +39,7 @@ class _MyProjectsPageState extends ConsumerState<MyProjectsPage> {
 
         leading: const NavigationButton(),
 
-        title: Text('setting.options.my_projects'.tr()),
+        title: Text('setting.options.published_projects'.tr()),
       ),
 
       body: FutureBuilder(

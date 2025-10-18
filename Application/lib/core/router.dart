@@ -12,6 +12,8 @@ import 'package:paralelo/features/projects/views/create_project_page.dart';
 import 'package:paralelo/features/projects/views/my_projects_page.dart';
 import 'package:paralelo/features/projects/views/project_details_page.dart';
 import 'package:paralelo/features/proposal/views/create_proposal_page.dart';
+import 'package:paralelo/features/proposal/views/my_proposals_page.dart';
+import 'package:paralelo/features/proposal/views/proposal_details_page.dart';
 import 'package:paralelo/features/user/models/user.dart';
 import 'package:paralelo/widgets/bottom_nav_bar.dart';
 
@@ -21,7 +23,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     debugLogDiagnostics: true,
     initialLocation: AuthPage.routePath,
-    refreshListenable: GoRouterRefreshStream(ref.read(authProvider.notifier).stream),
+    refreshListenable: GoRouterRefreshStream(
+      ref.read(authProvider.notifier).stream,
+    ),
     redirect: (_, state) {
       final loggedIn = authState != null;
       final loggingIn = [AuthPage.routePath].contains(state.matchedLocation);
@@ -77,6 +81,18 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, state) {
           final project = state.extra as Project;
           return CreateProposalPage(project: project);
+        },
+      ),
+      GoRoute(
+        path: ProposalDetailsPage.routePath,
+        builder: (_, state) {
+          return ProposalDetailsPage(proposalId: state.extra as int);
+        },
+      ),
+      GoRoute(
+        path: MyProposalsPage.routePath,
+        builder: (_, _) {
+          return const MyProposalsPage();
         },
       ),
 
