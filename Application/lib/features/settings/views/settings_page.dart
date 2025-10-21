@@ -169,15 +169,15 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   leading: const Icon(TablerIcons.bell_filled),
                   title: 'setting.options.notifications'.tr(),
                 ),
-                SettingOption.toggle(
-                  value: prefs.theme == ThemeMode.dark,
-                  onChanged: (v) {
-                    notifier.setTheme(v ? ThemeMode.dark : ThemeMode.light);
-                  },
+                // SettingOption.toggle(
+                //   value: prefs.theme == ThemeMode.dark,
+                //   onChanged: (v) {
+                //     notifier.setTheme(v ? ThemeMode.dark : ThemeMode.light);
+                //   },
 
-                  leading: const Icon(TablerIcons.moon_filled),
-                  title: 'setting.options.dark_mode'.tr(),
-                ),
+                //   leading: const Icon(TablerIcons.moon_filled),
+                //   title: 'setting.options.dark_mode'.tr(),
+                // ),
               ],
             ),
 

@@ -24,7 +24,6 @@ void main() async {
     authOptions: const FlutterAuthClientOptions(autoRefreshToken: true),
   );
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
   await FCMService.initialize(
     onMessage: (msg) {
       debugPrint("🔥 Foreground: ${msg.notification?.title}");

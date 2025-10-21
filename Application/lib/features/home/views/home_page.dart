@@ -1,6 +1,7 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/auth/exports.dart';
+import 'package:paralelo/features/home/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/widgets/person_picture.dart';
@@ -63,13 +64,36 @@ class _HomePageState extends ConsumerState<HomePage> {
                   ),
                   Text(
                     '${firstName(user.displayName)} ${lastName(user.displayName)}',
-                    style: Theme.of(context).textTheme.bodyLarge,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
             );
           },
         ),
+      ),
+
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: 8.0,
+
+          children: [
+            CreditsSummaryCard(credits: 0.00, collaborations: 0),
+            CommunityGrowthCard(),
+            UserLevelCard(level: UserLevel.rookie),
+            UpgradeLevelCard(),
+            CampusActivityCard(conections: 0),
+            Text(
+              'Proyectos para ti',
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+            ).margin(const EdgeInsets.only(top: 8.0, bottom: 4.0)),
+          ],
+        ).margin(const EdgeInsets.all(8.0)),
       ),
     );
   }

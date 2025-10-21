@@ -4,7 +4,7 @@ export 'package:flutter/material.dart' hide TextDirection;
 export 'package:flutter/services.dart' hide TextDirection;
 export 'package:flutter_dotenv/flutter_dotenv.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';
-export 'package:supabase_flutter/supabase_flutter.dart' hide User;
+export 'package:supabase_flutter/supabase_flutter.dart' hide User, AuthUser;
 export 'package:flutter_svg/svg.dart';
 export 'package:shared_preferences/shared_preferences.dart';
 export 'package:lucide_icons/lucide_icons.dart';

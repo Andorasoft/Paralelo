@@ -33,7 +33,10 @@ class SupabaseAuthRepository implements AuthRepository {
 
   @override
   Future<AuthUser?> loginWithMicrosoft() async {
-    await _client.auth.signInWithOAuth(OAuthProvider.azure);
+    await _client.auth.signInWithOAuth(
+      OAuthProvider.azure,
+      queryParams: {'prompt': 'select_account'},
+    );
     return currentUser();
   }
 

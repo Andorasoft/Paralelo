@@ -1,8 +1,5 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' hide AuthUser;
-
-import 'package:paralelo/features/auth/models/auth_repository.dart';
-import 'package:paralelo/features/auth/models/auth_user.dart';
+import 'package:paralelo/core/imports.dart';
+import 'package:paralelo/features/auth/exports.dart';
 
 /// Global provider that exposes authentication state and actions.
 ///
@@ -28,17 +25,17 @@ class _AuthNotifier extends StateNotifier<AuthUser?> {
 
   /// Signs in the user using the selected [provider].
   ///
-  /// For [OAuthProvider.email], both [email] and [password] must be provided.
+  /// For [AuthProvider.email], both [email] and [password] must be provided.
   Future<void> login({
     String? email,
     String? password,
-    OAuthProvider provider = OAuthProvider.email,
+    AuthProvider provider = AuthProvider.email,
   }) async {
     switch (provider) {
-      case OAuthProvider.email:
+      case AuthProvider.email:
         state = await _repo.loginWithEmail(email!, password!);
         break;
-      case OAuthProvider.microsoft:
+      case AuthProvider.microsoft:
         state = await _repo.loginWithMicrosoft();
         break;
     }
@@ -52,4 +49,4 @@ class _AuthNotifier extends StateNotifier<AuthUser?> {
 }
 
 /// Supported authentication providers for login.
-enum OAuthProvider { email, microsoft }
+enum AuthProvider { email, microsoft }
