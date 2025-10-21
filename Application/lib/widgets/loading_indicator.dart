@@ -1,0 +1,27 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+
+class LoadingIndicator extends ConsumerWidget {
+  final String? message;
+  final bool showMessage;
+
+  const LoadingIndicator({super.key, this.message, this.showMessage = true});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      spacing: 8.0,
+
+      children: [
+        CircularProgressIndicator.adaptive().center(),
+        if (showMessage)
+          Text(message ?? 'Cargando...', textAlign: TextAlign.center),
+      ],
+    );
+  }
+}
