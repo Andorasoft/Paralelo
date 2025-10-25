@@ -19,7 +19,7 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  late final Future<User> loadDataFuture;
+  late final Future<(User, int, int)> loadDataFuture;
 
   @override
   void initState() {
@@ -39,11 +39,11 @@ class _HomePageState extends ConsumerState<HomePage> {
           future: loadDataFuture,
 
           builder: (_, snapshot) {
-            final user = snapshot.data;
-
-            if (user == null) {
+            if (!snapshot.hasData) {
               return const LoadingIndicator(showMessage: false).center();
             }
+
+            final (user, _, _) = snapshot.data!;
 
             return AppBar(
               toolbarHeight: 64.0,
@@ -75,34 +75,46 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
       ),
 
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          spacing: 8.0,
+      body: FutureBuilder(
+        future: loadDataFuture,
+        builder: (_, snapshot) {
+          if (!snapshot.hasData) {
+            return const LoadingIndicator(showMessage: false).center();
+          }
 
-          children: [
-            CreditsSummaryCard(credits: 0.00, collaborations: 0),
-            CommunityGrowthCard(),
-            UserLevelCard(level: UserLevel.rookie),
-            UpgradeLevelCard(),
-            CampusActivityCard(conections: 0),
-            Text(
-              'Proyectos para ti',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
-            ).margin(const EdgeInsets.only(top: 8.0, bottom: 4.0)),
-          ],
-        ).margin(const EdgeInsets.all(8.0)),
+          final (_, collaborations, conections) = snapshot.data!;
+
+          return ListView(
+            scrollDirection: Axis.vertical,
+            children: [
+              CreditsSummaryCard(credits: 0.00, collaborations: collaborations),
+              CommunityGrowthCard(),
+              UserLevelCard(level: UserLevel.rookie),
+              UpgradeLevelCard(),
+              CampusActivityCard(conections: conections),
+              Text(
+                'Proyectos para ti',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+              ).margin(const EdgeInsets.only(top: 8.0, bottom: 4.0)),
+            ].divide(const SizedBox(height: 8.0)),
+          ).margin(const EdgeInsets.all(8.0));
+        },
       ),
     );
   }
 
-  Future<User> loadData() async {
+  Future<(User, int, int)> loadData() async {
     final userId = ref.read(authProvider)!.id;
     final user = await ref.read(userProvider).getById(userId);
 
-    return user!;
+    final collaborations = await ref
+        .read(collaborationsProvider)
+        .getForUser(userId);
+    final conections = await ref.read(conectionsProvider).getForUser(userId);
+
+    return (user!, collaborations, conections);
   }
 
   String firstName(String fullName) {

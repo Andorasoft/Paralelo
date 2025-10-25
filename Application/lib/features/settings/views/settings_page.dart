@@ -1,17 +1,16 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
-import 'package:paralelo/features/auth/exports.dart';
-import 'package:paralelo/features/projects/views/my_projects_page.dart';
-import 'package:paralelo/features/settings/widgets/setting_option.dart';
-import 'package:paralelo/features/user/exports.dart';
-import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/core/providers.dart';
 import 'package:paralelo/core/services.dart';
 import 'package:paralelo/core/modals.dart';
 import 'package:paralelo/core/router.dart';
+import 'package:paralelo/features/auth/exports.dart';
+import 'package:paralelo/features/projects/exports.dart';
+import 'package:paralelo/features/settings/exports.dart';
+import 'package:paralelo/features/user/exports.dart';
+import 'package:paralelo/widgets/loading_indicator.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
-  static const routeName = 'SettingPage';
   static const routePath = '/settings';
 
   const SettingsPage({super.key});
@@ -50,7 +49,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           children: [
             TextButton(
               onPressed: () async {
-                await ref.read(authProvider.notifier).logout();
+                await ref.read(authProvider.notifier).signOut();
               },
               child: Text('button.logout'.tr()),
             ).align(Alignment.centerRight),
@@ -98,11 +97,17 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   leading: const Icon(TablerIcons.file_filled),
                   title: 'setting.options.proposals_submitted'.tr(),
                 ),
+                // SettingOption.tile(
+                //   onTap: () {},
+
+                //   leading: const Icon(TablerIcons.star_filled),
+                //   title: 'setting.options.my_skills'.tr(),
+                // ),
                 SettingOption.tile(
                   onTap: () {},
 
                   leading: const Icon(TablerIcons.star_filled),
-                  title: 'setting.options.my_skills'.tr(),
+                  title: 'setting.options.benefits_plan'.tr(),
                 ),
               ],
             ),

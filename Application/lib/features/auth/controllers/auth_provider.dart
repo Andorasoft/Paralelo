@@ -26,27 +26,13 @@ class _AuthNotifier extends StateNotifier<AuthUser?> {
   /// Signs in the user using the selected [provider].
   ///
   /// For [AuthProvider.email], both [email] and [password] must be provided.
-  Future<void> login({
-    String? email,
-    String? password,
-    AuthProvider provider = AuthProvider.email,
-  }) async {
-    switch (provider) {
-      case AuthProvider.email:
-        state = await _repo.loginWithEmail(email!, password!);
-        break;
-      case AuthProvider.microsoft:
-        state = await _repo.loginWithMicrosoft();
-        break;
-    }
+  Future<void> signIn({String? email, String? password}) async {
+    state = await _repo.signIn(email!, password!);
   }
 
   /// Signs out the current user and clears the auth state.
-  Future<void> logout() async {
-    await _repo.logout();
+  Future<void> signOut() async {
+    await _repo.singOut();
     state = null;
   }
 }
-
-/// Supported authentication providers for login.
-enum AuthProvider { email, microsoft }

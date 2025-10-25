@@ -60,7 +60,8 @@
     "cancel": "Cancel",
     "open_settings": "Open settings",
     "show_proposal": "Show proposal",
-    "offer_help": "Offer help"
+    "offer_help": "Offer help",
+    "mark_completed": "Mark as completed"
   },
   "setting": {
     "sections": {
@@ -74,6 +75,7 @@
       "proposals_submitted": "Proposals submitted",
       "reports_generated": "Reports generated",
       "my_skills": "My skills",
+      "benefits_plan": "Benefits plan",
       "language": "Language",
       "notifications": "Notifications",
       "dark_mode": "Dark mode",

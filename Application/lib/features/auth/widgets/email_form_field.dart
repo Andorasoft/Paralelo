@@ -1,12 +1,18 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:paralelo/core/imports.dart';
 
 class EmailFormField extends ConsumerStatefulWidget {
   final TextEditingController? controller;
+  final FocusNode? focusNode;
   final String? hintText;
+  final String? labelText;
 
-  const EmailFormField({super.key, this.controller, this.hintText});
+  const EmailFormField({
+    super.key,
+    this.controller,
+    this.focusNode,
+    this.hintText,
+    this.labelText,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -15,21 +21,42 @@ class EmailFormField extends ConsumerStatefulWidget {
 }
 
 class _EmailFormFieldState extends ConsumerState<EmailFormField> {
-  final focusNode = FocusNode();
-
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: widget.controller,
-      focusNode: focusNode,
+      focusNode: widget.focusNode,
 
       decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white.withAlpha(100),
+
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        labelText: widget.labelText,
         hintText: widget.hintText,
-        prefixIcon: Icon(LucideIcons.mail),
+
+        prefixIcon: const Icon(LucideIcons.mail),
         suffixIcon: InkWell(
           onTap: () {},
           overlayColor: WidgetStateProperty.all(Colors.transparent),
-          child: Icon(LucideIcons.x),
+          child: const Icon(LucideIcons.x),
         ),
       ),
 

@@ -60,7 +60,8 @@
     "cancel": "Cancelar",
     "open_settings": "Abrir ajustes",
     "show_proposal": "Ver propuesta",
-    "offer_help": "Ofrecer ayuda"
+    "offer_help": "Ofrecer ayuda",
+    "mark_completed": "Marcar como completado"
   },
   "setting": {
     "sections": {
@@ -74,6 +75,7 @@
       "proposals_submitted": "Propuestas enviadas",
       "reports_generated": "Reportes generados",
       "my_skills": "Mis habilidades",
+      "benefits_plan": "Plan de beneficios",
       "language": "Idioma",
       "notifications": "Notificaciones",
       "dark_mode": "Modo oscuro",

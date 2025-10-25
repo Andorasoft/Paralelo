@@ -95,17 +95,23 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
 
         builder: (_, snapshot) {
           return FilledButton(
-            onPressed: snapshot.hasData && userId != widget.project.ownerId
-                ? () async {
-                    await ref
-                        .read(goRouterProvider)
-                        .push(
-                          CreateProposalPage.routePath,
-                          extra: widget.project,
-                        );
-                  }
+            onPressed: snapshot.hasData
+                ? userId != widget.project.ownerId
+                      ? () async {
+                          await ref
+                              .read(goRouterProvider)
+                              .push(
+                                CreateProposalPage.routePath,
+                                extra: widget.project,
+                              );
+                        }
+                      : () {}
                 : null,
-            child: Text('button.offer_help'.tr()),
+            child: Text(
+              userId != widget.project.ownerId
+                  ? 'button.offer_help'.tr()
+                  : 'button.mark_completed'.tr(),
+            ),
           ).margin(const EdgeInsets.all(16.0)).useSafeArea();
         },
       ),

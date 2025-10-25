@@ -2,6 +2,7 @@ import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
+import 'package:paralelo/features/proposal/widgets/proposal_info_presenter.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
 
@@ -32,6 +33,7 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
   @override
   Widget build(BuildContext context) {
     final userId = ref.read(authProvider)!.id;
+
     return Scaffold(
       key: scaffoldKey,
 
@@ -67,9 +69,36 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
             return const LoadingIndicator().center();
           }
 
-          return ListView(children: [Text(proposal.message)]);
+          return SingleChildScrollView(
+            child:
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  spacing: 16.0,
+
+                  children: [
+                    Text('Detalles de la propuesta'),
+                    ProposalInfoPresenter(proposal: proposal),
+                  ],
+                ).margin(
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                ),
+          );
         },
       ),
+
+      bottomNavigationBar: FutureBuilder(
+        future: loadDataFuture,
+        builder: (_, snapshot) {
+          final proposal = snapshot.data;
+
+          return FilledButton(
+            onPressed: proposal != null && proposal.providerId != userId
+                ? () {}
+                : null,
+            child: Text('Aceptar propuesta'),
+          ).margin(const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0));
+        },
+      ).useSafeArea(),
     );
   }
 
