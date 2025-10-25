@@ -3,7 +3,6 @@ import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/auth/exports.dart';
 
 class AuthPage extends ConsumerStatefulWidget {
-  static const routeName = 'AuthPage';
   static const routePath = '/auth';
 
   const AuthPage({super.key});

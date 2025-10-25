@@ -45,7 +45,7 @@ class ChatTile extends ConsumerWidget {
               ),
           ],
         ).margin(EdgeInsets.only(right: (unread ?? false) ? 16.0 : 0.0)),
-      ).margin(const EdgeInsets.all(8.0)),
+      ).margin(const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0)),
     );
   }
 }

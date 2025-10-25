@@ -98,7 +98,7 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
 
               leading: const NavigationButton(),
               title: Text(user.displayName.obscure()),
-              actions: const [UserRatingPresenter(rating: 4.5)],
+              actions: const [UserRatingStar(rating: 0.0)],
 
               bottom: PreferredSize(
                 preferredSize: const Size.fromHeight(36.0),

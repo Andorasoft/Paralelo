@@ -2,7 +2,7 @@ import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/proposal/models/proposal.dart';
 
 abstract class ProposalRepository {
-  Future<bool> applied(int projectId);
+  Future<bool> applied({required int projectId, required String providerId});
 
   Future<Proposal?> getById(int id);
 
@@ -26,11 +26,15 @@ class SupabaseProposalRepository implements ProposalRepository {
   const SupabaseProposalRepository(this._client);
 
   @override
-  Future<bool> applied(int projectId) async {
+  Future<bool> applied({
+    required int projectId,
+    required String providerId,
+  }) async {
     final data = await _client
         .from('proposal')
         .select('id')
         .eq('project_id', projectId)
+        .eq('provider_id', providerId)
         .limit(1)
         .maybeSingle();
 

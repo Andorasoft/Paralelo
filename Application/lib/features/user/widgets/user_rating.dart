@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class UserRatingPresenter extends ConsumerStatefulWidget {
+class UserRatingStar extends ConsumerStatefulWidget {
   final double rating;
 
-  const UserRatingPresenter({super.key, required this.rating});
+  const UserRatingStar({super.key, required this.rating});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return _UserRatingPresenterState();
+    return _UserRatingStarState();
   }
 }
 
-class _UserRatingPresenterState extends ConsumerState<UserRatingPresenter> {
+class _UserRatingStarState extends ConsumerState<UserRatingStar> {
   @override
   Widget build(BuildContext context) {
     return Row(
       spacing: 4.0,
       children: [
-        Icon(Icons.star_rounded, size: 20.0),
+        const Icon(Icons.star_rounded, size: 20.0),
         Text('${widget.rating}', style: Theme.of(context).textTheme.bodyLarge),
       ],
     );

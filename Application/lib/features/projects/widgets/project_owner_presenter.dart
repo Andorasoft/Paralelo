@@ -69,7 +69,7 @@ class ProjectOwnerPresenter extends ConsumerWidget {
               ),
             ],
           ).expanded(),
-          UserRatingPresenter(rating: 4.5),
+          UserRatingStar(rating: 0.0),
         ],
       ).margin(const EdgeInsets.all(16.0)),
     );

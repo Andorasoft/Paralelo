@@ -1,22 +1,18 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/core/providers.dart';
-import 'package:paralelo/features/auth/controllers/auth_provider.dart';
-import 'package:paralelo/features/chats/controllers/chat_room_provider.dart';
-import 'package:paralelo/features/chats/models/chat_room.dart';
-import 'package:paralelo/features/chats/views/chat_room_page.dart';
-import 'package:paralelo/features/chats/widgets/chat_tile.dart';
-import 'package:paralelo/features/projects/controllers/project_provider.dart';
-import 'package:paralelo/features/projects/models/project.dart';
-import 'package:paralelo/features/proposal/controllers/proposal_provider.dart';
-import 'package:paralelo/features/user/exports.dart';
-import 'package:paralelo/utils/formatters.dart';
-import 'package:paralelo/widgets/empty_indicator.dart';
-import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/core/router.dart';
+import 'package:paralelo/features/auth/exports.dart';
+import 'package:paralelo/features/chats/exports.dart';
+import 'package:paralelo/features/projects/exports.dart';
+import 'package:paralelo/features/proposal/exports.dart';
+import 'package:paralelo/features/user/exports.dart';
+import 'package:paralelo/utils/extensions.dart';
+import 'package:paralelo/utils/formatters.dart';
+import 'package:paralelo/widgets/skeleton.dart';
+import 'package:paralelo/widgets/skeleton_block.dart';
 
 class ChatsPage extends ConsumerStatefulWidget {
-  static const routeName = 'ChatsPage';
   static const routePath = '/chats';
 
   const ChatsPage({super.key});
@@ -43,72 +39,113 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: loadDataFuture,
+      builder: (_, snapshot) {
+        if (!snapshot.hasData) {
+          return skeleton();
+        }
+
+        return page(snapshot.data!);
+      },
+    ).hideKeyboardOnTap(context);
+  }
+
+  Widget skeleton() {
+    return Skeleton(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        key: scaffoldKey,
+
+        appBar: AppBar(
+          titleSpacing: 16.0,
+          title: const SkeletonBlock(
+            radius: 100.0,
+            width: double.infinity,
+            height: 44.0,
+          ),
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(32.0),
+            child: Row(
+              spacing: 12.0,
+              children: [
+                for (int i = 0; i < 3; i++)
+                  const SkeletonBlock(radius: 100.0, width: 80.0, height: 24.0),
+              ],
+            ).margin(Insets.h16v8),
+          ),
+        ),
+
+        body: ListView(
+          shrinkWrap: true,
+          children: [
+            for (int i = 0; i < 4; i++) ...[
+              const SkeletonBlock(
+                radius: 100.0,
+                width: 64.0,
+                height: 16.0,
+              ).align(Alignment.centerLeft),
+              const SkeletonBlock(
+                radius: 100.0,
+                width: double.infinity,
+                height: 16.0,
+              ),
+              if (i < 3) const SizedBox(height: 13.0),
+            ],
+          ].divide(const SizedBox(height: 8.0)),
+        ).margin(Insets.h16v8),
+      ),
+    );
+  }
+
+  Widget page(List<(ChatRoom, Project, User)> data) {
     return Scaffold(
       key: scaffoldKey,
 
       appBar: AppBar(
-        toolbarHeight: 0.0,
+        titleSpacing: 16.0,
+        title: SearchBar(
+          onSubmitted: (query) {},
 
+          leading: const Icon(LucideIcons.search),
+          hintText: 'input.search_chats'.tr(),
+        ).size(height: 44.0),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(48.0),
-          child:
-              SearchBar(
-                    padding: WidgetStateProperty.all(
-                      const EdgeInsets.symmetric(horizontal: 12.0),
-                    ),
-                    onSubmitted: (query) {},
+          preferredSize: Size.fromHeight(32.0),
+          child: Row(
+            spacing: 8.0,
+            children: tabs
+                .map(
+                  (key) => ChoiceChip(
+                    selected: selectedTab == key,
+                    onSelected: (selected) {
+                      if (selected) {
+                        safeSetState(() => selectedTab = key);
+                      }
+                    },
 
-                    leading: const Icon(LucideIcons.search),
-                    hintText: 'input.search_chats'.tr(),
-                  )
-                  .size(height: 44.0)
-                  .margin(const EdgeInsets.symmetric(horizontal: 16.0)),
+                    padding: EdgeInsets.zero,
+                    labelPadding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    visualDensity: VisualDensity.compact,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(100.0),
+                    ),
+
+                    label: Text(
+                      'chip.$key'.tr(),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                )
+                .toList(),
+          ).margin(Insets.h16),
         ),
       ),
 
-      body: FutureBuilder(
-        future: loadDataFuture,
-
-        builder: (_, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return const LoadingIndicator().center();
-          }
-
-          if (!snapshot.hasData || (snapshot.data?.isEmpty ?? true)) {
-            return const EmptyIndicator().center();
-          }
-
-          final list = snapshot.data!;
-
-          return ListView(
-            scrollDirection: Axis.vertical,
-
-            children: [
-              Row(
-                spacing: 8.0,
-
-                children: tabs
-                    .map(
-                      (key) => ChoiceChip(
-                        selected: selectedTab == key,
-                        onSelected: (selected) {
-                          if (selected) {
-                            safeSetState(() => selectedTab = key);
-                          }
-                        },
-
-                        showCheckmark: false,
-                        padding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100.0),
-                        ),
-
-                        label: Text('chip.$key'.tr()),
-                      ),
-                    )
-                    .toList(),
-              ),
-              ...list
+      body: data.isNotEmpty
+          ? ListView(
+              children: data
                   .map((i) {
                     final (room, project, user) = i;
 
@@ -124,19 +161,20 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
                       onTap: () async {
                         await ref
                             .read(goRouterProvider)
-                            .push(ChatRoomPage.routePath, extra: (room, user));
+                            .push(
+                              ChatRoomPage.routePath,
+                              extra: (room.id, user.id),
+                            );
                       },
                       title: user.displayName.obscure(),
                       subtitle: project.title,
                       unread: hasUnread,
                     );
                   })
-                  .divide(const Divider(height: 9.0)),
-            ],
-          ).margin(const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0));
-        },
-      ),
-    ).hideKeyboardOnTap(context);
+                  .divide(const Divider(height: 13.0).margin(Insets.h16)),
+            ).margin(Insets.v8)
+          : Text('empty'.tr()).center(),
+    );
   }
 
   Future<List<(ChatRoom, Project, User)>> loadData() async {
@@ -150,19 +188,19 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
 
     if (chats.isEmpty) return [];
 
-    // Obtener todas las proposal IDs únicas
+    // Get all unique proposal IDs
     final proposalIds = chats.map((c) => c.proposalId).toSet().toList();
     final proposals = await proposalRepo.getByIds(proposalIds);
 
-    // Obtener todos los project IDs únicos de esas proposals
+    // Get all unique project IDs for those proposals
     final projectIds = proposals.map((p) => p.projectId).toSet().toList();
     final projects = await projectRepo.getByIds(projectIds);
 
-    // Mapear por ID para acceso rápido
+    // Map by ID for quick access
     final proposalMap = {for (var p in proposals) p.id: p};
     final projectMap = {for (var p in projects) p.id: p};
 
-    // Armar resultado final
+    // Assemble final result
     final results = await Future.wait(
       chats.map((chat) async {
         final proposal = proposalMap[chat.proposalId];

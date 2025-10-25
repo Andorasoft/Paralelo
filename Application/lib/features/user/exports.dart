@@ -8,4 +8,4 @@ export 'models/user_repository.dart';
 export 'models/user.dart';
 
 export 'widgets/user_presenter.dart';
-export 'widgets/user_rating_presenter.dart';
+export 'widgets/user_rating.dart';
