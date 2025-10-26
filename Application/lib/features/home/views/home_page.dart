@@ -110,9 +110,9 @@ class _HomePageState extends ConsumerState<HomePage> {
     final user = await ref.read(userProvider).getById(userId);
 
     final collaborations = await ref
-        .read(collaborationsProvider)
+        .read(collaborationProvider)
         .getForUser(userId);
-    final conections = await ref.read(conectionsProvider).getForUser(userId);
+    final conections = await ref.read(conectionProvider).getForUser(userId);
 
     return (user!, collaborations, conections);
   }

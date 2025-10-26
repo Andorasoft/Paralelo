@@ -1,18 +1,18 @@
 import 'package:paralelo/core/imports.dart';
 
-abstract class CollaborationsRepository {
+abstract class ConectionRepository {
   Future<int> getForUser(String userId);
 }
 
-class SupabaseCollaborationsRepository implements CollaborationsRepository {
+class SupabaseConectionRepository implements ConectionRepository {
   final SupabaseClient _client;
 
-  const SupabaseCollaborationsRepository(this._client);
+  const SupabaseConectionRepository(this._client);
 
   @override
   Future<int> getForUser(String userId) async {
     final res = await _client.functions.invoke(
-      'get-total-collaborations',
+      'get-recent-conections',
       queryParameters: {'user_id': userId},
     );
 

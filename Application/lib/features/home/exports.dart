@@ -1,10 +1,10 @@
 export 'views/home_page.dart';
 
-export 'controllers/collaborations_provider.dart';
-export 'controllers/conections_provider.dart';
+export 'controllers/collaboration_provider.dart';
+export 'controllers/conection_provider.dart';
 
-export 'models/collaborations_repository.dart';
-export 'models/conections_repository.dart';
+export 'models/collaboration_repository.dart';
+export 'models/conection_repository.dart';
 
 export 'widgets/campus_activity_card.dart';
 export 'widgets/community_growth_card.dart';

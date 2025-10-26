@@ -18,6 +18,8 @@ abstract class ProposalRepository {
     required String providerId,
     required int projectId,
   });
+
+  Future<bool> accept(int id);
 }
 
 class SupabaseProposalRepository implements ProposalRepository {
@@ -89,5 +91,15 @@ class SupabaseProposalRepository implements ProposalRepository {
         .single();
 
     return Proposal.fromMap(data);
+  }
+
+  @override
+  Future<bool> accept(int id) async {
+    final res = await _client.functions.invoke(
+      'accept-proposal',
+      queryParameters: {'proposal_id': '$id'},
+    );
+
+    return res.status == 200;
   }
 }
