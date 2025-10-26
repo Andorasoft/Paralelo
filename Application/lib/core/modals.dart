@@ -9,7 +9,7 @@ Future<String?> showLocaleSelectorModalBottomSheet(
 }) {
   final options = const [
     {'title': 'Español', 'code': 'es'},
-    {'title': 'English', 'code': 'en'},
+    //{'title': 'English', 'code': 'en'},
   ];
 
   return showModalBottomSheet<String>(
