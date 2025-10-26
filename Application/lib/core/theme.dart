@@ -156,6 +156,7 @@ extension AppThemeData on ThemeData {
     chipTheme: const ChipThemeData(
       backgroundColor: Color(0xFFf0f3f5),
       side: BorderSide.none,
+      showCheckmark: false,
 
       padding: EdgeInsets.symmetric(vertical: 8.0),
     ),
@@ -193,6 +194,12 @@ extension AppThemeData on ThemeData {
       splashRadius: 12.0,
       visualDensity: VisualDensity.compact,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    ),
+
+    cardTheme: CardThemeData(
+      color: Colors.transparent,
+      margin: EdgeInsets.zero,
+      elevation: 0.0,
     ),
 
     colorScheme: ColorScheme.fromSeed(

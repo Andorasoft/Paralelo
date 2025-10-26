@@ -173,7 +173,11 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
         );
 
     final appliedList = await Future.wait(
-      projects.map((p) => ref.read(proposalProvider).applied(p.id)),
+      projects.map(
+        (p) => ref
+            .read(proposalProvider)
+            .applied(projectId: p.id, providerId: userId),
+      ),
     );
 
     return (

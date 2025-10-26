@@ -85,6 +85,24 @@ class ChatService {
     final doc = await _firestore.collection('rooms').doc(roomId).get();
     return doc.data()?['unread'] as Map<String, dynamic>?;
   }
+
+  Future<void> deleteChatRoom(String roomId) async {
+    final roomRef = _firestore.collection('rooms').doc(roomId);
+    final messagesRef = roomRef.collection('messages');
+
+    while (true) {
+      final snapshot = await messagesRef.limit(500).get();
+      if (snapshot.docs.isEmpty) break;
+
+      final batch = _firestore.batch();
+      for (final doc in snapshot.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+    }
+
+    await roomRef.delete();
+  }
 }
 
 /// Service for handling Firebase Cloud Messaging (FCM).

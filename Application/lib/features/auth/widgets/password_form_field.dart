@@ -6,9 +6,17 @@ import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 
 class PasswordFormField extends ConsumerStatefulWidget {
   final TextEditingController? controller;
+  final FocusNode? focusNode;
   final String? hintText;
+  final String? labelText;
 
-  const PasswordFormField({super.key, this.controller, this.hintText});
+  const PasswordFormField({
+    super.key,
+    this.controller,
+    this.focusNode,
+    this.hintText,
+    this.labelText,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -17,21 +25,42 @@ class PasswordFormField extends ConsumerStatefulWidget {
 }
 
 class _PasswordFormFieldState extends ConsumerState<PasswordFormField> {
-  final focusNode = FocusNode();
-
   bool showPassword = false;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: widget.controller,
-      focusNode: focusNode,
+      focusNode: widget.focusNode,
 
       obscureText: !showPassword,
 
       decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white.withAlpha(100),
+
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+
+        floatingLabelBehavior: FloatingLabelBehavior.always,
         hintText: widget.hintText,
-        prefixIcon: Icon(LucideIcons.lock),
+        labelText: widget.labelText,
+
+        prefixIcon: const Icon(LucideIcons.lock),
         suffixIcon: InkWell(
           onTap: () {
             safeSetState(() => showPassword = !showPassword);

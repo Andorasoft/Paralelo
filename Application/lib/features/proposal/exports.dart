@@ -9,3 +9,4 @@ export 'views/proposal_details_page.dart';
 
 export 'widgets/create_proposal_button.dart';
 export 'widgets/show_proposal_button.dart';
+export 'widgets/proposal_info_presenter.dart';

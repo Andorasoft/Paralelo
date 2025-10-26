@@ -1,5 +1,7 @@
 import { setGlobalOptions } from "firebase-functions/v2/options";
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
+import { onRequest } from "firebase-functions/v2/https";
+import { getFirestore } from "firebase-admin/firestore";
 import { defineSecret } from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
@@ -146,3 +148,60 @@ export const sendChatNotification = onDocumentCreated(
     }
   }
 );
+
+/**
+ * Cloud Function: cleanupRooms
+ * ------------------------------------------------------------
+ * Deletes multiple chat rooms from Firestore in parallel.
+ * For each room:
+ *  - Deletes all messages in sub-collection "messages"
+ *    in safe batches of 500 writes (Firestore limit).
+ *  - Deletes the parent room document.
+ *
+ * Expected request body:
+ *   { "rooms": [{ "id": "room123" }, { "id": "room456" }] }
+ *
+ * Returns:
+ *   200 OK  → All deletions completed successfully
+ *   400     → Missing or invalid input
+ *   500     → Internal server error
+ */
+export const cleanupRooms = onRequest(async (req, res): Promise<any> => {
+  try {
+    const firestore = getFirestore();
+    const { rooms } = req.body as { rooms: { id: string }[] };
+
+    // Validate input
+    if (!rooms || !Array.isArray(rooms) || rooms.length === 0) {
+      return res.status(400).send("No rooms provided.");
+    }
+
+    // Run deletions for all rooms in parallel
+    await Promise.all(
+      rooms.map(async (room) => {
+        const roomRef = firestore.collection("rooms").doc(room.id);
+        const messagesRef = roomRef.collection("messages");
+
+        // 🔁 Delete messages in batches of up to 500
+        while (true) {
+          const snapshot = await messagesRef.limit(500).get();
+          if (snapshot.empty) break;
+
+          const batch = firestore.batch();
+          snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+          await batch.commit();
+        }
+
+        // 🗑️ Delete the room document itself
+        await roomRef.delete();
+        console.log(`✅ Room ${room.id} deleted.`);
+      })
+    );
+
+    // ✅ Success response
+    return res.status(200).send();
+  } catch (err: any) {
+    console.error("❌ cleanupRooms error:", err);
+    return res.status(500).send(err.message);
+  }
+});

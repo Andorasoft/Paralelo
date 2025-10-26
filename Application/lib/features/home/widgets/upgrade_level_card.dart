@@ -12,6 +12,8 @@ class UpgradeLevelCard extends ConsumerWidget {
       elevation: 0.0,
 
       child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 8.0,
 
@@ -34,10 +36,28 @@ class UpgradeLevelCard extends ConsumerWidget {
           ),
           FilledButton.tonal(
             onPressed: () {},
-            child: Text('¡Quiero ser Leyenda!'),
-          ),
+
+            style: Theme.of(context).filledButtonTheme.style?.copyWith(
+              backgroundColor: WidgetStateProperty.all(
+                Theme.of(context).colorScheme.secondary,
+              ),
+              shape: WidgetStateProperty.all(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100.0),
+                ),
+              ),
+            ),
+
+            child: Text(
+              '¡Quiero ser Leyenda!',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.tertiary,
+              ),
+            ),
+          ).center(),
         ],
-      ).margin(const EdgeInsets.all(16.0)),
+      ).margin(const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0)),
     );
   }
 }

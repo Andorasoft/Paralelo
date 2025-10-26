@@ -4,13 +4,10 @@ import 'package:supabase_flutter/supabase_flutter.dart' hide AuthUser;
 /// Defines authentication-related operations.
 abstract class AuthRepository {
   /// Signs in using email and password.
-  Future<AuthUser?> loginWithEmail(String email, String password);
-
-  /// Signs in via Microsoft OAuth.
-  Future<AuthUser?> loginWithMicrosoft();
+  Future<AuthUser?> signIn(String email, String password);
 
   /// Ends the current user session.
-  Future<void> logout();
+  Future<void> singOut();
 
   /// Returns the currently signed-in user, or `null` if no session exists.
   AuthUser? currentUser();
@@ -26,22 +23,13 @@ class SupabaseAuthRepository implements AuthRepository {
   const SupabaseAuthRepository(this._client);
 
   @override
-  Future<AuthUser?> loginWithEmail(String email, String password) async {
+  Future<AuthUser?> signIn(String email, String password) async {
     await _client.auth.signInWithPassword(email: email, password: password);
     return currentUser();
   }
 
   @override
-  Future<AuthUser?> loginWithMicrosoft() async {
-    await _client.auth.signInWithOAuth(
-      OAuthProvider.azure,
-      queryParams: {'prompt': 'select_account'},
-    );
-    return currentUser();
-  }
-
-  @override
-  Future<void> logout() async {
+  Future<void> singOut() async {
     await _client.auth.signOut();
   }
 

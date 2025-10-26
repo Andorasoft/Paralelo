@@ -10,7 +10,7 @@ class Skeleton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Shimmer.fromColors(
       highlightColor: Colors.white,
-      baseColor: Colors.grey.shade300,
+      baseColor: Colors.grey.shade200,
 
       child: child,
     );

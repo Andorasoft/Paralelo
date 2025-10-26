@@ -1,17 +1,17 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
-import 'package:paralelo/features/auth/exports.dart';
-import 'package:paralelo/features/projects/views/my_projects_page.dart';
-import 'package:paralelo/features/settings/widgets/setting_option.dart';
-import 'package:paralelo/features/user/exports.dart';
-import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/core/providers.dart';
 import 'package:paralelo/core/services.dart';
 import 'package:paralelo/core/modals.dart';
 import 'package:paralelo/core/router.dart';
+import 'package:paralelo/features/auth/exports.dart';
+import 'package:paralelo/features/projects/exports.dart';
+import 'package:paralelo/features/settings/exports.dart';
+import 'package:paralelo/features/user/exports.dart';
+import 'package:paralelo/widgets/skeleton.dart';
+import 'package:paralelo/widgets/skeleton_block.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
-  static const routeName = 'SettingPage';
   static const routePath = '/settings';
 
   const SettingsPage({super.key});
@@ -50,7 +50,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           children: [
             TextButton(
               onPressed: () async {
-                await ref.read(authProvider.notifier).logout();
+                await ref.read(authProvider.notifier).signOut();
               },
               child: Text('button.logout'.tr()),
             ).align(Alignment.centerRight),
@@ -63,7 +63,21 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
                 builder: (_, snapshot) {
                   if (!snapshot.hasData) {
-                    return const LoadingIndicator(showMessage: false).center();
+                    return Skeleton(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        spacing: 16.0,
+                        children: [
+                          SkeletonBlock(
+                            radius: 100.0,
+                            width: 64.0,
+                            height: 64.0,
+                          ),
+                          SkeletonBlock(width: 256.0, height: 16.0),
+                          SkeletonBlock(width: 128.0, height: 16.0),
+                        ],
+                      ),
+                    ).center();
                   }
 
                   return UserPresenter(user: snapshot.data!).center();
@@ -102,7 +116,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   onTap: () {},
 
                   leading: const Icon(TablerIcons.star_filled),
-                  title: 'setting.options.my_skills'.tr(),
+                  title: 'setting.options.benefits_plan'.tr(),
                 ),
               ],
             ),
@@ -151,7 +165,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
                   onChanged: (checked) async {
                     if (checked) {
-                      final granted = await _handleNotificationPermission(
+                      final granted = await handleNotificationPermission(
                         context,
                       );
 
@@ -169,15 +183,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   leading: const Icon(TablerIcons.bell_filled),
                   title: 'setting.options.notifications'.tr(),
                 ),
-                // SettingOption.toggle(
-                //   value: prefs.theme == ThemeMode.dark,
-                //   onChanged: (v) {
-                //     notifier.setTheme(v ? ThemeMode.dark : ThemeMode.light);
-                //   },
-
-                //   leading: const Icon(TablerIcons.moon_filled),
-                //   title: 'setting.options.dark_mode'.tr(),
-                // ),
               ],
             ),
 
@@ -259,7 +264,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     return (await ref.read(userProvider).getById(userId))!;
   }
 
-  Future<bool> _handleNotificationPermission(BuildContext context) async {
+  Future<bool> handleNotificationPermission(BuildContext context) async {
     var granted = await FCMService.instance.checkPermission();
 
     if (!granted) {

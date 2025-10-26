@@ -1,5 +1,11 @@
 export 'views/home_page.dart';
 
+export 'controllers/collaboration_provider.dart';
+export 'controllers/conection_provider.dart';
+
+export 'models/collaboration_repository.dart';
+export 'models/conection_repository.dart';
+
 export 'widgets/campus_activity_card.dart';
 export 'widgets/community_growth_card.dart';
 export 'widgets/credits_summary_card.dart';

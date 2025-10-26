@@ -9,7 +9,7 @@ Future<String?> showLocaleSelectorModalBottomSheet(
 }) {
   final options = const [
     {'title': 'Español', 'code': 'es'},
-    {'title': 'English', 'code': 'en'},
+    //{'title': 'English', 'code': 'en'},
   ];
 
   return showModalBottomSheet<String>(
@@ -197,7 +197,7 @@ Future<void> showUserNotAllowedDialog(
       actions: [
         TextButton(
           onPressed: () async {
-            await ref.read(authProvider.notifier).logout();
+            await ref.read(authProvider.notifier).signOut();
           },
           child: const Text('Entendido'),
         ),
