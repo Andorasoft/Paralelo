@@ -104,6 +104,7 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
 
                       project: project,
                       applied: applied,
+                      featured: project.featured,
                       maxLines: 5,
                     );
                   })
@@ -161,7 +162,7 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
     final userId = ref.read(authProvider)!.id;
 
     final user = await ref.read(userProvider).getById(userId);
-    final uni = await ref.read(universityProvider).getById(user!.universityId);
+    final uni = await ref.read(universityProvider).getById(user!.universityId!);
 
     final (pages, projects) = await ref
         .read(projectProvider)

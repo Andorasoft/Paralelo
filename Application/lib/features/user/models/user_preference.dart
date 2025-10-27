@@ -6,7 +6,7 @@ class UserPreference {
   final int id;
 
   /// Timestamp when the record was last updated.
-  final DateTime updatedAt;
+  final DateTime createdAt;
 
   /// Preferred language (e.g., "en", "es").
   final String language;
@@ -22,7 +22,7 @@ class UserPreference {
 
   const UserPreference({
     required this.id,
-    required this.updatedAt,
+    required this.createdAt,
     required this.language,
     required this.darkMode,
     required this.notificationsEnabled,
@@ -33,7 +33,7 @@ class UserPreference {
   factory UserPreference.fromMap(Map<String, dynamic> map) {
     return UserPreference(
       id: map['id'],
-      updatedAt: DateTime.parse(map['updated_at']),
+      createdAt: DateTime.parse(map['created_at']),
       language: map['language'],
       darkMode: map['dark_mode'],
       notificationsEnabled: map['notifications_enabled'],

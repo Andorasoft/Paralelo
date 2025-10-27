@@ -6,6 +6,7 @@ import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
 import 'package:paralelo/core/providers.dart';
 import 'package:paralelo/core/services.dart';
+import 'package:paralelo/utils/extensions.dart';
 import 'package:paralelo/utils/formatters.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
 import 'package:paralelo/widgets/skeleton.dart';
@@ -65,48 +66,10 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
           future: loadDataFuture,
           builder: (_, snapshot) {
             if (!snapshot.hasData) {
-              return Skeleton(
-                child: AppBar(
-                  automaticallyImplyLeading: false,
-                  toolbarHeight: 64.0,
-
-                  leading: const SkeletonBlock(
-                    width: 40.0,
-                    height: 40.0,
-                    radius: 100.0,
-                  ).center(),
-                  title: const SkeletonBlock(width: 94.0, height: 20.0),
-                  actions: const [SkeletonBlock(width: 32.0, height: 20.0)],
-
-                  bottom: const PreferredSize(
-                    preferredSize: Size.fromHeight(36.0),
-                    child: SkeletonBlock(
-                      width: double.infinity,
-                      height: 36.0,
-                      radius: 0.0,
-                    ),
-                  ),
-                ),
-              );
+              return skeleton();
             }
 
-            final (user, proposal) = snapshot.data!;
-
-            return AppBar(
-              automaticallyImplyLeading: false,
-              toolbarHeight: 64.0,
-
-              leading: const NavigationButton(),
-              title: Text(user.displayName.obscure()),
-              actions: const [UserRatingStar(rating: 0.0)],
-
-              bottom: PreferredSize(
-                preferredSize: const Size.fromHeight(36.0),
-                child: ShowProposalButton(
-                  proposalId: proposal.id,
-                ).size(height: 36.0),
-              ),
-            );
+            return header(snapshot.data!);
           },
         ),
       ),
@@ -154,8 +117,49 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
             },
           ).useSafeArea(),
         ],
-      ).margin(const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0)),
+      ).margin(Insets.h16v8),
     ).hideKeyboardOnTap(context);
+  }
+
+  Widget skeleton() {
+    return Skeleton(
+      child: AppBar(
+        automaticallyImplyLeading: false,
+        toolbarHeight: 64.0,
+        leading: const SkeletonBlock(
+          width: 40.0,
+          height: 40.0,
+        ).align(Alignment.centerRight),
+        title: const SkeletonBlock(width: 94.0, height: 20.0),
+        actions: const [SkeletonBlock(width: 32.0, height: 20.0)],
+
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(36.0),
+          child: SkeletonBlock(
+            width: double.infinity,
+            height: 36.0,
+            radius: 0.0,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget header((User, Proposal) data) {
+    final (user, proposal) = data;
+    return AppBar(
+      automaticallyImplyLeading: false,
+      toolbarHeight: 64.0,
+
+      leading: const NavigationButton(),
+      title: Text(user.displayName.obscure()),
+      actions: const [UserRatingStar(rating: 0.0)],
+
+      bottom: PreferredSize(
+        preferredSize: const Size.fromHeight(36.0),
+        child: ShowProposalButton(proposalId: proposal.id).size(height: 36.0),
+      ),
+    );
   }
 
   Future<(User, Proposal)> loadData() async {

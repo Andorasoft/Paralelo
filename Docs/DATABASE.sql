@@ -17,7 +17,30 @@ create table
   );
 
 -- ============================================================
--- 2. Table: user
+-- 2. Table: plan
+-- ============================================================
+create table
+  if not exists "plan" (
+    id serial primary key,
+    created_at timestamptz not null default now (),
+    name text not null unique,
+    description text,
+    price numeric not null default 0,
+    period_unit text not null default 'MONTH',
+    proposals_per_week integer not null default 0,
+    active_projects_limit integer,
+    featured_projects_limit integer,
+    ongoing_projects_limit integer,
+    tag text,
+    support_level text not null default 'BASIC',
+    performance_metrics boolean not null default false,
+    visibility_priority text not null default 'LOW',
+    highlight_services boolean not null default false,
+    is_active boolean not null default true
+  );
+
+-- ============================================================
+-- 3. Table: user
 -- ============================================================
 create table
   if not exists "user" (
@@ -28,11 +51,12 @@ create table
     "verified" boolean not null default false,
     "picture_url" text,
     "device_token" text,
-    "university_id" integer not null references "university" ("id") on delete set null
+    "plan_id" integer references "plan" ("id") on delete set null,
+    "university_id" integer references "university" ("id") on delete set null
   );
 
 -- ============================================================
--- 3. Table: skill
+-- 4. Table: skill
 -- ============================================================
 create table
   if not exists "skill" (
@@ -42,7 +66,7 @@ create table
   );
 
 -- ============================================================
--- 4. Table: category
+-- 5. Table: category
 -- ============================================================
 create table
   if not exists "category" (
@@ -53,7 +77,7 @@ create table
   );
 
 -- ============================================================
--- 5. Table: project
+-- 6. Table: project
 -- ============================================================
 create table
   if not exists "project" (
@@ -63,12 +87,14 @@ create table
     "description" text not null,
     "status" text not null default 'OPEN',
     "requirement" text,
+    "featured" boolean not null default false,
+    "visibility_priority" text not null default 'LOW',
     "owner_id" uuid not null references "user" ("id") on delete cascade,
     "category_id" integer references "category" ("id") on delete set null
   );
 
 -- ============================================================
--- Table: proposal
+-- 7. Table: proposal
 -- ============================================================
 create table
   if not exists "proposal" (
@@ -86,7 +112,7 @@ create table
   );
 
 -- ============================================================
--- 7. Table: project_payment
+-- 8. Table: project_payment
 -- ============================================================
 create table
   if not exists "project_payment" (
@@ -100,7 +126,7 @@ create table
   );
 
 -- ============================================================
--- 8. Table: project_skill
+-- 9. Table: project_skill
 -- ============================================================
 create table
   if not exists "project_skill" (
@@ -111,7 +137,7 @@ create table
   );
 
 -- ============================================================
--- 9. Table: user_skill
+-- 10. Table: user_skill
 -- ============================================================
 create table
   if not exists "user_skill" (
@@ -123,19 +149,20 @@ create table
   );
 
 -- ============================================================
--- 10. Table: chat_room
+-- 11. Table: chat_room
 -- ============================================================
 create table
   if not exists "chat_room" (
     "id" uuid primary key default uuid_generate_v4 (),
     "created_at" timestamptz not null default now (),
+    "is_active" boolean not null default true,
     "user1_id" uuid not null references "user" ("id") on delete cascade,
     "user2_id" uuid not null references "user" ("id") on delete cascade,
     "proposal_id" integer not null references "proposal" ("id") on delete cascade
   );
 
 -- ============================================================
--- 11. Table: user_rating
+-- 12. Table: user_rating
 -- ============================================================
 create table
   if not exists "user_rating" (
@@ -149,7 +176,7 @@ create table
   );
 
 -- ============================================================
--- 12. Table: report
+-- 13. Table: report
 -- ============================================================
 create table
   if not exists "report" (
@@ -164,7 +191,7 @@ create table
   );
 
 -- ============================================================
--- 13. Table: application
+-- 14. Table: application
 -- ============================================================
 create table
   if not exists "application" (
@@ -179,12 +206,12 @@ create table
   );
 
 -- ============================================================
--- 14. Table: user_preference
+-- 15. Table: user_preference
 -- ============================================================
 create table
   if not exists "user_preference" (
     "id" integer generated always as identity primary key,
-    "updated_at" timestamptz not null default now (),
+    "created_at" timestamptz not null default now (),
     "language" text not null default 'es',
     "dark_mode" boolean not null default false,
     "notifications_enabled" boolean not null default false,
@@ -194,6 +221,10 @@ create table
 -- ============================================================
 -- ENUM-LIKE FIELDS (reference only)
 -- ============================================================
+-- plan.period_unit                 → 'MONTH', 'YEAR'
+-- plan.tag                         → '-', 'PRO', 'PREMIUM'
+-- plan.support_level               → 'BASIC', 'PRIORITY', 'PREMIUM'
+-- plan.visibility_priority         → 'LOW', 'MEDIUM', 'HIGH'
 -- project.status                   → 'OPEN', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'
 -- proposal.mode                    → 'REMOTE', 'IN_PERSON', 'HYBRID'
 -- proposal.status                  → 'PENDING', 'ACCEPTED', 'REJECTED', 'CANCELLED'

@@ -25,7 +25,7 @@ class SupabaseChatRoomRepository implements ChatRoomRepository {
     final data = await _client
         .from('chat_room')
         .select()
-        .eq('active', true)
+        .eq('is_active', true)
         .or('user1_id.eq.$userId,user2_id.eq.$userId');
 
     return data.map((i) => ChatRoom.fromMap(i)).toList();

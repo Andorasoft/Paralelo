@@ -18,7 +18,7 @@ class SkeletonBlock extends ConsumerWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(radius ?? 4.0),
+        borderRadius: BorderRadius.circular(radius ?? 100.0),
         color: Colors.grey.shade200,
       ),
     );

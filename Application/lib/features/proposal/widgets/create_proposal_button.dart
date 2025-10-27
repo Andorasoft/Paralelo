@@ -17,7 +17,7 @@ class CreateProposalButton extends ConsumerWidget {
           : () async {
               await ref
                   .read(goRouterProvider)
-                  .push(CreateProposalPage.routePath, extra: project);
+                  .push(CreateProposalPage.routePath, extra: project.id);
             },
 
       style: Theme.of(context).outlinedButtonTheme.style?.copyWith(

@@ -1,6 +1,6 @@
-export 'package:easy_localization/easy_localization.dart';
+export 'package:easy_localization/easy_localization.dart' hide TextDirection;
 export 'package:firebase_core/firebase_core.dart';
-export 'package:flutter/material.dart' hide TextDirection;
+export 'package:flutter/material.dart';
 export 'package:flutter/services.dart' hide TextDirection;
 export 'package:flutter_dotenv/flutter_dotenv.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';

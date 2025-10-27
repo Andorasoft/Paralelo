@@ -2,6 +2,7 @@ import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/user/exports.dart';
 import 'package:paralelo/utils/formatters.dart';
+import 'package:paralelo/widgets/person_picture.dart';
 
 class ProjectOwnerPresenter extends ConsumerWidget {
   final User owner;
@@ -27,20 +28,11 @@ class ProjectOwnerPresenter extends ConsumerWidget {
         spacing: 12.0,
 
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(100.0),
-
-            child: owner.pictureUrl == null
-                ? SvgPicture.asset(
-                    'assets/images/user.svg',
-                    width: 40.0,
-                    height: 40.0,
-                  )
-                : Image.network(owner.pictureUrl!, width: 40.0, height: 40.0),
-          ),
+          PersonPicture(source: owner.pictureUrl ?? '', size: 44.0),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 4.0,
 
             children: [
               Row(
@@ -51,25 +43,69 @@ class ProjectOwnerPresenter extends ConsumerWidget {
                   Text(
                     owner.displayName.obscure(),
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   if (owner.verified)
                     Icon(
                       TablerIcons.rosette_discount_check_filled,
+                      size: 22.0,
                       color: Theme.of(context).colorScheme.secondary,
                     ),
                 ],
               ),
-              Text(
-                '11 proyectos completados',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.outline,
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: 4.0,
+                children: [
+                  Icon(
+                    Icons.calendar_month_rounded,
+                    size: 18.0,
+                    color: Colors.grey.shade500,
+                  ),
+                  Text(
+                    owner.createdAt.toShortDateString(),
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+                ],
               ),
             ],
           ).expanded(),
-          UserRatingStar(rating: 0.0),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            spacing: 4.0,
+            children: [
+              UserRatingStar(rating: 0.0),
+              if (owner.planId != 1)
+                Chip(
+                  visualDensity: VisualDensity(
+                    horizontal: VisualDensity.minimumDensity,
+                    vertical: VisualDensity.minimumDensity,
+                  ),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  padding: EdgeInsets.zero,
+                  backgroundColor: owner.planId == 2
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.secondary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100.0),
+                  ),
+
+                  label: Text(
+                    owner.planId == 2 ? 'PRO' : 'PREMIUM',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 10.0,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ],
       ).margin(const EdgeInsets.all(16.0)),
     );

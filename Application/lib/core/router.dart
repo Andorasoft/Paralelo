@@ -71,8 +71,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: CreateProposalPage.routePath,
         builder: (_, state) {
-          final project = state.extra as Project;
-          return CreateProposalPage(project: project);
+          return CreateProposalPage(projectId: state.extra as int);
         },
       ),
       GoRoute(

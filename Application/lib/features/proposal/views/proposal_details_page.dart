@@ -1,4 +1,5 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/core/constants.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/core/router.dart';
 import 'package:paralelo/core/services.dart';
@@ -39,18 +40,19 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: loadDataFuture,
-      builder: (_, snapshot) {
-        if (!snapshot.hasData) {
-          return skeleton();
-        }
+    return WillPopScope(
+      onWillPop: () async => !isBussy,
+      child: FutureBuilder(
+        future: loadDataFuture,
+        builder: (_, snapshot) {
+          if (!snapshot.hasData) {
+            return skeleton();
+          }
 
-        final (proposal, room) = snapshot.data!;
-
-        return page(proposal: proposal, room: room);
-      },
-    );
+          return page(snapshot.data!);
+        },
+      ),
+    ).hideKeyboardOnTap(context);
   }
 
   Widget skeleton() {
@@ -58,8 +60,8 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
       color: Theme.of(context).colorScheme.surface,
       child: Skeleton(
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           key: scaffoldKey,
+          backgroundColor: Colors.transparent,
 
           appBar: AppBar(
             leading: const SkeletonBlock(
@@ -92,26 +94,24 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
                       SkeletonBlock(width: double.infinity, height: 16.0),
                     ],
                   ],
-                ).margin(const EdgeInsets.all(16.0)),
+                ).margin(Insets.h16),
               ),
             ],
-          ).margin(const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0)),
+          ).margin(Insets.h16v8),
 
-          bottomNavigationBar:
-              SkeletonBlock(
-                radius: 12.0,
-                width: double.infinity,
-                height: 44.0,
-              ).useSafeArea().margin(
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              ),
+          bottomNavigationBar: SkeletonBlock(
+            radius: 12.0,
+            width: double.infinity,
+            height: 44.0,
+          ).margin(Insets.h16v8).useSafeArea(),
         ),
       ),
     );
   }
 
-  Widget page({required Proposal proposal, required ChatRoom room}) {
+  Widget page((Proposal, ChatRoom) data) {
     final userId = ref.read(authProvider)!.id;
+    final (proposal, room) = data;
 
     return Scaffold(
       key: scaffoldKey,
@@ -121,7 +121,9 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
         actions: [
           if (proposal.providerId == userId)
             TextButton(
-              onPressed: proposal.status != 'ACCEPTED' ? () {} : null,
+              onPressed: proposal.status != ProposalStatus.accepted
+                  ? () {}
+                  : null,
               child: Text('button.edit'.tr()),
             ),
         ],
@@ -196,7 +198,7 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
                 ).margin(const EdgeInsets.only(top: 12.0)),
                 Text(proposal.message),
               ],
-            ).margin(const EdgeInsets.all(16.0)),
+            ).margin(Insets.a16),
           ),
         ],
       ).margin(Insets.h16v8),

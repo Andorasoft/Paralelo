@@ -1,3 +1,4 @@
+import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/user/models/user.dart';
 
@@ -13,7 +14,8 @@ abstract class UserRepository {
     required String email,
     String? pictureUrl,
     String? deviceToken,
-    required int universityId,
+    int? planId,
+    int? universityId,
   });
 
   /// Updates a [User] with the provided fields.
@@ -23,6 +25,7 @@ abstract class UserRepository {
     String? email,
     String? pictureUrl,
     String? deviceToken,
+    int? planId,
   });
 }
 
@@ -46,7 +49,8 @@ class SupabaseUserRepository implements UserRepository {
     required String email,
     String? pictureUrl,
     String? deviceToken,
-    required int universityId,
+    int? planId,
+    int? universityId,
   }) async {
     final data = await _client
         .from('user')
@@ -56,6 +60,7 @@ class SupabaseUserRepository implements UserRepository {
           'email': email,
           'picture_url': pictureUrl,
           'device_token': deviceToken,
+          'plan_id': planId,
           'university_id': universityId,
         })
         .select()
@@ -71,13 +76,15 @@ class SupabaseUserRepository implements UserRepository {
     String? email,
     String? pictureUrl,
     String? deviceToken,
+    int? planId,
   }) async {
     final updates = <String, dynamic>{};
 
-    if (displayName != null) updates['display_name'] = displayName;
-    if (email != null) updates['email'] = email;
-    if (pictureUrl != null) updates['picture_url'] = pictureUrl;
-    if (deviceToken != null) updates['device_token'] = deviceToken;
+    if (displayName.isNotNull) updates['display_name'] = displayName;
+    if (email.isNotNull) updates['email'] = email;
+    if (pictureUrl.isNotNull) updates['picture_url'] = pictureUrl;
+    if (deviceToken.isNotNull) updates['device_token'] = deviceToken;
+    if (planId.isNotNull) updates['plan_id'] = planId;
 
     if (updates.isEmpty) return await getById(id);
 

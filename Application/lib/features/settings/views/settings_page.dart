@@ -63,16 +63,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
                 builder: (_, snapshot) {
                   if (!snapshot.hasData) {
-                    return Skeleton(
+                    return const Skeleton(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         spacing: 16.0,
                         children: [
-                          SkeletonBlock(
-                            radius: 100.0,
-                            width: 64.0,
-                            height: 64.0,
-                          ),
+                          SkeletonBlock(width: 64.0, height: 64.0),
                           SkeletonBlock(width: 256.0, height: 16.0),
                           SkeletonBlock(width: 128.0, height: 16.0),
                         ],

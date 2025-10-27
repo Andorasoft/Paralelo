@@ -20,6 +20,10 @@ class Project {
   /// Optional additional requirement text.
   final String? requirement;
 
+  final bool featured;
+
+  final String visibilityPriority;
+
   /// UUID of the project owner.
   final String ownerId;
 
@@ -33,6 +37,8 @@ class Project {
     required this.description,
     required this.status,
     this.requirement,
+    required this.featured,
+    required this.visibilityPriority,
     required this.ownerId,
     this.categoryId,
   });
@@ -45,6 +51,8 @@ class Project {
     description: map['description'],
     status: map['status'],
     requirement: map['requirement'],
+    featured: map['featured'],
+    visibilityPriority: map['visibility_priority'],
     ownerId: map['owner_id'],
     categoryId: map['category_id'],
   );

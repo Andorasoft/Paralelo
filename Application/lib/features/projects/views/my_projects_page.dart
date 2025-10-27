@@ -3,6 +3,7 @@ import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/projects/exports.dart';
+import 'package:paralelo/utils/extensions.dart';
 import 'package:paralelo/widgets/empty_indicator.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
@@ -38,7 +39,6 @@ class _MyProjectsPageState extends ConsumerState<MyProjectsPage> {
         automaticallyImplyLeading: false,
 
         leading: const NavigationButton(),
-
         title: Text('setting.options.published_projects'.tr()),
       ),
 
@@ -61,6 +61,8 @@ class _MyProjectsPageState extends ConsumerState<MyProjectsPage> {
                   (i) => ProjectInfoPresenter(
                     project: i,
                     maxLines: 5,
+                    showStatus: true,
+                    featured: i.featured,
 
                     onTap: () async {
                       await ref
@@ -70,14 +72,14 @@ class _MyProjectsPageState extends ConsumerState<MyProjectsPage> {
                   ),
                 )
                 .divide(const SizedBox(height: 8.0)),
-          ).margin(const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0));
+          ).margin(Insets.h16v8);
         },
       ),
     );
   }
 
-  Future<List<Project>> loadData() async {
+  Future<List<Project>> loadData() {
     final userId = ref.read(authProvider)!.id;
-    return await ref.read(projectProvider).getForUser(userId);
+    return ref.read(projectProvider).getForUser(userId);
   }
 }

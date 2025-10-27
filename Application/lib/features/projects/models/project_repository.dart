@@ -12,6 +12,8 @@ abstract class ProjectRepository {
 
   Future<List<Project>> getForUser(String userId);
 
+  Future<Project?> getById(int id);
+
   Future<List<Project>> getByIds(List<int> ids);
 }
 
@@ -104,6 +106,17 @@ class SupabaseProjectRepository implements ProjectRepository {
     final data = await _client.from('project').select().eq('owner_id', userId);
 
     return data.map((i) => Project.fromMap(i)).toList();
+  }
+
+  @override
+  Future<Project?> getById(int id) async {
+    final data = await _client
+        .from('project')
+        .select()
+        .eq('id', id)
+        .maybeSingle();
+
+    return data != null ? Project.fromMap(data) : null;
   }
 
   @override

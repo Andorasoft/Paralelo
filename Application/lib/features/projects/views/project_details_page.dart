@@ -80,6 +80,7 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
                     project: widget.project,
                     payment: payment,
                     skills: skills,
+                    showStatus: true,
                   ),
                   if (userId != widget.project.ownerId)
                     ProjectOwnerPresenter(owner: owner),
@@ -102,7 +103,7 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
                               .read(goRouterProvider)
                               .push(
                                 CreateProposalPage.routePath,
-                                extra: widget.project,
+                                extra: widget.project.id,
                               );
                         }
                       : () {}

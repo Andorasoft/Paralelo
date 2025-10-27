@@ -1,9 +1,5 @@
-import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/core/router.dart';
 
 class NavigationButton extends ConsumerWidget {
@@ -29,7 +25,7 @@ class NavigationButton extends ConsumerWidget {
           color: Theme.of(context).colorScheme.outline,
         ),
       ),
-    ).center();
+    ).align(Alignment.centerRight);
   }
 }
 

@@ -78,6 +78,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
       displayName: 'Usuario sin nombre',
       email: authUser.email,
       pictureUrl: authUser.pictureUrl,
+      planId: 1,
       universityId: uni.id,
     );
 
