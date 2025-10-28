@@ -3,6 +3,10 @@ import './skill.dart';
 
 abstract class SkillRepository {
   Future<Skill?> getById(int id);
+
+  Future<List<Skill>> getForUser(String userId);
+
+  Future<List<Skill>> getForProject(int projectId);
 }
 
 class SupabaseSkillRepository implements SkillRepository {
@@ -19,5 +23,45 @@ class SupabaseSkillRepository implements SkillRepository {
         .maybeSingle();
 
     return data != null ? Skill.fromMap(data) : null;
+  }
+
+  @override
+  Future<List<Skill>> getForUser(String userId) async {
+    final res = await _client
+        .from('user_skill')
+        .select('skill_id')
+        .eq('user_id', userId);
+
+    final skillIds = res.map((e) => e['skill_id'] as int).toList();
+
+    if (skillIds.isEmpty) return [];
+
+    final data = await _client
+        .from('skill')
+        .select()
+        .inFilter('id', skillIds)
+        .order('name', ascending: true);
+
+    return data.map((e) => Skill.fromMap(e)).toList();
+  }
+
+  @override
+  Future<List<Skill>> getForProject(int projectId) async {
+    final res = await _client
+        .from('project_skill')
+        .select('skill_id')
+        .eq('project_id', projectId);
+
+    final ids = res.map((e) => e['skill_id'] as int).toList();
+
+    if (ids.isEmpty) return [];
+
+    final data = await _client
+        .from('skill')
+        .select()
+        .inFilter('id', ids)
+        .order('name', ascending: true);
+
+    return data.map((e) => Skill.fromMap(e)).toList();
   }
 }

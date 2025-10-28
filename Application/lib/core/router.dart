@@ -5,6 +5,7 @@ import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/chats/exports.dart';
 import 'package:paralelo/features/management/exports.dart';
+import 'package:paralelo/features/plan/views/plans_page.dart';
 import 'package:paralelo/features/projects/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/widgets/bottom_nav_bar.dart';
@@ -58,7 +59,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: ProjectDetailsPage.routePath,
         builder: (_, state) {
-          return ProjectDetailsPage(project: state.extra as Project);
+          return ProjectDetailsPage(projectId: state.extra as int);
         },
       ),
       GoRoute(
@@ -77,8 +78,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: ProposalDetailsPage.routePath,
         builder: (_, state) {
-          final proposalId = state.extra as int;
-          return ProposalDetailsPage(proposalId: proposalId);
+          return ProposalDetailsPage(proposalId: state.extra as int);
         },
       ),
       GoRoute(
@@ -91,8 +91,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: ChatRoomPage.routePath,
         builder: (_, state) {
-          final (roomId, userId) = state.extra as (String, String);
-          return ChatRoomPage(roomId: roomId, recipientId: userId);
+          return ChatRoomPage(roomId: state.extra as String);
+        },
+      ),
+
+      GoRoute(
+        path: PlansPage.routePath,
+        builder: (_, _) {
+          return const PlansPage();
         },
       ),
     ],

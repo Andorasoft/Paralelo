@@ -1,17 +1,46 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
-import 'package:paralelo/features/settings/views/settings_page.dart';
-import 'package:paralelo/features/chats/views/chats_page.dart';
-import 'package:paralelo/features/home/views/home_page.dart';
-import 'package:paralelo/features/projects/views/create_project_page.dart';
-import 'package:paralelo/features/projects/views/marketplace_page.dart';
 import 'package:paralelo/core/router.dart';
+import 'package:paralelo/core/services.dart';
+import 'package:paralelo/features/settings/exports.dart';
+import 'package:paralelo/features/chats/exports.dart';
+import 'package:paralelo/features/home/exports.dart';
+import 'package:paralelo/features/projects/exports.dart';
 
-class BottomNavBar extends ConsumerWidget {
+class BottomNavBar extends ConsumerStatefulWidget {
   const BottomNavBar({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() {
+    return _BottomNavBarState();
+  }
+}
+
+class _BottomNavBarState extends ConsumerState<BottomNavBar> {
+  bool _hasMessages = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await FCMService.initialize(
+        onMessage: (msg) {
+          if (!_hasMessages) {
+            safeSetState(() => _hasMessages = true);
+          }
+        },
+        onMessageOpenedApp: (msg) async {
+          await ref
+              .read(goRouterProvider)
+              .push(ChatRoomPage.routePath, extra: msg.data['room_id']);
+        },
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Theme(
       data: Theme.of(
         context,
@@ -22,7 +51,11 @@ class BottomNavBar extends ConsumerWidget {
         ),
 
         child: BottomNavBarWidget(
-          onTap: (index) {},
+          onTap: (index) {
+            if (index == 2 && _hasMessages) {
+              safeSetState(() => _hasMessages = false);
+            }
+          },
 
           height: 56.0,
           showLabels: false,
@@ -60,7 +93,8 @@ class BottomNavBar extends ConsumerWidget {
             BottomNavBarItem(
               label: 'nav.chats'.tr(),
               icon: Badge(
-                isLabelVisible: false,
+                smallSize: 8.0,
+                isLabelVisible: _hasMessages,
                 backgroundColor: Theme.of(context).colorScheme.primary,
 
                 child: const Icon(TablerIcons.message_2, size: 28.0),

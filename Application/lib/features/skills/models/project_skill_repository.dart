@@ -2,10 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import './project_skill.dart';
 
 abstract class ProjectSkillRepository {
-  Future<List<ProjectSkill>> getByProject(
-    int projectId, {
-    required bool includeRelations,
-  });
+  Future<ProjectSkill> create({required int projectId, required skillId});
 }
 
 class SupabaseProjectSkillRepository implements ProjectSkillRepository {
@@ -14,15 +11,16 @@ class SupabaseProjectSkillRepository implements ProjectSkillRepository {
   const SupabaseProjectSkillRepository(this._client);
 
   @override
-  Future<List<ProjectSkill>> getByProject(
-    int projectId, {
-    required bool includeRelations,
+  Future<ProjectSkill> create({
+    required int projectId,
+    required skillId,
   }) async {
     final data = await _client
         .from('project_skill')
-        .select(includeRelations ? '*, skill(*)' : '*')
-        .eq('project_id', projectId);
+        .insert({'project_id': projectId, 'skill_id': skillId})
+        .select()
+        .single();
 
-    return data.map((i) => ProjectSkill.fromMap(i)).toList();
+    return ProjectSkill.fromMap(data);
   }
 }

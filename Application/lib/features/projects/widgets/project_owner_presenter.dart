@@ -3,6 +3,7 @@ import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/user/exports.dart';
 import 'package:paralelo/utils/formatters.dart';
 import 'package:paralelo/widgets/person_picture.dart';
+import 'package:paralelo/widgets/verified_mark.dart';
 
 class ProjectOwnerPresenter extends ConsumerWidget {
   final User owner;
@@ -28,7 +29,27 @@ class ProjectOwnerPresenter extends ConsumerWidget {
         spacing: 12.0,
 
         children: [
-          PersonPicture(source: owner.pictureUrl ?? '', size: 44.0),
+          PersonPicture(
+            source: owner.pictureUrl ?? '',
+            size: 48.0,
+
+            badge: switch (owner.planId!) {
+              3 => Icon(TablerIcons.crown),
+              2 => Icon(TablerIcons.star),
+              _ => null,
+            },
+            side: switch (owner.planId!) {
+              3 => BorderSide(
+                width: 3.0,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+              2 => BorderSide(
+                width: 3.0,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              _ => BorderSide.none,
+            },
+          ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,76 +57,33 @@ class ProjectOwnerPresenter extends ConsumerWidget {
 
             children: [
               Row(
-                mainAxisSize: MainAxisSize.min,
-                spacing: 4.0,
-
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    owner.displayName.obscure(),
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: 4.0,
+
+                    children: [
+                      Text(
+                        owner.displayName.obscure(),
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      if (owner.verified) const VerifiedMark(size: 22.0),
+                    ],
                   ),
-                  if (owner.verified)
-                    Icon(
-                      TablerIcons.rosette_discount_check_filled,
-                      size: 22.0,
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
+                  UserRatingStar(rating: 0.0),
                 ],
               ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                spacing: 4.0,
-                children: [
-                  Icon(
-                    Icons.calendar_month_rounded,
-                    size: 18.0,
-                    color: Colors.grey.shade500,
-                  ),
-                  Text(
-                    owner.createdAt.toShortDateString(),
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      color: Colors.grey.shade700,
-                    ),
-                  ),
-                ],
+              Text(
+                'Miembro desde ${owner.createdAt.toLongDateString().toLowerCase()}',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.outline,
+                ),
               ),
             ],
           ).expanded(),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            spacing: 4.0,
-            children: [
-              UserRatingStar(rating: 0.0),
-              if (owner.planId != 1)
-                Chip(
-                  visualDensity: VisualDensity(
-                    horizontal: VisualDensity.minimumDensity,
-                    vertical: VisualDensity.minimumDensity,
-                  ),
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  padding: EdgeInsets.zero,
-                  backgroundColor: owner.planId == 2
-                      ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.secondary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(100.0),
-                  ),
-
-                  label: Text(
-                    owner.planId == 2 ? 'PRO' : 'PREMIUM',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10.0,
-                      color: Theme.of(context).colorScheme.onPrimary,
-                    ),
-                  ),
-                ),
-            ],
-          ),
         ],
       ).margin(const EdgeInsets.all(16.0)),
     );

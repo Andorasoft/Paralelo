@@ -5,8 +5,13 @@ import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 
 class MessageInputBar extends ConsumerStatefulWidget {
   final void Function(String) onSubmitted;
+  final bool disabled;
 
-  const MessageInputBar({super.key, required this.onSubmitted});
+  const MessageInputBar({
+    super.key,
+    required this.onSubmitted,
+    this.disabled = false,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -28,6 +33,7 @@ class MessageInputBarState extends ConsumerState<MessageInputBar> {
         TextFormField(
           controller: _inputFieldController,
           focusNode: _inputFieldFocusNode,
+          enabled: !widget.disabled,
 
           decoration: InputDecoration(
             hintText: 'Mensaje...',
@@ -36,20 +42,29 @@ class MessageInputBarState extends ConsumerState<MessageInputBar> {
               borderRadius: BorderRadius.circular(100.0),
             ),
             focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(width: 1.0, color: Colors.grey.shade300),
+              borderSide: BorderSide(
+                width: 1.0,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              borderRadius: BorderRadius.circular(100.0),
+            ),
+            disabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(width: 1.0, color: Colors.grey.shade200),
               borderRadius: BorderRadius.circular(100.0),
             ),
           ),
         ).expanded(),
         IconButton.filled(
-          onPressed: () {
-            if (_inputFieldController.text.isEmpty) return;
+          onPressed: !widget.disabled
+              ? () {
+                  if (_inputFieldController.text.isEmpty) return;
 
-            final msg = _inputFieldController.text;
-            _inputFieldController.clear();
+                  final msg = _inputFieldController.text;
+                  _inputFieldController.clear();
 
-            widget.onSubmitted.call(msg);
-          },
+                  widget.onSubmitted.call(msg);
+                }
+              : null,
           icon: const Icon(Icons.send, size: 20.0),
         ),
       ],

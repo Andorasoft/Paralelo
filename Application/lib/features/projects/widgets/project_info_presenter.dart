@@ -18,7 +18,7 @@ class ProjectInfoPresenter extends ConsumerWidget {
 
   final Project project;
   final ProjectPayment? payment;
-  final List<ProjectSkill>? skills;
+  final List<Skill>? skills;
 
   const ProjectInfoPresenter({
     super.key,
@@ -194,7 +194,7 @@ class ProjectInfoPresenter extends ConsumerWidget {
                   spacing: 8.0,
 
                   children: skills!
-                      .map((s) => Chip(label: Text(s.skill!.name)))
+                      .map((s) => Chip(label: Text(s.name)))
                       .toList(),
                 ),
               ],

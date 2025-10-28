@@ -113,6 +113,8 @@ class FCMService {
   /// Singleton instance.
   static final instance = FCMService._internal();
 
+  static bool _initialized = false;
+
   final _messaging = FirebaseMessaging.instance;
 
   /// Private constructor for Singleton.
@@ -200,6 +202,8 @@ class FCMService {
     void Function(RemoteMessage message)? onMessageOpenedApp,
     void Function(String token)? onTokenRefresh,
   }) async {
+    if (_initialized) return;
+
     if (onTokenRefresh != null) {
       instance._listenTokenRefresh(onTokenRefresh);
     }
@@ -211,5 +215,7 @@ class FCMService {
 
     // Background message handler
     FirebaseMessaging.onBackgroundMessage(_messagingBackgroundHandler);
+
+    _initialized = true;
   }
 }

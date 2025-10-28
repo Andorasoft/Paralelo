@@ -5,6 +5,7 @@ import 'package:paralelo/core/router.dart';
 import 'package:paralelo/core/services.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/chats/exports.dart';
+import 'package:paralelo/features/projects/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/utils/extensions.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
@@ -162,7 +163,10 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Text('USD 20 / hora'),
+                    if (proposal.amount.isNotNull)
+                      Text('USD ${proposal.amount}')
+                    else
+                      Text('USD ${proposal.hourlyRate} / hora'),
                   ],
                 ),
 
@@ -172,7 +176,7 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
                     context,
                   ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                 ).margin(const EdgeInsets.only(top: 12.0)),
-                Text('Presencial'),
+                Text(ProposalMode.labels[proposal.mode]!),
 
                 Text(
                   'Tiempo estimado',
@@ -180,7 +184,9 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
                     context,
                   ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                 ).margin(const EdgeInsets.only(top: 12.0)),
-                Text('5 días'),
+                Text(
+                  '${proposal.estimatedDurationValue} ${proposal.estimatedDurationUnit}',
+                ),
 
                 Text(
                   'Estado',
@@ -188,7 +194,7 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
                     context,
                   ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                 ).margin(const EdgeInsets.only(top: 12.0)),
-                Text('Pendiente'),
+                Text(ProposalStatus.labels[proposal.status]!),
 
                 Text(
                   'Mensaje inicial',
@@ -197,6 +203,17 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
                   ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                 ).margin(const EdgeInsets.only(top: 12.0)),
                 Text(proposal.message),
+                FilledButton.tonal(
+                  onPressed: () async {
+                    await ref
+                        .read(goRouterProvider)
+                        .push(
+                          ProjectDetailsPage.routePath,
+                          extra: proposal.projectId,
+                        );
+                  },
+                  child: const Text('Ir al proyecto'),
+                ).margin(const EdgeInsets.only(top: 20.0)),
               ],
             ).margin(Insets.a16),
           ),

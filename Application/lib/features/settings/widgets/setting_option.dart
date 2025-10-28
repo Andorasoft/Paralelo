@@ -84,6 +84,7 @@ class SettingOptionState extends ConsumerState<SettingOption> {
           widget.onChanged != null
               ? Switch.adaptive(
                   value: widget.value,
+                  activeTrackColor: Theme.of(context).colorScheme.primary,
                   onChanged: (v) {
                     widget.onChanged?.call(v);
                   },

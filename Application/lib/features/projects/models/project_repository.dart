@@ -94,9 +94,7 @@ class SupabaseProjectRepository implements ProjectRepository {
         .order('created_at', ascending: false)
         .range(start, end);
 
-    final projects = (data as List)
-        .map((i) => Project.fromMap(i as Map<String, dynamic>))
-        .toList();
+    final projects = data.map((i) => Project.fromMap(i)).toList();
 
     return (pages, projects);
   }

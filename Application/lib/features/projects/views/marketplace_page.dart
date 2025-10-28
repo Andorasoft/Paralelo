@@ -6,7 +6,7 @@ import 'package:paralelo/features/projects/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/features/university/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
-import 'package:paralelo/widgets/empty_indicator.dart';
+import 'package:paralelo/utils/extensions.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 
 class MarketplacePage extends ConsumerStatefulWidget {
@@ -37,122 +37,109 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: loadDataFuture,
+      builder: (_, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return skeleton();
+        }
+
+        return page(snapshot.data!);
+      },
+    ).hideKeyboardOnTap(context);
+  }
+
+  Widget skeleton() {
+    return Scaffold(key: scaffoldKey, body: const LoadingIndicator().center());
+  }
+
+  Widget page((int, List<(Project, bool)>) data) {
+    final (total, list) = data;
     return Scaffold(
       key: scaffoldKey,
 
       appBar: AppBar(
-        toolbarHeight: 0.0,
+        title: SearchBar(
+          padding: WidgetStateProperty.all(
+            const EdgeInsets.symmetric(horizontal: 12.0),
+          ),
 
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(48.0),
+          onSubmitted: (query) {
+            safeSetState(() {
+              querySearch = query;
+              loadDataFuture = loadData(page: currentPage, query: querySearch);
+            });
+          },
 
-          child: Row(
-            spacing: 8.0,
-
-            children: [
-              SearchBar(
-                padding: WidgetStateProperty.all(
-                  const EdgeInsets.symmetric(horizontal: 12.0),
-                ),
-
-                onSubmitted: (query) {
-                  safeSetState(() {
-                    querySearch = query;
-                    loadDataFuture = loadData(
-                      page: currentPage,
-                      query: querySearch,
-                    );
-                  });
-                },
-
-                leading: const Icon(LucideIcons.search),
-                hintText: 'input.search_projects'.tr(),
-              ).size(height: 44.0).expanded(),
-              const ProjectSortButton(),
-              // const ProjectFilterButton(),
-            ],
-          ).margin(const EdgeInsets.symmetric(horizontal: 16.0)),
-        ),
+          leading: const Icon(LucideIcons.search),
+          hintText: 'input.search_projects'.tr(),
+        ).size(height: 44.0),
+        actions: [const ProjectSortButton()],
       ),
 
-      body: FutureBuilder(
-        future: loadDataFuture,
+      body: ListView(
+        padding: Insets.h16v8,
+        children: [
+          ...list
+              .map((i) {
+                final (project, applied) = i;
 
-        builder: (_, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return const LoadingIndicator().center();
-          }
+                return ProjectInfoPresenter(
+                  onTap: () async {
+                    await ref
+                        .read(goRouterProvider)
+                        .push(ProjectDetailsPage.routePath, extra: project.id);
+                  },
 
-          if (!snapshot.hasData) {
-            return const EmptyIndicator().center();
-          }
+                  project: project,
+                  applied: applied,
+                  featured: project.featured,
+                  maxLines: 5,
+                );
+              })
+              .divide(const SizedBox(height: 16.0)),
 
-          final (total, list) = snapshot.data!;
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            spacing: 128.0,
 
-          return ListView(
             children: [
-              ...list
-                  .map((i) {
-                    final (project, applied) = i;
+              IconButton.filledTonal(
+                onPressed: currentPage != 1
+                    ? () {
+                        safeSetState(() {
+                          currentPage -= 1;
+                          loadDataFuture = loadData(
+                            page: currentPage,
+                            query: querySearch,
+                          );
+                        });
+                      }
+                    : null,
 
-                    return ProjectInfoPresenter(
-                      onTap: () async {
-                        await ref
-                            .read(goRouterProvider)
-                            .push(ProjectDetailsPage.routePath, extra: project);
-                      },
+                icon: const Icon(LucideIcons.chevronLeft),
+              ),
+              IconButton.filledTonal(
+                onPressed: currentPage != total
+                    ? () {
+                        safeSetState(() {
+                          currentPage += 1;
+                          loadDataFuture = loadData(
+                            page: currentPage,
+                            query: querySearch,
+                          );
+                        });
+                      }
+                    : null,
 
-                      project: project,
-                      applied: applied,
-                      featured: project.featured,
-                      maxLines: 5,
-                    );
-                  })
-                  .divide(const SizedBox(height: 8.0)),
-
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                spacing: 128.0,
-
-                children: [
-                  IconButton.filledTonal(
-                    onPressed: currentPage != 1
-                        ? () {
-                            safeSetState(() {
-                              currentPage -= 1;
-                              loadDataFuture = loadData(
-                                page: currentPage,
-                                query: querySearch,
-                              );
-                            });
-                          }
-                        : null,
-
-                    icon: const Icon(LucideIcons.chevronLeft),
-                  ),
-                  IconButton.filledTonal(
-                    onPressed: currentPage != total
-                        ? () {
-                            safeSetState(() {
-                              currentPage += 1;
-                              loadDataFuture = loadData(
-                                page: currentPage,
-                                query: querySearch,
-                              );
-                            });
-                          }
-                        : null,
-
-                    icon: const Icon(LucideIcons.chevronRight),
-                  ),
-                ],
-              ).margin(const EdgeInsets.only(top: 32.0)),
+                icon: const Icon(LucideIcons.chevronRight),
+              ),
             ],
-          ).margin(const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0));
-        },
+          ).margin(const EdgeInsets.only(top: 32.0)),
+        ],
       ),
-    ).hideKeyboardOnTap(context);
+    );
   }
 
   Future<(int, List<(Project, bool)>)> loadData({

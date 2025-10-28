@@ -13,17 +13,11 @@ import 'package:paralelo/widgets/skeleton.dart';
 import 'package:paralelo/widgets/skeleton_block.dart';
 
 class ChatRoomPage extends ConsumerStatefulWidget {
-  static const routeName = 'ChatRoomPage';
   static const routePath = '/chat-room';
 
   final String roomId;
-  final String recipientId;
 
-  const ChatRoomPage({
-    super.key,
-    required this.roomId,
-    required this.recipientId,
-  });
+  const ChatRoomPage({super.key, required this.roomId});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -33,17 +27,17 @@ class ChatRoomPage extends ConsumerStatefulWidget {
 
 class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  late final Future<(User, Proposal)> loadDataFuture;
+  late final Future<(ChatRoom, User, Proposal)> loadDataFuture;
+  late final String userId;
 
   @override
   void initState() {
     super.initState();
 
+    userId = ref.read(authProvider)!.id;
     loadDataFuture = loadData();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final userId = ref.read(authProvider)!.id;
-
       await ChatService.instance.markAsRead(
         roomId: widget.roomId,
         userId: userId,
@@ -53,24 +47,70 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: loadDataFuture,
+      builder: (_, snapshot) {
+        if (!snapshot.hasData) {
+          return skeleton();
+        }
+
+        return page(snapshot.data!);
+      },
+    ).hideKeyboardOnTap(context);
+  }
+
+  Widget skeleton() {
+    return Container(
+      color: Theme.of(context).colorScheme.surface,
+      child: Skeleton(
+        child: Scaffold(
+          key: scaffoldKey,
+          backgroundColor: Colors.transparent,
+
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            toolbarHeight: 64.0,
+            leading: const SkeletonBlock(
+              width: 40.0,
+              height: 40.0,
+            ).align(Alignment.centerRight),
+            title: const SkeletonBlock(width: 94.0, height: 20.0),
+            actions: const [SkeletonBlock(width: 32.0, height: 20.0)],
+
+            bottom: const PreferredSize(
+              preferredSize: Size.fromHeight(36.0),
+              child: SkeletonBlock(
+                width: double.infinity,
+                height: 36.0,
+                radius: 0.0,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget page((ChatRoom, User, Proposal) data) {
+    final (room, recipient, proposal) = data;
+
     final messagesAsync = ref.watch(messagesProvider(widget.roomId));
 
     return Scaffold(
       key: scaffoldKey,
       resizeToAvoidBottomInset: true,
 
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(100.0),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        toolbarHeight: 64.0,
 
-        child: FutureBuilder(
-          future: loadDataFuture,
-          builder: (_, snapshot) {
-            if (!snapshot.hasData) {
-              return skeleton();
-            }
+        leading: const NavigationButton(),
+        title: Text(recipient.displayName.obscure()),
+        actions: const [UserRatingStar(rating: 0.0)],
 
-            return header(snapshot.data!);
-          },
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(36.0),
+          child: ShowProposalButton(proposalId: proposal.id).size(height: 36.0),
         ),
       ),
 
@@ -91,7 +131,7 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                       date:
                           (msg['timestamp'] as Timestamp?)?.toDate() ??
                           DateTime.now(),
-                      isFromCurrentUser: msg['recipient'] == widget.recipientId,
+                      isFromCurrentUser: msg['recipient'] == recipient.id,
                     );
                   },
 
@@ -106,69 +146,30 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
 
           MessageInputBar(
             onSubmitted: (message) async {
-              final userId = ref.read(authProvider)!.id;
-
               await ChatService.instance.sendMessage(
                 roomId: widget.roomId,
                 senderId: userId,
-                recipientId: widget.recipientId,
+                recipientId: recipient.id,
                 text: message,
               );
             },
+            disabled: room.isReadonly,
           ).useSafeArea(),
         ],
       ).margin(Insets.h16v8),
     ).hideKeyboardOnTap(context);
   }
 
-  Widget skeleton() {
-    return Skeleton(
-      child: AppBar(
-        automaticallyImplyLeading: false,
-        toolbarHeight: 64.0,
-        leading: const SkeletonBlock(
-          width: 40.0,
-          height: 40.0,
-        ).align(Alignment.centerRight),
-        title: const SkeletonBlock(width: 94.0, height: 20.0),
-        actions: const [SkeletonBlock(width: 32.0, height: 20.0)],
+  Future<(ChatRoom, User, Proposal)> loadData() async {
+    final room = await ref.read(chatRoomProvider).getById(widget.roomId);
 
-        bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(36.0),
-          child: SkeletonBlock(
-            width: double.infinity,
-            height: 36.0,
-            radius: 0.0,
-          ),
-        ),
-      ),
-    );
-  }
+    final recipientId = room!.user1Id == userId ? room.user2Id : room.user1Id;
 
-  Widget header((User, Proposal) data) {
-    final (user, proposal) = data;
-    return AppBar(
-      automaticallyImplyLeading: false,
-      toolbarHeight: 64.0,
-
-      leading: const NavigationButton(),
-      title: Text(user.displayName.obscure()),
-      actions: const [UserRatingStar(rating: 0.0)],
-
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(36.0),
-        child: ShowProposalButton(proposalId: proposal.id).size(height: 36.0),
-      ),
-    );
-  }
-
-  Future<(User, Proposal)> loadData() async {
-    final (user, room) = await (
-      ref.read(userProvider).getById(widget.recipientId),
-      ref.read(chatRoomProvider).getById(widget.roomId),
+    final (recipient, proposal) = await (
+      ref.read(userProvider).getById(recipientId),
+      ref.read(proposalProvider).getById(room.proposalId),
     ).wait;
-    final proposal = await ref.read(proposalProvider).getById(room!.proposalId);
 
-    return (user!, proposal!);
+    return (room, recipient!, proposal!);
   }
 }

@@ -2,6 +2,7 @@ import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/user/exports.dart';
 import 'package:paralelo/widgets/person_picture.dart';
+import 'package:paralelo/widgets/verified_mark.dart';
 
 class UserPresenter extends ConsumerWidget {
   final User user;
@@ -14,7 +15,28 @@ class UserPresenter extends ConsumerWidget {
       mainAxisSize: MainAxisSize.min,
 
       children: [
-        PersonPicture(source: user.pictureUrl ?? '', size: 64.0),
+        PersonPicture(
+          source: user.pictureUrl ?? '',
+          size: 64.0,
+
+          badgePlacement: BadgePlacement.topLef,
+          badge: switch (user.planId!) {
+            3 => Icon(TablerIcons.crown),
+            2 => Icon(LucideIcons.star),
+            _ => null,
+          },
+          side: switch (user.planId!) {
+            3 => BorderSide(
+              width: 3.0,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+            2 => BorderSide(
+              width: 3.0,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            _ => BorderSide.none,
+          },
+        ),
         Row(
           mainAxisSize: MainAxisSize.min,
           spacing: 4.0,
@@ -26,11 +48,7 @@ class UserPresenter extends ConsumerWidget {
                 context,
               ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
             ),
-            if (user.verified)
-              Icon(
-                TablerIcons.rosette_discount_check_filled,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
+            if (user.verified) const VerifiedMark(),
           ],
         ).margin(const EdgeInsets.only(top: 8.0)),
         Text(

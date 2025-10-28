@@ -1,24 +1,26 @@
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/auth/exports.dart';
+import 'package:paralelo/features/user/exports.dart';
 
 /// Global provider that exposes authentication state and actions.
 ///
-/// The provider uses [_AuthNotifier] to manage sign-in, sign-out,
+/// The provider uses [AuthStateNotifier] to manage sign-in, sign-out,
 /// and the current [AuthUser] session reactively.
-final authProvider = StateNotifierProvider<_AuthNotifier, AuthUser?>((ref) {
+final authProvider = StateNotifierProvider<AuthStateNotifier, AuthUser?>((ref) {
   final client = Supabase.instance.client;
   final repo = SupabaseAuthRepository(client);
-  return _AuthNotifier(repo);
+  return AuthStateNotifier(repo, ref);
 });
 
 /// Handles authentication logic and exposes the current [AuthUser] state.
 ///
 /// This class bridges the [AuthRepository] and the app’s reactive state.
 /// It updates [state] whenever a user logs in or out.
-class _AuthNotifier extends StateNotifier<AuthUser?> {
+class AuthStateNotifier extends StateNotifier<AuthUser?> {
   final AuthRepository _repo;
+  final StateNotifierProviderRef<AuthStateNotifier, AuthUser?> ref;
 
-  _AuthNotifier(this._repo) : super(null) {
+  AuthStateNotifier(this._repo, this.ref) : super(null) {
     // Initialize the state with the current authenticated user, if any.
     state = _repo.currentUser();
   }
@@ -33,6 +35,7 @@ class _AuthNotifier extends StateNotifier<AuthUser?> {
   /// Signs out the current user and clears the auth state.
   Future<void> signOut() async {
     await _repo.singOut();
+    await ref.read(userProvider).update(state!.id, deviceToken: '');
     state = null;
   }
 }

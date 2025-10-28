@@ -22,22 +22,46 @@ class SplashPage extends ConsumerStatefulWidget {
 }
 
 class _SplashPageState extends ConsumerState<SplashPage> {
+  late final String userId, userEmail;
+
   @override
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final (_, prefs, _) = await loadData();
-      final notifier = ref.read(preferencesProvider.notifier);
+    userId = ref.read(authProvider)!.id;
+    userEmail = ref.read(authProvider)!.email;
 
-      if (prefs == null) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      var (user, prefs, uni) = await loadData();
+      final preferences = ref.read(preferencesProvider.notifier);
+
+      if (uni == null) {
         await showUserNotAllowedDialog(context, ref: ref);
         return;
       }
 
-      notifier.setLocale(prefs.language);
-      notifier.setTheme(prefs.darkMode ? ThemeMode.dark : ThemeMode.light);
-      notifier.setNotifications(prefs.notificationsEnabled);
+      user ??= await ref
+          .read(userProvider)
+          .create(
+            id: userId,
+            displayName: 'Usuario sin nombre',
+            email: userEmail,
+            pictureUrl: null,
+            planId: 1,
+            universityId: uni.id,
+          );
+
+      prefs ??= await ref.read(userPreferenceProvider).create(userId: userId);
+
+      final token = await FCMService.instance.getDeviceToken();
+
+      if (user.deviceToken != token) {
+        user = await ref.read(userProvider).update(user.id, deviceToken: token);
+      }
+
+      preferences.setLocale(prefs.language);
+      preferences.setTheme(prefs.darkMode ? ThemeMode.dark : ThemeMode.light);
+      preferences.setNotifications(prefs.notificationsEnabled);
 
       await context.setLocale(Locale(prefs.language));
       await ref.read(goRouterProvider).pushReplacement('/');
@@ -60,35 +84,11 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   }
 
   Future<(User?, UserPreference?, University?)> loadData() async {
-    final authUser = ref.read(authProvider)!;
-    final userRepo = ref.read(userProvider);
-    final uniRepo = ref.read(universityProvider);
-    final prefRepo = ref.read(userPreferenceProvider);
-
-    var (user, prefs, uni) = await (
-      userRepo.getById(authUser.id),
-      prefRepo.getForUser(authUser.id),
-      uniRepo.getByDomain(authUser.email.extractDomain()),
+    final (user, prefs, uni) = await (
+      ref.read(userProvider).getById(userId),
+      ref.read(userPreferenceProvider).getForUser(userId),
+      ref.read(universityProvider).getByDomain(userEmail.extractDomain()),
     ).wait;
-
-    if (uni == null) return (null, null, null);
-
-    user ??= await userRepo.create(
-      id: authUser.id,
-      displayName: 'Usuario sin nombre',
-      email: authUser.email,
-      pictureUrl: authUser.pictureUrl,
-      planId: 1,
-      universityId: uni.id,
-    );
-
-    prefs ??= await prefRepo.create(userId: authUser.id);
-
-    final token = await FCMService.instance.getDeviceToken();
-
-    if (user.deviceToken != token) {
-      user = await userRepo.update(user.id, deviceToken: token);
-    }
 
     return (user, prefs, uni);
   }

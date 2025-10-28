@@ -2,7 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import './project_payment.dart';
 
 abstract class ProjectPaymentRepository {
-  Future<ProjectPayment?> getByProject(int projectId);
+  Future<ProjectPayment?> getForProject(int projectId);
 }
 
 class SupabaseProjectPaymentRepository implements ProjectPaymentRepository {
@@ -11,7 +11,7 @@ class SupabaseProjectPaymentRepository implements ProjectPaymentRepository {
   const SupabaseProjectPaymentRepository(this._client);
 
   @override
-  Future<ProjectPayment?> getByProject(int projectId) async {
+  Future<ProjectPayment?> getForProject(int projectId) async {
     final data = await _client
         .from('project_payment')
         .select()

@@ -260,7 +260,7 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
 
     final (project, payment, applied) = await (
       ref.read(projectProvider).getById(widget.projectId),
-      ref.read(projectPaymentProvider).getByProject(widget.projectId),
+      ref.read(projectPaymentProvider).getForProject(widget.projectId),
       ref
           .read(proposalProvider)
           .applied(projectId: widget.projectId, providerId: userId),

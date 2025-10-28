@@ -6,15 +6,16 @@ import 'package:paralelo/features/projects/exports.dart';
 import 'package:paralelo/features/skills/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
+import 'package:paralelo/utils/extensions.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
 
 class ProjectDetailsPage extends ConsumerStatefulWidget {
   static const routePath = '/project-details';
 
-  final Project project;
+  final int projectId;
 
-  const ProjectDetailsPage({super.key, required this.project});
+  const ProjectDetailsPage({super.key, required this.projectId});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -24,7 +25,8 @@ class ProjectDetailsPage extends ConsumerStatefulWidget {
 
 class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  late final Future<(User, ProjectPayment, List<ProjectSkill>)> loadDataFuture;
+  late final Future<(User, Project, ProjectPayment, List<Skill>, bool)>
+  loadDataFuture;
 
   @override
   void initState() {
@@ -35,6 +37,24 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: loadDataFuture,
+      builder: (_, snapshot) {
+        if (!snapshot.hasData) {
+          return skeleton();
+        }
+
+        return page(snapshot.data!);
+      },
+    ).hideKeyboardOnTap(context);
+  }
+
+  Widget skeleton() {
+    return Scaffold(key: scaffoldKey, body: const LoadingIndicator().center());
+  }
+
+  Widget page((User, Project, ProjectPayment, List<Skill>, bool) data) {
+    final (owner, project, payment, skills, applied) = data;
     final userId = ref.read(authProvider)!.id;
 
     return Scaffold(
@@ -46,91 +66,75 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
         leading: const NavigationButton(),
 
         actions: [
-          if (userId == widget.project.ownerId)
+          if (userId == owner.id)
             TextButton(onPressed: () {}, child: Text('button.edit'.tr())),
         ],
       ),
 
-      body: FutureBuilder(
-        future: loadDataFuture,
-        builder: (_, snapshot) {
-          if (!snapshot.hasData) {
-            return const LoadingIndicator().center();
-          }
+      body: ListView(
+        padding: Insets.h16v8,
+        children: [
+          Text(
+            project.title,
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w500),
+          ),
+          Text(
+            'Publicado en ${project.createdAt.toLongDateString()}',
+          ).margin(const EdgeInsets.symmetric(vertical: 16.0)),
 
-          final (owner, payment, skills) = snapshot.data!;
+          Column(
+            spacing: 8.0,
 
-          return ListView(
             children: [
-              Text(
-                widget.project.title,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w500,
-                ),
+              ProjectInfoPresenter(
+                project: project,
+                payment: payment,
+                skills: skills,
+                showStatus: true,
               ),
-              Text(
-                'Publicado en ${widget.project.createdAt.toLongDateString()}',
-              ).margin(const EdgeInsets.symmetric(vertical: 16.0)),
-
-              Column(
-                spacing: 8.0,
-
-                children: [
-                  ProjectInfoPresenter(
-                    project: widget.project,
-                    payment: payment,
-                    skills: skills,
-                    showStatus: true,
-                  ),
-                  if (userId != widget.project.ownerId)
-                    ProjectOwnerPresenter(owner: owner),
-                ],
-              ),
+              if (userId != owner.id) ProjectOwnerPresenter(owner: owner),
             ],
-          ).margin(const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0));
-        },
+          ),
+        ],
       ),
 
-      bottomNavigationBar: FutureBuilder(
-        future: loadDataFuture,
-
-        builder: (_, snapshot) {
-          return FilledButton(
-            onPressed: snapshot.hasData
-                ? userId != widget.project.ownerId
-                      ? () async {
-                          await ref
-                              .read(goRouterProvider)
-                              .push(
-                                CreateProposalPage.routePath,
-                                extra: widget.project.id,
-                              );
-                        }
-                      : () {}
-                : null,
-            child: Text(
-              userId != widget.project.ownerId
-                  ? 'button.offer_help'.tr()
-                  : 'button.mark_completed'.tr(),
-            ),
-          ).margin(const EdgeInsets.all(16.0)).useSafeArea();
-        },
-      ),
+      bottomNavigationBar: FilledButton(
+        onPressed: !applied
+            ? userId != owner.id
+                  ? () async {
+                      await ref
+                          .read(goRouterProvider)
+                          .push(
+                            CreateProposalPage.routePath,
+                            extra: widget.projectId,
+                          );
+                    }
+                  : () {}
+            : null,
+        child: Text(
+          userId != owner.id
+              ? 'button.offer_help'.tr()
+              : 'button.mark_completed'.tr(),
+        ),
+      ).margin(const EdgeInsets.all(16.0)).useSafeArea(),
     );
   }
 
-  Future<(User, ProjectPayment, List<ProjectSkill>)> loadData() async {
-    final projectId = widget.project.id;
-    final ownerId = widget.project.ownerId;
+  Future<(User, Project, ProjectPayment, List<Skill>, bool)> loadData() async {
+    final userId = ref.read(authProvider)!.id;
 
-    final (owner, payment, skills) = await (
-      ref.read(userProvider).getById(ownerId),
-      ref.read(projectPaymentProvider).getByProject(projectId),
+    final (project, payment, skills, applied) = await (
+      ref.read(projectProvider).getById(widget.projectId),
+      ref.read(projectPaymentProvider).getForProject(widget.projectId),
+      ref.read(skillProvider).getForProject(widget.projectId),
       ref
-          .read(projectSkillProvider)
-          .getByProject(projectId, includeRelations: true),
+          .read(proposalProvider)
+          .applied(projectId: widget.projectId, providerId: userId),
     ).wait;
+    final owner = await ref.read(userProvider).getById(project!.ownerId);
 
-    return (owner!, payment!, skills);
+    return (owner!, project, payment!, skills, applied);
   }
 }

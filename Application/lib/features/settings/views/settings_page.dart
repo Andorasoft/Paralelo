@@ -5,6 +5,7 @@ import 'package:paralelo/core/services.dart';
 import 'package:paralelo/core/modals.dart';
 import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/exports.dart';
+import 'package:paralelo/features/plan/views/plans_page.dart';
 import 'package:paralelo/features/projects/exports.dart';
 import 'package:paralelo/features/settings/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
@@ -109,7 +110,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                   title: 'setting.options.proposals_submitted'.tr(),
                 ),
                 SettingOption.tile(
-                  onTap: () {},
+                  onTap: () async {
+                    await ref.read(goRouterProvider).push(PlansPage.routePath);
+                  },
 
                   leading: const Icon(TablerIcons.star_filled),
                   title: 'setting.options.benefits_plan'.tr(),

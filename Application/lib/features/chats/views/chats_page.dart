@@ -161,10 +161,7 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
                       onTap: () async {
                         await ref
                             .read(goRouterProvider)
-                            .push(
-                              ChatRoomPage.routePath,
-                              extra: (room.id, user.id),
-                            );
+                            .push(ChatRoomPage.routePath, extra: room.id);
                       },
                       title: user.displayName.obscure(),
                       subtitle: project.title,

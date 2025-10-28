@@ -58,6 +58,23 @@ class _HomePageState extends ConsumerState<HomePage> {
         leading: PersonPicture(
           source: user.pictureUrl ?? '',
           size: 40.0,
+
+          badge: switch (user.planId!) {
+            3 => Icon(TablerIcons.crown),
+            2 => Icon(LucideIcons.star),
+            _ => null,
+          },
+          side: switch (user.planId!) {
+            3 => BorderSide(
+              width: 2.0,
+              color: Theme.of(context).colorScheme.secondary,
+            ),
+            2 => BorderSide(
+              width: 2.0,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            _ => BorderSide.none,
+          },
         ).align(Alignment.centerRight),
         title: Column(
           mainAxisSize: MainAxisSize.min,
