@@ -1,6 +1,6 @@
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/core/router.dart';
-import 'package:paralelo/features/projects/exports.dart';
+import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
 
 class CreateProposalButton extends ConsumerWidget {

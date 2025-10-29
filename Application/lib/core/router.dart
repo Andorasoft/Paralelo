@@ -3,10 +3,10 @@ import 'package:go_router/go_router.dart';
 
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/features/auth/exports.dart';
-import 'package:paralelo/features/chats/exports.dart';
+import 'package:paralelo/features/chat/exports.dart';
 import 'package:paralelo/features/management/exports.dart';
 import 'package:paralelo/features/plan/views/plans_page.dart';
-import 'package:paralelo/features/projects/exports.dart';
+import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/widgets/bottom_nav_bar.dart';
 
