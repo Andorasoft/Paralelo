@@ -4,7 +4,6 @@ import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/utils/extensions.dart';
-import 'package:paralelo/widgets/empty_indicator.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
 
@@ -32,48 +31,50 @@ class _MyProjectsPageState extends ConsumerState<MyProjectsPage> {
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: loadDataFuture,
+      builder: (_, snapshot) {
+        if (!snapshot.hasData) {
+          return skeleton();
+        }
+
+        return page(snapshot.data!);
+      },
+    ).hideKeyboardOnTap(context);
+  }
+
+  Widget skeleton() {
+    return Scaffold(key: scaffoldKey, body: const LoadingIndicator().center());
+  }
+
+  Widget page(List<Project> data) {
     return Scaffold(
       key: scaffoldKey,
 
       appBar: AppBar(
         automaticallyImplyLeading: false,
-
         leading: const NavigationButton(),
         title: Text('setting.options.published_projects'.tr()),
       ),
 
-      body: FutureBuilder(
-        future: loadDataFuture,
-        builder: (_, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return const LoadingIndicator().center();
-          }
+      body: ListView(
+        padding: Insets.h16v8,
+        children: data
+            .map(
+              (i) => ProjectInfoPresenter(
+                project: i,
+                maxLines: 5,
+                showStatus: true,
+                featured: i.featured,
 
-          if (!snapshot.hasData || (snapshot.data?.isEmpty ?? true)) {
-            return const EmptyIndicator().center();
-          }
-
-          final projects = snapshot.data!;
-
-          return ListView(
-            children: projects
-                .map(
-                  (i) => ProjectInfoPresenter(
-                    project: i,
-                    maxLines: 5,
-                    showStatus: true,
-                    featured: i.featured,
-
-                    onTap: () async {
-                      await ref
-                          .read(goRouterProvider)
-                          .push(ProjectDetailsPage.routePath, extra: i);
-                    },
-                  ),
-                )
-                .divide(const SizedBox(height: 8.0)),
-          ).margin(Insets.h16v8);
-        },
+                onTap: () async {
+                  await ref
+                      .read(goRouterProvider)
+                      .push(ProjectDetailsPage.routePath, extra: i.id);
+                },
+              ),
+            )
+            .divide(const SizedBox(height: 8.0)),
       ),
     );
   }

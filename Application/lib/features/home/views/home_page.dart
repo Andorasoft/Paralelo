@@ -2,6 +2,7 @@ import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/home/exports.dart';
+import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
 import 'package:paralelo/utils/extensions.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
@@ -20,7 +21,7 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  late final Future<(User, int, int)> loadDataFuture;
+  late final Future<(User, List<Project>, int, int)> loadDataFuture;
 
   @override
   void initState() {
@@ -47,8 +48,8 @@ class _HomePageState extends ConsumerState<HomePage> {
     return Scaffold(key: scaffoldKey, body: const LoadingIndicator().center());
   }
 
-  Widget page((User, int, int) data) {
-    final (user, collaborations, conections) = data;
+  Widget page((User, List<Project>, int, int) data) {
+    final (user, projects, collaborations, conections) = data;
 
     return Scaffold(
       key: scaffoldKey,
@@ -100,23 +101,30 @@ class _HomePageState extends ConsumerState<HomePage> {
         scrollDirection: Axis.vertical,
         padding: Insets.h16v8,
         children: [
-          CreditsSummaryCard(credits: 0.00, collaborations: collaborations),
-          CommunityGrowthCard(),
-          UserLevelCard(level: UserLevel.rookie),
-          UpgradeLevelCard(),
-          CampusActivityCard(conections: conections),
+          ...[
+            CreditsSummaryCard(credits: 0.00, collaborations: collaborations),
+            CommunityGrowthCard(),
+            UserLevelCard(level: UserLevel.rookie),
+            UpgradeLevelCard(),
+            CampusActivityCard(conections: conections),
+          ].divide(const SizedBox(height: 16.0)),
+
           Text(
             'Proyectos para ti',
             style: Theme.of(
               context,
             ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
-          ).margin(const EdgeInsets.only(top: 8.0, bottom: 4.0)),
-        ].divide(const SizedBox(height: 16.0)),
+          ).margin(const EdgeInsets.only(top: 16.0, bottom: 8.0)),
+
+          ...projects
+              .map((i) => ProjectCard(project: i))
+              .divide(const SizedBox(height: 16.0)),
+        ],
       ),
     );
   }
 
-  Future<(User, int, int)> loadData() async {
+  Future<(User, List<Project>, int, int)> loadData() async {
     final userId = ref.read(authProvider)!.id;
 
     final (user, collaborations, conections) = await (
@@ -125,7 +133,15 @@ class _HomePageState extends ConsumerState<HomePage> {
       ref.read(conectionProvider).getForUser(userId),
     ).wait;
 
-    return (user!, collaborations, conections);
+    final (_, projects) = await ref
+        .read(projectProvider)
+        .getPaginated(
+          excludedUserId: userId,
+          universityId: user!.universityId,
+          limit: 3,
+        );
+
+    return (user, projects, collaborations, conections);
   }
 
   String firstName(String fullName) {

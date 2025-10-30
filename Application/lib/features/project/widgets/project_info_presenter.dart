@@ -123,9 +123,12 @@ class ProjectInfoPresenter extends ConsumerWidget {
                         children: [
                           TextSpan(text: payment!.currency),
                           TextSpan(text: ' ${payment!.min} - ${payment!.max}'),
-                          if (payment!.type == 'HOURLY') ...[
+                          if (payment!.type == ProjectPaymentType.hourly) ...[
                             TextSpan(text: ' / '),
-                            TextSpan(text: 'hour'.tr()),
+                            TextSpan(
+                              text: ProjectPaymentType.labels[payment!.type]!
+                                  .tr(),
+                            ),
                           ],
                         ],
 

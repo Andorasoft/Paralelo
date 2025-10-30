@@ -1,5 +1,6 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
+import 'package:paralelo/core/modals.dart';
 import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
@@ -111,7 +112,13 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
                             extra: widget.projectId,
                           );
                     }
-                  : () {}
+                  : () async {
+                      final rating = await showRatingUserModalBottomSheet(
+                        context,
+                      );
+
+                      debugPrint('$rating');
+                    }
             : null,
         child: Text(
           userId != owner.id
