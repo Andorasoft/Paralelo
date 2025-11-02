@@ -80,11 +80,21 @@ class SupabaseUserRepository implements UserRepository {
   }) async {
     final updates = <String, dynamic>{};
 
-    if (displayName.isNotNull) updates['display_name'] = displayName;
-    if (email.isNotNull) updates['email'] = email;
-    if (pictureUrl.isNotNull) updates['picture_url'] = pictureUrl;
-    if (deviceToken.isNotNull) updates['device_token'] = deviceToken;
-    if (planId.isNotNull) updates['plan_id'] = planId;
+    if (displayName.isNotNull) {
+      updates['display_name'] = displayName;
+    }
+    if (email.isNotNull) {
+      updates['email'] = email;
+    }
+    if (pictureUrl.isNotNull) {
+      updates['picture_url'] = pictureUrl;
+    }
+    if (deviceToken.isNotNull) {
+      updates['device_token'] = deviceToken;
+    }
+    if (planId.isNotNull) {
+      updates['plan_id'] = planId;
+    }
 
     if (updates.isEmpty) return await getById(id);
 

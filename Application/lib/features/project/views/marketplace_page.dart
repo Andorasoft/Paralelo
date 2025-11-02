@@ -7,6 +7,7 @@ import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/features/university/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
 import 'package:paralelo/utils/extensions.dart';
+import 'package:paralelo/widgets/empty_indicator.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 
 class MarketplacePage extends ConsumerStatefulWidget {
@@ -40,7 +41,7 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
     return FutureBuilder(
       future: loadDataFuture,
       builder: (_, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
+        if (!snapshot.hasData) {
           return skeleton();
         }
 
@@ -77,68 +78,72 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
         actions: [const ProjectSortButton()],
       ),
 
-      body: ListView(
-        padding: Insets.h16v8,
-        children: [
-          ...list
-              .map((i) {
-                final (project, applied) = i;
+      body: list.isEmpty
+          ? const EmptyIndicator().center()
+          : ListView(
+              padding: Insets.h16v8,
+              children: [
+                ...list
+                    .map((i) {
+                      final (project, applied) = i;
 
-                return ProjectInfoPresenter(
-                  onTap: () async {
-                    await ref
-                        .read(goRouterProvider)
-                        .push(ProjectDetailsPage.routePath, extra: project.id);
-                  },
+                      return ProjectInfoPresenter(
+                        onTap: () async {
+                          await ref
+                              .read(goRouterProvider)
+                              .push(
+                                ProjectDetailsPage.routePath,
+                                extra: project.id,
+                              );
+                        },
 
-                  project: project,
-                  applied: applied,
-                  featured: project.featured,
-                  maxLines: 5,
-                );
-              })
-              .divide(const SizedBox(height: 16.0)),
+                        project: project,
+                        applied: applied,
+                        featured: project.featured,
+                        maxLines: 5,
+                      );
+                    })
+                    .divide(const SizedBox(height: 16.0)),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: 128.0,
 
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            spacing: 128.0,
+                  children: [
+                    IconButton.filledTonal(
+                      onPressed: (currentPage - 1) != 0
+                          ? () {
+                              safeSetState(() {
+                                currentPage -= 1;
+                                loadDataFuture = loadData(
+                                  page: currentPage,
+                                  query: querySearch,
+                                );
+                              });
+                            }
+                          : null,
 
-            children: [
-              IconButton.filledTonal(
-                onPressed: currentPage != 1
-                    ? () {
-                        safeSetState(() {
-                          currentPage -= 1;
-                          loadDataFuture = loadData(
-                            page: currentPage,
-                            query: querySearch,
-                          );
-                        });
-                      }
-                    : null,
+                      icon: const Icon(LucideIcons.chevronLeft),
+                    ),
+                    IconButton.filledTonal(
+                      onPressed: (currentPage - 1) != total
+                          ? () {
+                              safeSetState(() {
+                                currentPage += 1;
+                                loadDataFuture = loadData(
+                                  page: currentPage,
+                                  query: querySearch,
+                                );
+                              });
+                            }
+                          : null,
 
-                icon: const Icon(LucideIcons.chevronLeft),
-              ),
-              IconButton.filledTonal(
-                onPressed: currentPage != total
-                    ? () {
-                        safeSetState(() {
-                          currentPage += 1;
-                          loadDataFuture = loadData(
-                            page: currentPage,
-                            query: querySearch,
-                          );
-                        });
-                      }
-                    : null,
-
-                icon: const Icon(LucideIcons.chevronRight),
-              ),
-            ],
-          ).margin(const EdgeInsets.only(top: 32.0)),
-        ],
-      ),
+                      icon: const Icon(LucideIcons.chevronRight),
+                    ),
+                  ],
+                ).margin(const EdgeInsets.only(top: 32.0)),
+              ],
+            ),
     );
   }
 

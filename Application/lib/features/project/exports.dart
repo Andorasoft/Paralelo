@@ -3,8 +3,6 @@ export 'controllers/project_provider.dart';
 
 export 'models/project_payment_repository.dart';
 export 'models/project_payment.dart';
-export 'models/project_requirement_repository.dart';
-export 'models/project_requirement.dart';
 export 'models/project_repository.dart';
 export 'models/project.dart';
 

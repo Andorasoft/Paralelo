@@ -66,7 +66,6 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
 
           appBar: AppBar(
             leading: const SkeletonBlock(
-              radius: 100.0,
               width: 40.0,
               height: 40.0,
             ).align(Alignment.centerRight),

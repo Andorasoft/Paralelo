@@ -4,6 +4,7 @@ import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/utils/extensions.dart';
+import 'package:paralelo/widgets/empty_indicator.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
 
@@ -57,25 +58,27 @@ class _MyProjectsPageState extends ConsumerState<MyProjectsPage> {
         title: Text('setting.options.published_projects'.tr()),
       ),
 
-      body: ListView(
-        padding: Insets.h16v8,
-        children: data
-            .map(
-              (i) => ProjectInfoPresenter(
-                project: i,
-                maxLines: 5,
-                showStatus: true,
-                featured: i.featured,
+      body: data.isEmpty
+          ? const EmptyIndicator().center()
+          : ListView(
+              padding: Insets.h16v8,
+              children: data
+                  .map(
+                    (i) => ProjectInfoPresenter(
+                      project: i,
+                      maxLines: 5,
+                      showStatus: true,
+                      featured: i.featured,
 
-                onTap: () async {
-                  await ref
-                      .read(goRouterProvider)
-                      .push(ProjectDetailsPage.routePath, extra: i.id);
-                },
-              ),
-            )
-            .divide(const SizedBox(height: 8.0)),
-      ),
+                      onTap: () async {
+                        await ref
+                            .read(goRouterProvider)
+                            .push(ProjectDetailsPage.routePath, extra: i.id);
+                      },
+                    ),
+                  )
+                  .divide(const SizedBox(height: 8.0)),
+            ),
     );
   }
 

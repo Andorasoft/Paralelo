@@ -1,5 +1,5 @@
 import 'package:paralelo/core/imports.dart';
-import 'package:paralelo/features/project/models/project.dart';
+import '../models/project.dart';
 
 abstract class ProjectRepository {
   Future<(int, List<Project>)> getPaginated({
@@ -10,11 +10,33 @@ abstract class ProjectRepository {
     int limit = 10,
   });
 
-  Future<List<Project>> getForUser(String userId);
-
   Future<Project?> getById(int id);
 
   Future<List<Project>> getByIds(List<int> ids);
+
+  Future<List<Project>> getForUser(String userId);
+
+  Future<Project> create({
+    required String title,
+    required String description,
+    required String requirement,
+    bool? featured,
+    required int categoryId,
+    required String ownerId,
+  });
+
+  Future<Project?> update(
+    int id, {
+    String? title,
+    String? description,
+    String? requirement,
+    bool? featured,
+    int? categoryId,
+  });
+
+  Future<int> countActive(String ownerId);
+
+  Future<int> countFeatured(String ownerId);
 }
 
 class SupabaseProjectRepository implements ProjectRepository {
@@ -100,13 +122,6 @@ class SupabaseProjectRepository implements ProjectRepository {
   }
 
   @override
-  Future<List<Project>> getForUser(String userId) async {
-    final data = await _client.from('project').select().eq('owner_id', userId);
-
-    return data.map((i) => Project.fromMap(i)).toList();
-  }
-
-  @override
   Future<Project?> getById(int id) async {
     final data = await _client
         .from('project')
@@ -125,5 +140,98 @@ class SupabaseProjectRepository implements ProjectRepository {
         .filter('id', 'in', '(${ids.join(',')})');
 
     return data.map((i) => Project.fromMap(i)).toList();
+  }
+
+  @override
+  Future<List<Project>> getForUser(String userId) async {
+    final data = await _client.from('project').select().eq('owner_id', userId);
+
+    return data.map((i) => Project.fromMap(i)).toList();
+  }
+
+  @override
+  Future<Project> create({
+    required String title,
+    required String description,
+    required String requirement,
+    bool? featured,
+    required int categoryId,
+    required String ownerId,
+  }) async {
+    final data = await _client
+        .from('project')
+        .insert({
+          'title': title,
+          'description': description,
+          'requirement': requirement,
+          'featured': featured ?? false,
+          'category_id': categoryId,
+          'owner_id': ownerId,
+        })
+        .select()
+        .single();
+
+    return Project.fromMap(data);
+  }
+
+  @override
+  Future<Project?> update(
+    int id, {
+    String? title,
+    String? description,
+    String? requirement,
+    bool? featured,
+    int? categoryId,
+  }) async {
+    final updates = <String, dynamic>{};
+
+    if (title != null) {
+      updates['title'] = title;
+    }
+    if (description != null) {
+      updates['description'] = description;
+    }
+    if (requirement != null) {
+      updates['requirement'] = requirement;
+    }
+    if (featured != null) {
+      updates['featured'] = featured;
+    }
+    if (categoryId != null) {
+      updates['category_id'] = categoryId;
+    }
+
+    if (updates.isEmpty) return await getById(id);
+
+    final data = await _client
+        .from('project')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .maybeSingle();
+
+    return data != null ? Project.fromMap(data) : null;
+  }
+
+  @override
+  Future<int> countActive(String ownerId) async {
+    final data = await _client
+        .from('project')
+        .select('id')
+        .eq('owner_id', ownerId)
+        .or('status.eq.OPEN,status.eq.IN_PROGRESS');
+
+    return data.length;
+  }
+
+  @override
+  Future<int> countFeatured(String ownerId) async {
+    final data = await _client
+        .from('project')
+        .select('id')
+        .eq('owner_id', ownerId)
+        .eq('featured', true);
+
+    return data.length;
   }
 }

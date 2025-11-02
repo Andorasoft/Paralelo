@@ -35,15 +35,16 @@ class ProjectPayment {
     required this.projectId,
   });
 
-  /// Converts the [ProjectPayment] object into a map
-  /// suitable for database storage or JSON encoding.
-  Map<String, dynamic> toMap() => {
-    'id': id,
-    'created_at': createdAt.toIso8601String(),
-    'min': min,
-    'max': max,
-    'currency': currency,
-    'type': type,
-    'project_id': projectId,
-  };
+  /// Builds a [ProjectPayment] object from a database map.
+  factory ProjectPayment.fromMap(Map<String, dynamic> map) {
+    return ProjectPayment(
+      id: map['id'],
+      createdAt: DateTime.parse(map['created_at']),
+      min: (map['min'] as num).toDouble(),
+      max: (map['max'] as num).toDouble(),
+      currency: map['currency'],
+      type: map['type'],
+      projectId: map['project_id'],
+    );
+  }
 }
