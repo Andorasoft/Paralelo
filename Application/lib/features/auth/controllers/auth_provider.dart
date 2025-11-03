@@ -28,8 +28,19 @@ class AuthStateNotifier extends StateNotifier<AuthUser?> {
   /// Signs in the user using the selected [provider].
   ///
   /// For [AuthProvider.email], both [email] and [password] must be provided.
-  Future<void> signIn({String? email, String? password}) async {
-    state = await _repo.signIn(email!, password!);
+  Future<AuthUser?> signIn({
+    required String email,
+    required String password,
+  }) async {
+    state = await _repo.signIn(email: email, password: password);
+    return state;
+  }
+
+  Future<AuthUser?> signUp({
+    required String email,
+    required String password,
+  }) async {
+    return await _repo.signUp(email: email, password: password);
   }
 
   /// Signs out the current user and clears the auth state.

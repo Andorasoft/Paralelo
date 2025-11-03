@@ -1,10 +1,12 @@
-import 'package:paralelo/features/auth/models/auth_user.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' hide AuthUser;
+import 'package:paralelo/core/imports.dart';
+import '../models/auth_user.dart';
 
 /// Defines authentication-related operations.
 abstract class AuthRepository {
   /// Signs in using email and password.
-  Future<AuthUser?> signIn(String email, String password);
+  Future<AuthUser?> signIn({required String email, required String password});
+
+  Future<AuthUser?> signUp({required String email, required String password});
 
   /// Ends the current user session.
   Future<void> singOut();
@@ -23,14 +25,42 @@ class SupabaseAuthRepository implements AuthRepository {
   const SupabaseAuthRepository(this._client);
 
   @override
-  Future<AuthUser?> signIn(String email, String password) async {
-    await _client.auth.signInWithPassword(email: email, password: password);
-    return currentUser();
+  Future<AuthUser?> signIn({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await _client.auth.signInWithPassword(email: email, password: password);
+      return currentUser();
+    } catch (err) {
+      return null;
+    }
+  }
+
+  @override
+  Future<AuthUser?> signUp({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      final res = await _client.auth.signUp(
+        email: email,
+        password: password,
+        emailRedirectTo: 'com.paralelo.andorasoft://callback',
+      );
+      return AuthUser(id: res.user!.id, email: res.user!.email ?? '');
+    } catch (err) {
+      return null;
+    }
   }
 
   @override
   Future<void> singOut() async {
-    await _client.auth.signOut();
+    try {
+      await _client.auth.signOut();
+    } catch (err) {
+      debugPrint(err.toString());
+    }
   }
 
   @override
@@ -39,10 +69,6 @@ class SupabaseAuthRepository implements AuthRepository {
 
     if (user == null) return null;
 
-    return AuthUser(
-      id: user.id,
-      email: user.email ?? "",
-      pictureUrl: user.userMetadata?['avatar_url'],
-    );
+    return AuthUser(id: user.id, email: user.email ?? '');
   }
 }

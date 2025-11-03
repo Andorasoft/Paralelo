@@ -149,6 +149,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   }
 
   String lastName(String fullName) {
-    return fullName.split(' ')[2];
+    return fullName.split(' ')[1];
   }
 }

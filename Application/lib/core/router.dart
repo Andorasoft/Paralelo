@@ -1,7 +1,5 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/chat/exports.dart';
 import 'package:paralelo/features/management/exports.dart';
@@ -12,23 +10,28 @@ import 'package:paralelo/features/rating/views/rating_user_page.dart';
 import 'package:paralelo/widgets/bottom_nav_bar.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authProvider);
+  final auth = ref.watch(authProvider);
 
   return GoRouter(
     debugLogDiagnostics: true,
-    initialLocation: AuthPage.routePath,
+    initialLocation: SignInPage.routePath,
     refreshListenable: GoRouterRefreshStream(
       ref.read(authProvider.notifier).stream,
     ),
-    redirect: (_, state) {
-      final loggedIn = authState != null;
-      final loggingIn = [AuthPage.routePath].contains(state.matchedLocation);
 
-      if (!loggedIn && !loggingIn) return AuthPage.routePath;
+    redirect: (_, state) {
+      final loggedIn = auth != null;
+      final loggingIn = [
+        SignInPage.routePath,
+        SignUpPage.routePath,
+      ].contains(state.matchedLocation);
+
+      if (!loggedIn && !loggingIn) return SignInPage.routePath;
       if (loggedIn && loggingIn) return SplashPage.routePath;
 
       return null;
     },
+
     routes: [
       GoRoute(
         path: '/',
@@ -38,9 +41,15 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
 
       GoRoute(
-        path: AuthPage.routePath,
+        path: SignInPage.routePath,
         builder: (_, __) {
-          return const AuthPage();
+          return const SignInPage();
+        },
+      ),
+      GoRoute(
+        path: SignUpPage.routePath,
+        builder: (_, __) {
+          return const SignUpPage();
         },
       ),
 

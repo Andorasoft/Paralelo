@@ -40,23 +40,14 @@ class _SplashPageState extends ConsumerState<SplashPage> {
         return;
       }
 
-      user ??= await ref
-          .read(userProvider)
-          .create(
-            id: userId,
-            displayName: 'Usuario sin nombre',
-            email: userEmail,
-            pictureUrl: null,
-            planId: 1,
-            universityId: uni.id,
-          );
-
       prefs ??= await ref.read(userPreferenceProvider).create(userId: userId);
 
       final token = await FCMService.instance.getDeviceToken();
 
       if (user.deviceToken != token) {
-        user = await ref.read(userProvider).update(user.id, deviceToken: token);
+        user = (await ref
+            .read(userProvider)
+            .update(user.id, deviceToken: token))!;
       }
 
       preferences.setLocale(prefs.language);
@@ -83,13 +74,13 @@ class _SplashPageState extends ConsumerState<SplashPage> {
     );
   }
 
-  Future<(User?, UserPreference?, University?)> loadData() async {
+  Future<(User, UserPreference?, University?)> loadData() async {
     final (user, prefs, uni) = await (
       ref.read(userProvider).getById(userId),
       ref.read(userPreferenceProvider).getForUser(userId),
       ref.read(universityProvider).getByDomain(userEmail.extractDomain()),
     ).wait;
 
-    return (user, prefs, uni);
+    return (user!, prefs, uni);
   }
 }

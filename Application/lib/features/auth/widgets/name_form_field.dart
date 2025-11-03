@@ -1,13 +1,13 @@
 import 'package:paralelo/core/imports.dart';
 
-class EmailFormField extends ConsumerStatefulWidget {
+class NameFormField extends ConsumerStatefulWidget {
   final String? Function(String?)? validator;
   final TextEditingController? controller;
   final Color? backgroundColor;
   final String? hintText;
   final String? labelText;
 
-  const EmailFormField({
+  const NameFormField({
     super.key,
     this.controller,
     this.validator,
@@ -18,11 +18,11 @@ class EmailFormField extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return _EmailFormFieldState();
+    return _NameFormFieldState();
   }
 }
 
-class _EmailFormFieldState extends ConsumerState<EmailFormField> {
+class _NameFormFieldState extends ConsumerState<NameFormField> {
   final focusNode = FocusNode();
 
   @override
@@ -47,7 +47,7 @@ class _EmailFormFieldState extends ConsumerState<EmailFormField> {
         hintStyle: hintStyle(),
 
         prefixIcon: Icon(
-          LucideIcons.mail,
+          LucideIcons.user,
           color: Theme.of(context).colorScheme.outline,
         ),
         suffixIcon: InkWell(
@@ -57,7 +57,7 @@ class _EmailFormFieldState extends ConsumerState<EmailFormField> {
         ),
       ),
 
-      keyboardType: TextInputType.emailAddress,
+      keyboardType: TextInputType.text,
     );
   }
 

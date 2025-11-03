@@ -40,8 +40,8 @@ class _AnimatedLogoState extends ConsumerState<AnimatedLogo>
   Widget build(BuildContext context) {
     return ScaleTransition(
       scale: scaleAnimation,
-      child: SvgPicture.asset(
-        'assets/images/icon.svg',
+      child: Image.asset(
+        'assets/images/icon-white.png',
         width: calculateSize(context),
         height: calculateSize(context),
       ),

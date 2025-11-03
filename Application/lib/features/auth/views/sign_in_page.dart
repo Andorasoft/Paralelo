@@ -1,26 +1,24 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
+import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/exports.dart';
 
-class AuthPage extends ConsumerStatefulWidget {
-  static const routePath = '/auth';
+class SignInPage extends ConsumerStatefulWidget {
+  static const routePath = '/sign-in';
 
-  const AuthPage({super.key});
+  const SignInPage({super.key});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return _AuthPageState();
+    return _SignInPageState();
   }
 }
 
-class _AuthPageState extends ConsumerState<AuthPage> {
+class _SignInPageState extends ConsumerState<SignInPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   final emailController = TextEditingController();
-  final emailFocusNode = FocusNode();
-
   final passwordController = TextEditingController();
-  final passwordFocusNode = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -31,34 +29,23 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: Theme.of(context).colorScheme.tertiary,
 
         body: Stack(
           children: [
-            SvgPicture.asset('assets/images/blob-scene.svg', fit: BoxFit.cover),
+            SvgPicture.asset(
+              'assets/images/blob-scene-blue.svg',
+              fit: BoxFit.cover,
+            ),
 
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-
               children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                Image.asset(
+                  'assets/images/icon-white.png',
+                  width: 112.0,
+                  height: 112.0,
+                ).center().expanded(),
 
-                  children: [
-                    SvgPicture.asset(
-                      'assets/images/icon.svg',
-                      width: 128.0,
-                      height: 128.0,
-                    ),
-                    // Image.asset(
-                    //   'assets/images/andorasoft.png',
-                    //   width: 128.0,
-                    //   height: 128.0,
-                    // ),
-                  ],
-                ).expanded(),
                 Card(
                   elevation: 4.0,
                   color: const Color(0xCCFFFFFF),
@@ -72,7 +59,6 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     spacing: 4.0,
-
                     children: [
                       Text(
                         'Bienvenido a Paralelo',
@@ -85,24 +71,29 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                         Text(
                           'Conecta con otros estudiantes, comparte tus conocimientos y encuentra la ayuda académica que necesitas.',
                         ),
+
                         EmailFormField(
                           controller: emailController,
-                          focusNode: emailFocusNode,
 
-                          labelText: 'Email',
-                          hintText: 'your@uni.edu.ec',
+                          backgroundColor: Colors.white.withOpacity(0.2),
+                          labelText: 'Correo institucional',
+                          hintText: 'tu@uni.edu.ec',
                         ),
-
                         PasswordFormField(
                           controller: passwordController,
-                          focusNode: passwordFocusNode,
 
-                          labelText: 'Password',
-                          hintText: '********',
+                          backgroundColor: Colors.white.withOpacity(0.2),
+                          labelText: 'Contraseña',
+                          hintText: '••••••••',
                         ),
 
                         FilledButton(
                           onPressed: () async {
+                            if (emailController.text.isEmpty ||
+                                passwordController.text.isEmpty) {
+                              return;
+                            }
+
                             await ref
                                 .read(authProvider.notifier)
                                 .signIn(
@@ -110,7 +101,7 @@ class _AuthPageState extends ConsumerState<AuthPage> {
                                   password: passwordController.text,
                                 );
                           },
-                          child: Text('Login'),
+                          child: const Text('Iniciar sesión'),
                         ),
                       ].divide(const SizedBox(height: 16.0)),
                     ],
@@ -122,15 +113,19 @@ class _AuthPageState extends ConsumerState<AuthPage> {
 
                   children: [
                     Text(
-                      'Don\'t have an account?',
+                      '¿Aún no tienes cuenta?',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: Theme.of(context).colorScheme.onPrimary,
                       ),
                     ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        await ref
+                            .read(goRouterProvider)
+                            .push(SignUpPage.routePath);
+                      },
                       child: Text(
-                        'Sign up',
+                        'Regístrate',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Theme.of(context).colorScheme.onPrimary,

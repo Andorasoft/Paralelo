@@ -1,19 +1,18 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/core/imports.dart';
 
 class PasswordFormField extends ConsumerStatefulWidget {
+  final String? Function(String?)? validator;
   final TextEditingController? controller;
-  final FocusNode? focusNode;
+  final Color? backgroundColor;
   final String? hintText;
   final String? labelText;
 
   const PasswordFormField({
     super.key,
     this.controller,
-    this.focusNode,
+    this.validator,
+    this.backgroundColor,
     this.hintText,
     this.labelText,
   });
@@ -25,42 +24,36 @@ class PasswordFormField extends ConsumerStatefulWidget {
 }
 
 class _PasswordFormFieldState extends ConsumerState<PasswordFormField> {
+  final focusNode = FocusNode();
   bool showPassword = false;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: widget.controller,
-      focusNode: widget.focusNode,
+      validator: widget.validator,
+      focusNode: focusNode,
 
       obscureText: !showPassword,
 
       decoration: InputDecoration(
         filled: true,
-        fillColor: Colors.white.withAlpha(100),
+        fillColor: widget.backgroundColor ?? Colors.transparent,
 
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.circular(12.0),
-        ),
+        enabledBorder: inputBorder(),
+        focusedBorder: inputBorder(),
+        errorBorder: inputBorder(),
+        focusedErrorBorder: inputBorder(),
 
         floatingLabelBehavior: FloatingLabelBehavior.always,
         hintText: widget.hintText,
         labelText: widget.labelText,
+        hintStyle: hintStyle(),
 
-        prefixIcon: const Icon(LucideIcons.lock),
+        prefixIcon: Icon(
+          LucideIcons.lock,
+          color: Theme.of(context).colorScheme.outline,
+        ),
         suffixIcon: InkWell(
           onTap: () {
             safeSetState(() => showPassword = !showPassword);
@@ -72,5 +65,18 @@ class _PasswordFormFieldState extends ConsumerState<PasswordFormField> {
 
       keyboardType: TextInputType.visiblePassword,
     );
+  }
+
+  InputBorder inputBorder() {
+    return OutlineInputBorder(
+      borderSide: BorderSide.none,
+      borderRadius: BorderRadius.circular(12.0),
+    );
+  }
+
+  TextStyle? hintStyle() {
+    return Theme.of(
+      context,
+    ).inputDecorationTheme.hintStyle?.copyWith(fontSize: 14.0);
   }
 }
