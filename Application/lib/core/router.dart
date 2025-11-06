@@ -10,24 +10,30 @@ import 'package:paralelo/features/rating/views/rating_user_page.dart';
 import 'package:paralelo/widgets/bottom_nav_bar.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
-  final auth = ref.watch(authProvider);
-
   return GoRouter(
     debugLogDiagnostics: true,
-    initialLocation: SignInPage.routePath,
+    initialLocation: SplashPage.routePath,
     refreshListenable: GoRouterRefreshStream(
       ref.read(authProvider.notifier).stream,
     ),
 
     redirect: (_, state) {
-      final loggedIn = auth != null;
-      final loggingIn = [
+      if (state.matchedLocation == SplashPage.routePath) {
+        return null;
+      }
+
+      final loggedIn = ref.read(authProvider) != null;
+      final loggingIn = const [
         SignInPage.routePath,
         SignUpPage.routePath,
       ].contains(state.matchedLocation);
 
-      if (!loggedIn && !loggingIn) return SignInPage.routePath;
-      if (loggedIn && loggingIn) return SplashPage.routePath;
+      if (!loggedIn && !loggingIn) {
+        return SignInPage.routePath;
+      }
+      if (loggedIn && loggingIn) {
+        return '/';
+      }
 
       return null;
     },
@@ -69,7 +75,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: ProjectDetailsPage.routePath,
         builder: (_, state) {
-          return ProjectDetailsPage(projectId: state.extra as int);
+          return ProjectDetailsPage(projectId: state.extra as String);
         },
       ),
       GoRoute(
@@ -82,13 +88,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: CreateProposalPage.routePath,
         builder: (_, state) {
-          return CreateProposalPage(projectId: state.extra as int);
+          return CreateProposalPage(projectId: state.extra as String);
         },
       ),
       GoRoute(
         path: ProposalDetailsPage.routePath,
         builder: (_, state) {
-          return ProposalDetailsPage(proposalId: state.extra as int);
+          return ProposalDetailsPage(proposalId: state.extra as String);
         },
       ),
       GoRoute(

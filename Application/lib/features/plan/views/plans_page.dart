@@ -20,7 +20,7 @@ class PlansPage extends ConsumerStatefulWidget {
 
 class _PlansPageState extends ConsumerState<PlansPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  late final Future<(List<Plan>, int)> loadDataFuture;
+  late final Future<(List<Plan>, String)> loadDataFuture;
 
   @override
   void initState() {
@@ -47,7 +47,7 @@ class _PlansPageState extends ConsumerState<PlansPage> {
     return Scaffold(key: scaffoldKey, body: const LoadingIndicator().center());
   }
 
-  Widget page((List<Plan>, int) data) {
+  Widget page((List<Plan>, String) data) {
     final (plans, planId) = data;
 
     return Scaffold(
@@ -93,7 +93,7 @@ class _PlansPageState extends ConsumerState<PlansPage> {
     );
   }
 
-  Future<(List<Plan>, int)> loadData() async {
+  Future<(List<Plan>, String)> loadData() async {
     final userId = ref.read(authProvider)!.id;
 
     final (plans, user) = await (
@@ -101,6 +101,6 @@ class _PlansPageState extends ConsumerState<PlansPage> {
       ref.read(userProvider).getById(userId),
     ).wait;
 
-    return (plans, user!.planId!);
+    return (plans, user!.planId);
   }
 }

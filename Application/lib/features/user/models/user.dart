@@ -23,10 +23,10 @@ class User {
   /// Optional push notification token (Firebase Cloud Messaging).
   final String? deviceToken;
 
-  final int? planId;
+  final String planId;
 
   /// Identifier of the university associated with the user.
-  final int? universityId;
+  final String universityId;
 
   const User({
     required this.id,
@@ -36,8 +36,8 @@ class User {
     required this.verified,
     this.pictureUrl,
     this.deviceToken,
-    this.planId,
-    this.universityId,
+    required this.planId,
+    required this.universityId,
   });
 
   /// Builds an [User] object from a database map.

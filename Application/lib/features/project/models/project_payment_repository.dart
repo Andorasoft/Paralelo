@@ -2,14 +2,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'project_payment.dart';
 
 abstract class ProjectPaymentRepository {
-  Future<ProjectPayment?> getForProject(int projectId);
+  Future<ProjectPayment?> getForProject(String projectId);
 
   Future<ProjectPayment> create({
     required double min,
     required double max,
     required String currency,
     required String type,
-    required int projectId,
+    required String projectId,
   });
 }
 
@@ -19,7 +19,7 @@ class SupabaseProjectPaymentRepository implements ProjectPaymentRepository {
   const SupabaseProjectPaymentRepository(this._client);
 
   @override
-  Future<ProjectPayment?> getForProject(int projectId) async {
+  Future<ProjectPayment?> getForProject(String projectId) async {
     final data = await _client
         .from('project_payment')
         .select()
@@ -35,7 +35,7 @@ class SupabaseProjectPaymentRepository implements ProjectPaymentRepository {
     required double max,
     required String currency,
     required String type,
-    required int projectId,
+    required String projectId,
   }) async {
     final data = await _client
         .from('project_payment')

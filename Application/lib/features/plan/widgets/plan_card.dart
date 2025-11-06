@@ -1,4 +1,5 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/core/constants.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/plan/models/plan.dart';
 import 'package:paralelo/utils/extensions.dart';
@@ -25,9 +26,9 @@ class PlanCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ap = plan.activeProjectsLimit ?? double.infinity;
-    final fp = plan.featuredProjectsLimit ?? double.infinity;
-    final op = plan.ongoingProjectsLimit ?? double.infinity;
+    final activeProjects = plan.activeProjectsLimit ?? double.infinity;
+    final featuredProjects = plan.featuredProjectsLimit;
+    final ongoingProjects = plan.ongoingProjectsLimit ?? double.infinity;
 
     return Card(
       elevation: 0.0,
@@ -88,7 +89,7 @@ class PlanCard extends ConsumerWidget {
                     fontSize: 20.0,
                   ),
                 ),
-                TextSpan(text: plan.periodUnit.toLowerCase()),
+                TextSpan(text: PlanPeriodUnit.labels[plan.periodUnit]!),
               ],
 
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
@@ -105,17 +106,25 @@ class PlanCard extends ConsumerWidget {
                 borderColor ?? Theme.of(context).colorScheme.primaryContainer,
           ).margin(Insets.v8),
 
-          _item('${plan.proposalsPerWeek} proposals per week'),
-          if (ap > 0)
-            _item('${ap.isInfinite ? 'Unlimited' : ap} active projects'),
-          if (fp > 0)
-            _item('${fp.isInfinite ? 'Unlimited' : fp} featured projects'),
-          if (op > 0)
-            _item('${op.isInfinite ? 'Unlimited' : op} ongoing projects'),
-          if (plan.tag != '-') _item('${plan.tag} user tag'),
-          _item('${plan.supportLevel} support level'),
-          if (plan.performanceMetrics) _item('Performance metrics'),
-          if (plan.highlightServices) _item('Highlight services'),
+          // Beneficios del plan
+          _item('${plan.proposalsPerWeek} propuestas por semana'),
+          if (activeProjects > 0)
+            _item(
+              activeProjects.isInfinite
+                  ? 'Proyectos activos ilimitados'
+                  : '$activeProjects proyectos activos',
+            ),
+          if (featuredProjects > 0)
+            _item('$featuredProjects proyectos destacados'),
+          if (ongoingProjects > 0)
+            _item(
+              ongoingProjects.isInfinite
+                  ? 'Proyectos en curso ilimitados'
+                  : '$ongoingProjects proyectos en curso',
+            ),
+          if (plan.tag != null) _item('Etiqueta de usuario: ${plan.tag}'),
+          _item('Soporte: nivel ${plan.supportLevel.toLowerCase()}'),
+          if (plan.performanceMetrics) _item('Métricas de rendimiento'),
 
           FilledButton(
             onPressed: !(isCurrent ?? false) ? onTap : null,

@@ -3,7 +3,7 @@ import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/proposal/exports.dart';
 
 class ShowProposalButton extends ConsumerWidget {
-  final int proposalId;
+  final String proposalId;
   final bool disabled;
 
   const ShowProposalButton({

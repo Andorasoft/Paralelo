@@ -3,7 +3,7 @@
 /// Stores service offers submitted by providers to projects.
 class Proposal {
   /// Unique identifier of the proposal.
-  final int id;
+  final String id;
 
   /// Timestamp when the proposal was created.
   final DateTime createdAt;
@@ -20,11 +20,8 @@ class Proposal {
   /// Optional hourly rate offered.
   final num? hourlyRate;
 
-  /// Numeric value of estimated duration.
-  final num estimatedDurationValue;
-
-  /// Unit of estimated duration (e.g., "DAYS", "HOURS").
-  final String estimatedDurationUnit;
+  /// Estimated duration.
+  final String? estimatedDuration;
 
   /// Current status of the proposal.
   final String status;
@@ -33,7 +30,7 @@ class Proposal {
   final String providerId;
 
   /// Identifier of the related project.
-  final int projectId;
+  final String projectId;
 
   const Proposal({
     required this.id,
@@ -42,8 +39,7 @@ class Proposal {
     required this.mode,
     this.amount,
     this.hourlyRate,
-    required this.estimatedDurationValue,
-    required this.estimatedDurationUnit,
+    this.estimatedDuration,
     required this.status,
     required this.providerId,
     required this.projectId,
@@ -57,8 +53,7 @@ class Proposal {
     mode: map['mode'],
     amount: map['amount'],
     hourlyRate: map['hourly_rate'],
-    estimatedDurationValue: map['estimated_duration_value'],
-    estimatedDurationUnit: map['estimated_duration_unit'],
+    estimatedDuration: map['estimated_duration'],
     status: map['status'],
     providerId: map['provider_id'],
     projectId: map['project_id'],

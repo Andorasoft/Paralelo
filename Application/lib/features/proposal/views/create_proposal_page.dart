@@ -17,7 +17,7 @@ import 'package:paralelo/widgets/skeleton_card.dart';
 class CreateProposalPage extends ConsumerStatefulWidget {
   static const routePath = '/create-proposal';
 
-  final int projectId;
+  final String projectId;
 
   const CreateProposalPage({super.key, required this.projectId});
 

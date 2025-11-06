@@ -27,8 +27,7 @@ class _ChipInputFormField extends ConsumerState<SkillInputSelector> {
   final controller = TextEditingController();
   final focusNode = FocusNode();
   final link = LayerLink();
-
-  late final Set<int> selected;
+  final selected = <String>{};
 
   OverlayEntry? overlayEntry;
 
@@ -49,7 +48,6 @@ class _ChipInputFormField extends ConsumerState<SkillInputSelector> {
   void initState() {
     super.initState();
 
-    selected = <int>{};
     focusNode.addListener(handleFocusChange);
     controller.addListener(() {
       if (overlayEntry != null) {

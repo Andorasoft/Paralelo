@@ -3,7 +3,7 @@
 /// Defines an academic or service category that projects can belong to.
 class Category {
   /// Unique identifier of the category.
-  final int id;
+  final String id;
 
   /// Timestamp when the category record was created.
   final DateTime createdAt;

@@ -5,7 +5,7 @@ import 'package:paralelo/core/services.dart';
 import 'package:paralelo/core/modals.dart';
 import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/exports.dart';
-import 'package:paralelo/features/plan/views/plans_page.dart';
+import 'package:paralelo/features/plan/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/features/setting/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
@@ -25,7 +25,7 @@ class SettingsPage extends ConsumerStatefulWidget {
 
 class _SettingsPageState extends ConsumerState<SettingsPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  late final Future<User> loadDataFuture;
+  late final Future<(User, Plan)> loadDataFuture;
 
   @override
   void initState() {
@@ -77,7 +77,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                     ).center();
                   }
 
-                  return UserPresenter(user: snapshot.data!).center();
+                  final (user, plan) = snapshot.data!;
+
+                  return UserPresenter(user: user, plan: plan).center();
                 },
               ),
             ),
@@ -257,10 +259,15 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     );
   }
 
-  Future<User> loadData() async {
+  Future<(User, Plan)> loadData() async {
     final userId = ref.read(authProvider)!.id;
 
-    return (await ref.read(userProvider).getById(userId))!;
+    final (user, plan) = await (
+      ref.read(userProvider).getById(userId),
+      ref.read(planProvider).getForUser(userId),
+    ).wait;
+
+    return (user!, plan!);
   }
 
   Future<bool> handleNotificationPermission(BuildContext context) async {

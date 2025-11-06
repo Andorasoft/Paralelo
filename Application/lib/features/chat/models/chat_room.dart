@@ -10,8 +10,6 @@ class ChatRoom {
 
   final bool isActive;
 
-  final bool isReadonly;
-
   /// Identifier of the first participant.
   final String user1Id;
 
@@ -19,26 +17,26 @@ class ChatRoom {
   final String user2Id;
 
   /// Identifier of the linked proposal.
-  final int proposalId;
+  final String proposalId;
 
   const ChatRoom({
     required this.id,
     required this.createdAt,
-    this.isActive = true,
-    this.isReadonly = false,
+    required this.isActive,
     required this.user1Id,
     required this.user2Id,
     required this.proposalId,
   });
 
   /// Builds a [ChatRoom] object from a database map.
-  factory ChatRoom.fromMap(Map<String, dynamic> map) => ChatRoom(
-    id: map['id'],
-    createdAt: DateTime.parse(map['created_at']),
-    isActive: map['is_active'],
-    isReadonly: map['is_readonly'],
-    user1Id: map['user1_id'],
-    user2Id: map['user2_id'],
-    proposalId: map['proposal_id'],
-  );
+  factory ChatRoom.fromMap(Map<String, dynamic> map) {
+    return ChatRoom(
+      id: map['id'],
+      createdAt: DateTime.parse(map['created_at']),
+      isActive: map['is_active'],
+      user1Id: map['user1_id'],
+      user2Id: map['user2_id'],
+      proposalId: map['proposal_id'],
+    );
+  }
 }

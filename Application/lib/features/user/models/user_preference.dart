@@ -3,7 +3,7 @@
 /// Stores user settings such as language, theme, and notifications.
 class UserPreference {
   /// Unique identifier of the preference record.
-  final int id;
+  final String id;
 
   /// Timestamp when the record was last updated.
   final DateTime createdAt;

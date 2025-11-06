@@ -7,6 +7,7 @@ import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/features/university/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
 import 'package:paralelo/utils/extensions.dart';
+import 'package:paralelo/utils/formatters.dart';
 import 'package:paralelo/widgets/empty_indicator.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 
@@ -152,15 +153,18 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
     int page = 1,
   }) async {
     final userId = ref.read(authProvider)!.id;
+    final userEmail = ref.read(authProvider)!.email;
 
-    final user = await ref.read(userProvider).getById(userId);
-    final uni = await ref.read(universityProvider).getById(user!.universityId!);
+    final (user, university) = await (
+      ref.read(userProvider).getById(userId),
+      ref.read(universityProvider).getByDomain(userEmail.extractDomain()),
+    ).wait;
 
     final (pages, projects) = await ref
         .read(projectProvider)
         .getPaginated(
           excludedUserId: userId,
-          universityId: uni!.id,
+          universityId: university!.id,
           query: query,
           page: page,
         );

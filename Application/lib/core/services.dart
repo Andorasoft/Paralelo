@@ -158,8 +158,16 @@ class FCMService {
       debugPrint("📱 Device Token: $token");
       return token;
     } catch (e) {
-      debugPrint("❌ Error retrieving FCM token: $e");
+      debugPrint('❌ Error retrieving FCM token: $e');
       return null;
+    }
+  }
+
+  Future<void> deleteDeviceToken() async {
+    try {
+      await _messaging.deleteToken();
+    } catch (e) {
+      debugPrint('❌ Error deleting FCM token: $e');
     }
   }
 

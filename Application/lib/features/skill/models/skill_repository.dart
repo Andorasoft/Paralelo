@@ -1,4 +1,4 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:paralelo/core/imports.dart';
 import 'skill.dart';
 
 abstract class SkillRepository {
@@ -6,7 +6,7 @@ abstract class SkillRepository {
 
   Future<List<Skill>> getForUser(String userId);
 
-  Future<List<Skill>> getForProject(int projectId);
+  Future<List<Skill>> getForProject(String projectId);
 }
 
 class SupabaseSkillRepository implements SkillRepository {
@@ -42,7 +42,7 @@ class SupabaseSkillRepository implements SkillRepository {
   }
 
   @override
-  Future<List<Skill>> getForProject(int projectId) async {
+  Future<List<Skill>> getForProject(String projectId) async {
     final res = await _client
         .from('project_skill')
         .select('skill_id')

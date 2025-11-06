@@ -1,5 +1,6 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
+import 'package:paralelo/features/plan/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
 import 'package:paralelo/utils/formatters.dart';
 import 'package:paralelo/widgets/person_picture.dart';
@@ -7,8 +8,13 @@ import 'package:paralelo/widgets/verified_mark.dart';
 
 class ProjectOwnerPresenter extends ConsumerWidget {
   final User owner;
+  final Plan plan;
 
-  const ProjectOwnerPresenter({super.key, required this.owner});
+  const ProjectOwnerPresenter({
+    super.key,
+    required this.owner,
+    required this.plan,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,17 +39,17 @@ class ProjectOwnerPresenter extends ConsumerWidget {
             source: owner.pictureUrl ?? '',
             size: 48.0,
 
-            badge: switch (owner.planId!) {
-              3 => Icon(TablerIcons.crown),
-              2 => Icon(TablerIcons.star),
+            badge: switch (plan.name) {
+              'Premium' => Icon(TablerIcons.crown),
+              'Pro' => Icon(TablerIcons.star),
               _ => null,
             },
-            side: switch (owner.planId!) {
-              3 => BorderSide(
+            side: switch (plan.name) {
+              'Premium' => BorderSide(
                 width: 3.0,
                 color: Theme.of(context).colorScheme.secondary,
               ),
-              2 => BorderSide(
+              'Pro' => BorderSide(
                 width: 3.0,
                 color: Theme.of(context).colorScheme.primary,
               ),

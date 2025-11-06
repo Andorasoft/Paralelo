@@ -3,6 +3,7 @@ import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/core/modals.dart';
 import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/exports.dart';
+import 'package:paralelo/features/plan/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/features/skill/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
@@ -14,7 +15,7 @@ import 'package:paralelo/widgets/navigation_button.dart';
 class ProjectDetailsPage extends ConsumerStatefulWidget {
   static const routePath = '/project-details';
 
-  final int projectId;
+  final String projectId;
 
   const ProjectDetailsPage({super.key, required this.projectId});
 
@@ -26,7 +27,7 @@ class ProjectDetailsPage extends ConsumerStatefulWidget {
 
 class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  late final Future<(User, Project, ProjectPayment, List<Skill>, bool)>
+  late final Future<(User, Plan, Project, ProjectPayment, List<Skill>, bool)>
   loadDataFuture;
 
   @override
@@ -54,8 +55,8 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
     return Scaffold(key: scaffoldKey, body: const LoadingIndicator().center());
   }
 
-  Widget page((User, Project, ProjectPayment, List<Skill>, bool) data) {
-    final (owner, project, payment, skills, applied) = data;
+  Widget page((User, Plan, Project, ProjectPayment, List<Skill>, bool) data) {
+    final (owner, plan, project, payment, skills, applied) = data;
     final userId = ref.read(authProvider)!.id;
 
     return Scaffold(
@@ -95,7 +96,8 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
                 skills: skills,
                 showStatus: true,
               ),
-              if (userId != owner.id) ProjectOwnerPresenter(owner: owner),
+              if (userId != owner.id)
+                ProjectOwnerPresenter(owner: owner, plan: plan),
             ],
           ),
         ],
@@ -129,7 +131,8 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
     );
   }
 
-  Future<(User, Project, ProjectPayment, List<Skill>, bool)> loadData() async {
+  Future<(User, Plan, Project, ProjectPayment, List<Skill>, bool)>
+  loadData() async {
     final userId = ref.read(authProvider)!.id;
 
     final (project, payment, skills, applied) = await (
@@ -140,8 +143,11 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
           .read(proposalProvider)
           .applied(projectId: widget.projectId, providerId: userId),
     ).wait;
-    final owner = await ref.read(userProvider).getById(project!.ownerId);
+    final (owner, plan) = await (
+      ref.read(userProvider).getById(project!.ownerId),
+      ref.read(planProvider).getForUser(project.ownerId),
+    ).wait;
 
-    return (owner!, project, payment!, skills, applied);
+    return (owner!, plan!, project, payment!, skills, applied);
   }
 }

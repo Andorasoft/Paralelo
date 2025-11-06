@@ -4,7 +4,7 @@ import '../models/category.dart';
 abstract class CategoryRepository {
   Future<List<Category>> getAll();
 
-  Future<Category?> getById(int id);
+  Future<Category?> getById(String id);
 }
 
 class SupabaseCategoryRepository implements CategoryRepository {
@@ -20,7 +20,7 @@ class SupabaseCategoryRepository implements CategoryRepository {
   }
 
   @override
-  Future<Category?> getById(int id) async {
+  Future<Category?> getById(String id) async {
     final data = await _client
         .from('category')
         .select()

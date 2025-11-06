@@ -3,7 +3,7 @@
 /// Defines a specific skill that can be linked to users or projects.
 class Skill {
   /// Unique identifier of the skill.
-  final int id;
+  final String id;
 
   /// Timestamp when the skill record was created.
   final DateTime createdAt;

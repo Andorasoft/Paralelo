@@ -1,15 +1,15 @@
 import 'package:paralelo/core/imports.dart';
+import 'package:paralelo/core/services.dart';
 import 'package:paralelo/features/auth/exports.dart';
-import 'package:paralelo/features/user/exports.dart';
 
 /// Global provider that exposes authentication state and actions.
 ///
 /// The provider uses [AuthStateNotifier] to manage sign-in, sign-out,
 /// and the current [AuthUser] session reactively.
-final authProvider = StateNotifierProvider<AuthStateNotifier, AuthUser?>((ref) {
+final authProvider = StateNotifierProvider<AuthStateNotifier, AuthUser?>((_) {
   final client = Supabase.instance.client;
   final repo = SupabaseAuthRepository(client);
-  return AuthStateNotifier(repo, ref);
+  return AuthStateNotifier(repo);
 });
 
 /// Handles authentication logic and exposes the current [AuthUser] state.
@@ -18,9 +18,8 @@ final authProvider = StateNotifierProvider<AuthStateNotifier, AuthUser?>((ref) {
 /// It updates [state] whenever a user logs in or out.
 class AuthStateNotifier extends StateNotifier<AuthUser?> {
   final AuthRepository _repo;
-  final StateNotifierProviderRef<AuthStateNotifier, AuthUser?> ref;
 
-  AuthStateNotifier(this._repo, this.ref) : super(null) {
+  AuthStateNotifier(this._repo) : super(null) {
     // Initialize the state with the current authenticated user, if any.
     state = _repo.currentUser();
   }
@@ -28,25 +27,18 @@ class AuthStateNotifier extends StateNotifier<AuthUser?> {
   /// Signs in the user using the selected [provider].
   ///
   /// For [AuthProvider.email], both [email] and [password] must be provided.
-  Future<AuthUser?> signIn({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> signIn({required String email, required String password}) async {
     state = await _repo.signIn(email: email, password: password);
-    return state;
   }
 
-  Future<AuthUser?> signUp({
-    required String email,
-    required String password,
-  }) async {
-    return await _repo.signUp(email: email, password: password);
+  Future<AuthUser?> signUp({required String email, required String password}) {
+    return _repo.signUp(email: email, password: password);
   }
 
   /// Signs out the current user and clears the auth state.
   Future<void> signOut() async {
+    await FCMService.instance.deleteDeviceToken();
     await _repo.singOut();
-    await ref.read(userProvider).update(state!.id, deviceToken: '');
     state = null;
   }
 }

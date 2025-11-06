@@ -3,7 +3,7 @@
 /// Stores project details created by users.
 class Project {
   /// Unique identifier of the project.
-  final int id;
+  final String id;
 
   /// Timestamp when the project was created.
   final DateTime createdAt;
@@ -22,13 +22,11 @@ class Project {
 
   final bool featured;
 
-  final String visibilityPriority;
-
   /// UUID of the project owner.
   final String ownerId;
 
   /// Optional category identifier.
-  final int? categoryId;
+  final String categoryId;
 
   const Project({
     required this.id,
@@ -38,9 +36,8 @@ class Project {
     required this.status,
     this.requirement,
     required this.featured,
-    required this.visibilityPriority,
     required this.ownerId,
-    this.categoryId,
+    required this.categoryId,
   });
 
   /// Builds a [Project] object from a database map.
@@ -52,7 +49,6 @@ class Project {
     status: map['status'],
     requirement: map['requirement'],
     featured: map['featured'],
-    visibilityPriority: map['visibility_priority'],
     ownerId: map['owner_id'],
     categoryId: map['category_id'],
   );

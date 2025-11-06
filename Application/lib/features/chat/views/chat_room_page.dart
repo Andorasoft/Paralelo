@@ -153,7 +153,6 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
                 text: message,
               );
             },
-            disabled: room.isReadonly,
           ).useSafeArea(),
         ],
       ).margin(Insets.h16v8),

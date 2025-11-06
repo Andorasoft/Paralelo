@@ -2,9 +2,9 @@ import 'package:paralelo/core/imports.dart';
 import '../models/proposal.dart';
 
 abstract class ProposalRepository {
-  Future<Proposal?> getById(int id);
+  Future<Proposal?> getById(String id);
 
-  Future<List<Proposal>> getByIds(List<int> ids);
+  Future<List<Proposal>> getByIds(List<String> ids);
 
   Future<Proposal> create({
     required String message,
@@ -14,20 +14,20 @@ abstract class ProposalRepository {
     required num estimatedDurationValue,
     required String estimatedDurationUnit,
     required String providerId,
-    required int projectId,
+    required String projectId,
   });
 
   Future<Proposal?> update(
-    int id, {
+    String id, {
     num? amount,
     num? hourlyRate,
     num? estimatedDurationValue,
     String? estimatedDurationUnit,
   });
 
-  Future<bool> applied({required int projectId, required String providerId});
+  Future<bool> applied({required String projectId, required String providerId});
 
-  Future<bool> accept(int id);
+  Future<bool> accept(String id);
 }
 
 class SupabaseProposalRepository implements ProposalRepository {
@@ -36,7 +36,7 @@ class SupabaseProposalRepository implements ProposalRepository {
   const SupabaseProposalRepository(this._client);
 
   @override
-  Future<Proposal?> getById(int id) async {
+  Future<Proposal?> getById(String id) async {
     final data = await _client
         .from('proposal')
         .select()
@@ -47,7 +47,7 @@ class SupabaseProposalRepository implements ProposalRepository {
   }
 
   @override
-  Future<List<Proposal>> getByIds(List<int> ids) async {
+  Future<List<Proposal>> getByIds(List<String> ids) async {
     final data = await _client
         .from('proposal')
         .select()
@@ -65,7 +65,7 @@ class SupabaseProposalRepository implements ProposalRepository {
     required num estimatedDurationValue,
     required String estimatedDurationUnit,
     required String providerId,
-    required int projectId,
+    required String projectId,
   }) async {
     final data = await _client
         .from('proposal')
@@ -87,7 +87,7 @@ class SupabaseProposalRepository implements ProposalRepository {
 
   @override
   Future<Proposal?> update(
-    int id, {
+    String id, {
     num? amount,
     num? hourlyRate,
     num? estimatedDurationValue,
@@ -122,7 +122,7 @@ class SupabaseProposalRepository implements ProposalRepository {
 
   @override
   Future<bool> applied({
-    required int projectId,
+    required String projectId,
     required String providerId,
   }) async {
     final data = await _client
@@ -137,10 +137,10 @@ class SupabaseProposalRepository implements ProposalRepository {
   }
 
   @override
-  Future<bool> accept(int id) async {
+  Future<bool> accept(String id) async {
     final res = await _client.functions.invoke(
       'accept-proposal',
-      queryParameters: {'proposal_id': '$id'},
+      queryParameters: {'proposal_id': id},
     );
 
     return res.status == 200;

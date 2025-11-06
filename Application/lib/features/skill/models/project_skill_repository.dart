@@ -1,8 +1,11 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:paralelo/core/imports.dart';
 import 'project_skill.dart';
 
 abstract class ProjectSkillRepository {
-  Future<ProjectSkill> create({required int projectId, required skillId});
+  Future<ProjectSkill> create({
+    required String projectId,
+    required String skillId,
+  });
 }
 
 class SupabaseProjectSkillRepository implements ProjectSkillRepository {
@@ -12,8 +15,8 @@ class SupabaseProjectSkillRepository implements ProjectSkillRepository {
 
   @override
   Future<ProjectSkill> create({
-    required int projectId,
-    required skillId,
+    required String projectId,
+    required String skillId,
   }) async {
     final data = await _client
         .from('project_skill')

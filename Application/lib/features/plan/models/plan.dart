@@ -3,7 +3,7 @@
 /// Defines subscription tiers and feature limits for users.
 class Plan {
   /// Unique identifier of the plan.
-  final int id;
+  final String id;
 
   /// Timestamp when the plan record was created.
   final DateTime createdAt;
@@ -27,7 +27,7 @@ class Plan {
   final int? activeProjectsLimit;
 
   /// Maximum number of featured projects allowed.
-  final int? featuredProjectsLimit;
+  final int featuredProjectsLimit;
 
   /// Maximum number of ongoing projects allowed.
   final int? ongoingProjectsLimit;
@@ -41,12 +41,6 @@ class Plan {
   /// Whether performance metrics are included.
   final bool performanceMetrics;
 
-  /// Visibility priority for the user (e.g., "LOW", "MEDIUM", "HIGH").
-  final String visibilityPriority;
-
-  /// Whether the user can highlight services.
-  final bool highlightServices;
-
   /// Whether the plan is currently active and available.
   final bool isActive;
 
@@ -59,13 +53,11 @@ class Plan {
     required this.periodUnit,
     required this.proposalsPerWeek,
     this.activeProjectsLimit,
-    this.featuredProjectsLimit,
+    required this.featuredProjectsLimit,
     this.ongoingProjectsLimit,
     this.tag,
     required this.supportLevel,
     required this.performanceMetrics,
-    required this.visibilityPriority,
-    required this.highlightServices,
     required this.isActive,
   });
 
@@ -85,8 +77,6 @@ class Plan {
       tag: map['tag'],
       supportLevel: map['support_level'],
       performanceMetrics: map['performance_metrics'],
-      visibilityPriority: map['visibility_priority'],
-      highlightServices: map['highlight_services'],
       isActive: map['is_active'],
     );
   }

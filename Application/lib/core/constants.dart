@@ -69,3 +69,12 @@ class ProjectPaymentType {
     hourly: 'const.project_payment_type.hourly'.tr(),
   };
 }
+
+class PlanPeriodUnit {
+  static const String month = 'MONTH';
+  static const String year = 'YEAR';
+
+  static List<String> values = [month, year];
+
+  static Map<String, String> labels = {month: 'mes', year: 'año'};
+}

@@ -4,16 +4,16 @@
 /// relationship between projects and skills.
 class ProjectSkill {
   /// Unique identifier of the project-skill relation.
-  final int id;
+  final String id;
 
   /// Timestamp when the relation was created.
   final DateTime createdAt;
 
   /// Identifier of the related project.
-  final int projectId;
+  final String projectId;
 
   /// Identifier of the linked skill.
-  final int skillId;
+  final String skillId;
 
   /// Creates an immutable [ProjectSkill] instance.
   const ProjectSkill({

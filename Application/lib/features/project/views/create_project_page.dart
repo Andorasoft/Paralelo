@@ -43,31 +43,27 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
   final minBadgeFocusNode = FocusNode();
   final maxBadgeFocusNode = FocusNode();
 
+  // Validators...
   final titleValidator = Validator<String>()
     ..required('El título es obligatorio')
     ..minLength(5);
-
   final descriptionValidator = Validator<String>()
     ..required('La descripción es obligatoria')
     ..minLength(10);
-
-  final categoryValidator = Validator<int>()..required();
-
+  final categoryValidator = Validator<String>()..required();
   final minBadgeValidator = Validator<String>()
     ..required('Indica el mínimo')
     ..isDouble('Debe ser numérico');
-
   final maxBadgeValidator = Validator<String>()
     ..required('Indica el máximo')
     ..isDouble('Debe ser numérico');
-
   final badgeTypeValidator = Validator<String>()..required();
 
-  bool isBussy = false;
+  bool bussy = false;
   bool featured = false;
-  int? selectedCategory;
+  String? selectedCategory;
   String? selectedBudgetType;
-  Set<int> selectedSkills = {};
+  Set<String> selectedSkills = {};
 
   @override
   void initState() {
@@ -79,7 +75,7 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async => !isBussy,
+      onWillPop: () async => !bussy,
       child: FutureBuilder(
         future: loadDataFuture,
         builder: (_, snapshot) {
@@ -253,7 +249,7 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
               ),
 
               const Text('Categoría').margin(const EdgeInsets.only(top: 16.0)),
-              DropdownButtonFormField<int>(
+              DropdownButtonFormField<String>(
                 isExpanded: true,
                 menuMaxHeight: 300.0,
                 initialValue: selectedCategory,
@@ -276,7 +272,7 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
                 ),
                 items: categories
                     .map(
-                      (it) => DropdownMenuItem<int>(
+                      (it) => DropdownMenuItem<String>(
                         value: it.id,
                         child: Text(it.name),
                       ),
@@ -410,7 +406,7 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
       ),
 
       bottomNavigationBar: FilledButton(
-        onPressed: canCreateActive && !isBussy
+        onPressed: canCreateActive && !bussy
             ? () async {
                 if (!formKey.currentState!.validate()) {
                   return;
@@ -419,7 +415,7 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
                 await createProject();
               }
             : null,
-        child: Text(!isBussy ? 'Publicar proyecto' : 'Publicando...'),
+        child: Text(!bussy ? 'Publicar proyecto' : 'Publicando...'),
       ).useSafeArea().margin(Insets.h16v8),
     );
   }
@@ -438,9 +434,7 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
     final canCreateActive = plan!.activeProjectsLimit == null
         ? true
         : actives < plan.activeProjectsLimit!;
-    final canCreateFeatured = plan.featuredProjectsLimit == null
-        ? true
-        : features < plan.featuredProjectsLimit!;
+    final canCreateFeatured = plan.featuredProjectsLimit > 0;
 
     return (skills, categories, canCreateActive, canCreateFeatured);
   }
@@ -449,7 +443,7 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
     final userId = ref.read(authProvider)!.id;
 
     try {
-      safeSetState(() => isBussy = true);
+      safeSetState(() => bussy = true);
 
       final project = await ref
           .read(projectProvider)
@@ -458,11 +452,11 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
             description: descriptionController.text,
             requirement: requirementController.text,
             featured: featured,
-            categoryId: selectedCategory!,
             ownerId: userId,
+            categoryId: selectedCategory!,
           );
 
-      final _ = await (
+      await (
         ref
             .read(projectPaymentProvider)
             .create(
@@ -482,27 +476,15 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
       ).wait;
 
       ref.read(goRouterProvider).pop();
+    } on PostgrestException catch (e) {
+      showSnackbar(context, e.message);
     } catch (err) {
       showSnackbar(
         context,
         'Ups, algo salió mal al publicar tu proyecto. Inténtalo otra vez.',
       );
     } finally {
-      safeSetState(() => isBussy = false);
+      safeSetState(() => bussy = false);
     }
   }
-
-  // Future<(Project, ProjectPayment, Category, List<Skill>)> load() async {
-  //   final (project, payment, skills) = await (
-  //     ref.read(projectProvider).getById(widget.projectId!),
-  //     ref.read(projectPaymentProvider).getForProject(widget.projectId!),
-  //     ref.read(skillProvider).getForProject(widget.projectId!),
-  //   ).wait;
-
-  //   final category = await ref
-  //       .read(categoryProvider)
-  //       .getById(project!.categoryId!);
-
-  //   return (project, payment!, category!, skills);
-  // }
 }

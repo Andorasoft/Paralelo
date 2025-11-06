@@ -1,3 +1,4 @@
+import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
 
 class EmailFormField extends ConsumerStatefulWidget {
@@ -24,6 +25,15 @@ class EmailFormField extends ConsumerStatefulWidget {
 
 class _EmailFormFieldState extends ConsumerState<EmailFormField> {
   final focusNode = FocusNode();
+  final uuid = Uuid().v4();
+  late final TextEditingController controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller = widget.controller ?? TextEditingController();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +41,12 @@ class _EmailFormFieldState extends ConsumerState<EmailFormField> {
       controller: widget.controller,
       validator: widget.validator,
       focusNode: focusNode,
+
+      onChanged: (value) {
+        EasyDebounce.debounce(uuid, Durations.medium4, () {
+          safeSetState(() {});
+        });
+      },
 
       decoration: InputDecoration(
         filled: true,
@@ -50,11 +66,16 @@ class _EmailFormFieldState extends ConsumerState<EmailFormField> {
           LucideIcons.mail,
           color: Theme.of(context).colorScheme.outline,
         ),
-        suffixIcon: InkWell(
-          onTap: () {},
-          overlayColor: WidgetStateProperty.all(Colors.transparent),
-          child: const Icon(LucideIcons.x),
-        ),
+        suffixIcon: controller.text.isNotEmpty
+            ? InkWell(
+                onTap: () {
+                  controller.clear();
+                  safeSetState(() {});
+                },
+                overlayColor: WidgetStateProperty.all(Colors.transparent),
+                child: const Icon(LucideIcons.x),
+              )
+            : null,
       ),
 
       keyboardType: TextInputType.emailAddress,

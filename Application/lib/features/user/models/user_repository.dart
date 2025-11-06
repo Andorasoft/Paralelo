@@ -14,15 +14,14 @@ abstract class UserRepository {
     required String email,
     String? pictureUrl,
     String? deviceToken,
-    int? planId,
-    int? universityId,
+    required String planId,
+    required String universityId,
   });
 
   /// Updates a [User] with the provided fields.
   Future<User?> update(
     String id, {
     String? displayName,
-    String? email,
     String? pictureUrl,
     String? deviceToken,
     int? planId,
@@ -49,8 +48,8 @@ class SupabaseUserRepository implements UserRepository {
     required String email,
     String? pictureUrl,
     String? deviceToken,
-    int? planId,
-    int? universityId,
+    required String planId,
+    required String universityId,
   }) async {
     final data = await _client
         .from('user')
@@ -73,7 +72,6 @@ class SupabaseUserRepository implements UserRepository {
   Future<User?> update(
     String id, {
     String? displayName,
-    String? email,
     String? pictureUrl,
     String? deviceToken,
     int? planId,
@@ -82,9 +80,6 @@ class SupabaseUserRepository implements UserRepository {
 
     if (displayName.isNotNull) {
       updates['display_name'] = displayName;
-    }
-    if (email.isNotNull) {
-      updates['email'] = email;
     }
     if (pictureUrl.isNotNull) {
       updates['picture_url'] = pictureUrl;

@@ -4,15 +4,15 @@ import '../models/project.dart';
 abstract class ProjectRepository {
   Future<(int, List<Project>)> getPaginated({
     required String excludedUserId,
-    int? universityId,
+    String? universityId,
     String? query,
     int page = 1,
     int limit = 10,
   });
 
-  Future<Project?> getById(int id);
+  Future<Project?> getById(String id);
 
-  Future<List<Project>> getByIds(List<int> ids);
+  Future<List<Project>> getByIds(List<String> ids);
 
   Future<List<Project>> getForUser(String userId);
 
@@ -21,17 +21,17 @@ abstract class ProjectRepository {
     required String description,
     required String requirement,
     bool? featured,
-    required int categoryId,
     required String ownerId,
+    required String categoryId,
   });
 
   Future<Project?> update(
-    int id, {
+    String id, {
     String? title,
     String? description,
     String? requirement,
     bool? featured,
-    int? categoryId,
+    String? categoryId,
   });
 
   Future<int> countActive(String ownerId);
@@ -47,7 +47,7 @@ class SupabaseProjectRepository implements ProjectRepository {
   @override
   Future<(int, List<Project>)> getPaginated({
     required String excludedUserId,
-    int? universityId,
+    String? universityId,
     String? query,
     int page = 1,
     int limit = 10,
@@ -122,7 +122,7 @@ class SupabaseProjectRepository implements ProjectRepository {
   }
 
   @override
-  Future<Project?> getById(int id) async {
+  Future<Project?> getById(String id) async {
     final data = await _client
         .from('project')
         .select()
@@ -133,7 +133,7 @@ class SupabaseProjectRepository implements ProjectRepository {
   }
 
   @override
-  Future<List<Project>> getByIds(List<int> ids) async {
+  Future<List<Project>> getByIds(List<String> ids) async {
     final data = await _client
         .from('project')
         .select()
@@ -155,8 +155,8 @@ class SupabaseProjectRepository implements ProjectRepository {
     required String description,
     required String requirement,
     bool? featured,
-    required int categoryId,
     required String ownerId,
+    required String categoryId,
   }) async {
     final data = await _client
         .from('project')
@@ -176,12 +176,12 @@ class SupabaseProjectRepository implements ProjectRepository {
 
   @override
   Future<Project?> update(
-    int id, {
+    String id, {
     String? title,
     String? description,
     String? requirement,
     bool? featured,
-    int? categoryId,
+    String? categoryId,
   }) async {
     final updates = <String, dynamic>{};
 

@@ -1,13 +1,15 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
+import 'package:paralelo/features/plan/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
 import 'package:paralelo/widgets/person_picture.dart';
 import 'package:paralelo/widgets/verified_mark.dart';
 
 class UserPresenter extends ConsumerWidget {
   final User user;
+  final Plan plan;
 
-  const UserPresenter({super.key, required this.user});
+  const UserPresenter({super.key, required this.user, required this.plan});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,17 +22,17 @@ class UserPresenter extends ConsumerWidget {
           size: 64.0,
 
           badgePlacement: BadgePlacement.topLef,
-          badge: switch (user.planId!) {
-            3 => Icon(TablerIcons.crown),
-            2 => Icon(LucideIcons.star),
+          badge: switch (plan.name) {
+            'Premium' => Icon(TablerIcons.crown),
+            'Pro' => Icon(LucideIcons.star),
             _ => null,
           },
-          side: switch (user.planId!) {
-            3 => BorderSide(
+          side: switch (plan.name) {
+            'Premium' => BorderSide(
               width: 3.0,
               color: Theme.of(context).colorScheme.secondary,
             ),
-            2 => BorderSide(
+            'Pro' => BorderSide(
               width: 3.0,
               color: Theme.of(context).colorScheme.primary,
             ),
