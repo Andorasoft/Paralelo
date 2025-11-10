@@ -1,9 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/core/imports.dart';
 
-class ModalBottomSheet extends ConsumerStatefulWidget {
+class ModalBottomSheet extends ConsumerWidget {
   final Widget child;
   final Key? formKey;
   final PreferredSizeWidget? title;
@@ -25,19 +23,16 @@ class ModalBottomSheet extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() {
-    return ModalBottomSheetState();
-  }
-}
-
-class ModalBottomSheetState extends ConsumerState<ModalBottomSheet> {
-  @override
-  Widget build(BuildContext context) {
-    final bottom = MediaQuery.of(context).padding.bottom;
+  Widget build(BuildContext context, WidgetRef _) {
+    final padding = EdgeInsets.fromLTRB(
+      16.0,
+      16.0,
+      16.0,
+      MediaQuery.of(context).padding.bottom > 0.0 ? 0.0 : 16.0,
+    );
 
     return Padding(
-      padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, bottom > 0.0 ? 0.0 : 16.0),
-
+      padding: padding,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -45,20 +40,17 @@ class ModalBottomSheetState extends ConsumerState<ModalBottomSheet> {
         spacing: 8.0,
 
         children: [
-          if (widget.title.isNotNull)
+          if (title != null)
             DefaultTextStyle(
               style: Theme.of(
                 context,
               ).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.w500),
-              child: widget.title!,
+              child: title!,
             ),
 
-          if (widget.formKey != null)
-            Form(key: widget.formKey, child: widget.child)
-          else
-            widget.child,
+          if (formKey != null) Form(key: formKey, child: child) else child,
 
-          if (widget.bottom.isNotNull) widget.bottom!,
+          if (bottom != null) bottom!,
         ],
       ),
     ).useSafeArea();

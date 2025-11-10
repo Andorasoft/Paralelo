@@ -1,13 +1,13 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/core/constants.dart';
 import 'package:paralelo/core/imports.dart';
+import 'package:paralelo/core/providers.dart';
+import 'package:paralelo/core/services.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/chat/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
-import 'package:paralelo/core/providers.dart';
-import 'package:paralelo/core/services.dart';
-import 'package:paralelo/utils/extensions.dart';
-import 'package:paralelo/utils/formatters.dart';
+import 'package:paralelo/utils/helpers.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
 import 'package:paralelo/widgets/skeleton.dart';
 import 'package:paralelo/widgets/skeleton_block.dart';
@@ -105,7 +105,7 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
         toolbarHeight: 64.0,
 
         leading: const NavigationButton(),
-        title: Text(recipient.displayName.obscure()),
+        title: Text(obscureText(recipient.displayName)),
         actions: const [UserRatingStar(rating: 0.0)],
 
         bottom: PreferredSize(

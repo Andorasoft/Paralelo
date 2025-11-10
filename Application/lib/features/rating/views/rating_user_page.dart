@@ -1,7 +1,6 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:paralelo/core/constants.dart';
 import 'package:paralelo/core/imports.dart';
-import 'package:paralelo/utils/extensions.dart';
 
 class RatingUserPage extends ConsumerStatefulWidget {
   static const routePath = '/rating-user';

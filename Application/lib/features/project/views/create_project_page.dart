@@ -7,7 +7,6 @@ import 'package:paralelo/features/category/exports.dart';
 import 'package:paralelo/features/plan/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/features/skill/exports.dart';
-import 'package:paralelo/utils/extensions.dart';
 import 'package:paralelo/utils/validators.dart';
 import 'package:paralelo/widgets/info_bar.dart';
 import 'package:paralelo/widgets/navigation_button.dart';

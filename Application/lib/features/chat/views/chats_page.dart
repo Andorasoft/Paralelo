@@ -1,4 +1,5 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/core/constants.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/core/providers.dart';
 import 'package:paralelo/core/router.dart';
@@ -7,8 +8,7 @@ import 'package:paralelo/features/chat/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
-import 'package:paralelo/utils/extensions.dart';
-import 'package:paralelo/utils/formatters.dart';
+import 'package:paralelo/utils/helpers.dart';
 import 'package:paralelo/widgets/skeleton.dart';
 import 'package:paralelo/widgets/skeleton_block.dart';
 
@@ -54,8 +54,8 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
   Widget skeleton() {
     return Skeleton(
       child: Scaffold(
-        backgroundColor: Colors.transparent,
         key: scaffoldKey,
+        backgroundColor: Colors.transparent,
 
         appBar: AppBar(
           titleSpacing: 16.0,
@@ -163,7 +163,7 @@ class _ChatsPageState extends ConsumerState<ChatsPage> {
                             .read(goRouterProvider)
                             .push(ChatRoomPage.routePath, extra: room.id);
                       },
-                      title: user.displayName.obscure(),
+                      title: obscureText(user.displayName),
                       subtitle: project.title,
                       unread: hasUnread,
                     );

@@ -1,7 +1,7 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/core/constants.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/skill/exports.dart';
-import 'package:paralelo/utils/extensions.dart';
 
 class SkillInputSelector extends ConsumerStatefulWidget {
   final List<Skill> source;

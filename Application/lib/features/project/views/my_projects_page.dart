@@ -1,9 +1,9 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/core/constants.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
-import 'package:paralelo/utils/extensions.dart';
 import 'package:paralelo/widgets/empty_indicator.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/widgets/navigation_button.dart';

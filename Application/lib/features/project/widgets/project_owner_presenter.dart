@@ -2,7 +2,7 @@ import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/plan/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
-import 'package:paralelo/utils/formatters.dart';
+import 'package:paralelo/utils/helpers.dart';
 import 'package:paralelo/widgets/person_picture.dart';
 import 'package:paralelo/widgets/verified_mark.dart';
 
@@ -71,7 +71,7 @@ class ProjectOwnerPresenter extends ConsumerWidget {
 
                     children: [
                       Text(
-                        owner.displayName.obscure(),
+                        obscureText(owner.displayName),
                         style: Theme.of(context).textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),

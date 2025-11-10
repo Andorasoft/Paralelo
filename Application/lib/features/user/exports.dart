@@ -7,5 +7,6 @@ export 'models/user_rating.dart';
 export 'models/user_repository.dart';
 export 'models/user.dart';
 
+export 'widgets/locale_selector_modal.dart';
 export 'widgets/user_presenter.dart';
 export 'widgets/user_rating.dart';

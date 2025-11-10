@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/utils/formatters.dart';
 
 class MessageBubble extends ConsumerStatefulWidget {
@@ -67,7 +65,7 @@ class MessageBubbleState extends ConsumerState<MessageBubble> {
 
   Widget _buildTextTime() {
     return Text(
-      widget.date.toShortTimeString(),
+      formatToShortDateString(widget.date),
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
         color: Theme.of(context).colorScheme.outline,
       ),

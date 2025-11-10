@@ -20,3 +20,29 @@ int compareVersions(String a, String b) {
 
   return 0; // Equals
 }
+
+String extractDomain(String email) {
+  if (email.isEmpty || !email.contains('@')) {
+    throw ArgumentError('Correo no válido');
+  }
+  return email.split('@').last;
+}
+
+/// Returns an obscured version of a full name, showing only the initials.
+///
+/// Example:
+/// ```dart
+/// final name = "Jordy Ricardo Carrión Chávez";
+/// print(name.obscure()); // J. R. C. C.
+/// ```
+///
+/// This method:
+/// - Splits the string by spaces.
+/// - Removes any extra whitespace.
+/// - Converts the first character of each part to uppercase.
+/// - Joins the initials with spaces and adds a period after each one.
+String obscureText(String data) {
+  final parts = data.split(' ').where((p) => p.trim().isNotEmpty).toList();
+  final initials = parts.map((p) => '${p[0].toUpperCase()}.').join(' ');
+  return initials;
+}

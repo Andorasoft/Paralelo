@@ -1,4 +1,5 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/core/constants.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/exports.dart';
@@ -6,13 +7,11 @@ import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/features/university/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
-import 'package:paralelo/utils/extensions.dart';
-import 'package:paralelo/utils/formatters.dart';
+import 'package:paralelo/utils/helpers.dart';
 import 'package:paralelo/widgets/empty_indicator.dart';
 import 'package:paralelo/widgets/loading_indicator.dart';
 
 class MarketplacePage extends ConsumerStatefulWidget {
-  static const routeName = 'MarketplacePage';
   static const routePath = '/marketplace';
 
   const MarketplacePage({super.key});
@@ -25,7 +24,8 @@ class MarketplacePage extends ConsumerStatefulWidget {
 
 class _MarketplacePageState extends ConsumerState<MarketplacePage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  late Future<(int, List<(Project, bool)>)> loadDataFuture;
+
+  late final Future<(int, List<(Project, bool)>)> loadDataFuture;
 
   String querySearch = '';
   int currentPage = 1;
@@ -76,7 +76,21 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
           leading: const Icon(LucideIcons.search),
           hintText: 'input.search_projects'.tr(),
         ).size(height: 44.0),
-        actions: [const ProjectSortButton()],
+        actions: [
+          IconButton.filledTonal(
+            onPressed: () async {
+              final sort = await showProjectSortModalBottomSheet(
+                context,
+                value: 'last_updated',
+              );
+
+              if (sort == null) return;
+
+              debugPrint('Sort projects by $sort...');
+            },
+            icon: const Icon(LucideIcons.arrowUpDown),
+          ),
+        ],
       ),
 
       body: list.isEmpty
@@ -153,11 +167,12 @@ class _MarketplacePageState extends ConsumerState<MarketplacePage> {
     int page = 1,
   }) async {
     final userId = ref.read(authProvider)!.id;
-    final userEmail = ref.read(authProvider)!.email;
+    final email = ref.read(authProvider)!.email;
+    final domain = extractDomain(email);
 
     final (user, university) = await (
       ref.read(userProvider).getById(userId),
-      ref.read(universityProvider).getByDomain(userEmail.extractDomain()),
+      ref.read(universityProvider).getByDomain(domain),
     ).wait;
 
     final (pages, projects) = await ref

@@ -1,13 +1,13 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/core/constants.dart';
 import 'package:paralelo/core/exceptions.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/exports.dart';
-import 'package:paralelo/features/plan/controllers/plan_provider.dart';
-import 'package:paralelo/features/university/controllers/university_provider.dart';
+import 'package:paralelo/features/plan/exports.dart';
+import 'package:paralelo/features/university/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
-import 'package:paralelo/utils/extensions.dart';
-import 'package:paralelo/utils/formatters.dart';
+import 'package:paralelo/utils/helpers.dart';
 import 'package:paralelo/utils/validators.dart';
 import 'package:paralelo/widgets/link_button.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
@@ -200,7 +200,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
       final password = passwordController.text.trim();
       final name = nameController.text.trim();
 
-      final domain = email.extractDomain();
+      final domain = extractDomain(email);
       final university = await ref.read(universityProvider).getByDomain(domain);
 
       if (university == null) {

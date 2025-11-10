@@ -16,3 +16,4 @@ export 'package:go_router/go_router.dart';
 export 'package:uuid/uuid.dart';
 export 'package:easy_debounce/easy_debounce.dart';
 export 'package:package_info_plus/package_info_plus.dart';
+export 'package:flutter_rating_bar/flutter_rating_bar.dart';

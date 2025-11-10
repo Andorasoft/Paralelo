@@ -2,7 +2,6 @@ import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/constants.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/plan/models/plan.dart';
-import 'package:paralelo/utils/extensions.dart';
 
 class PlanCard extends ConsumerWidget {
   final Plan plan;

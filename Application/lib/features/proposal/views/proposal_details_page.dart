@@ -8,7 +8,6 @@ import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/chat/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
-import 'package:paralelo/utils/extensions.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
 import 'package:paralelo/widgets/skeleton.dart';
 import 'package:paralelo/widgets/skeleton_block.dart';
