@@ -1,3 +1,4 @@
+//import 'package:andorasoft_flutter/andorasoft_flutter.dart';s
 import 'imports.dart';
 
 /// Background handler for FCM messages.
@@ -154,6 +155,10 @@ class FCMService {
   /// Returns the token as a [String], or `null` if there was an error.
   Future<String?> getDeviceToken() async {
     try {
+      // if (isiOS) {
+      //   final apn = await _messaging.getAPNSToken();
+      // }
+
       String? token = await _messaging.getToken();
       debugPrint("📱 Device Token: $token");
       return token;

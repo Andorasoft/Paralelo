@@ -9,8 +9,8 @@ import 'package:paralelo/features/plan/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/features/setting/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
-import 'package:paralelo/widgets/loading_indicator.dart';
 import 'package:paralelo/widgets/skeleton.dart';
+import 'package:paralelo/widgets/skeleton_block.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   static const routePath = '/settings';
@@ -28,14 +28,16 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   late final Future<(User, Plan)> loadDataFuture;
   late final PreferencesNotifier preferences;
+  late final String userId;
 
   @override
   void initState() {
     super.initState();
 
-    loadDataFuture = loadData();
-
     preferences = ref.read(preferencesProvider.notifier);
+    userId = ref.read(authProvider)!.id;
+
+    loadDataFuture = loadData();
   }
 
   @override
@@ -58,7 +60,45 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         key: scaffoldKey,
         backgroundColor: Colors.transparent,
 
-        body: const LoadingIndicator().center(),
+        appBar: AppBar(actions: [SkeletonBlock(width: 128.0, height: 24.0)]),
+
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 8.0,
+          children: [
+            SizedBox(
+              height: 192.0,
+
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                spacing: 12.0,
+                children: const [
+                  SkeletonBlock(width: 64.0, height: 64.0),
+                  SkeletonBlock(width: 256.0, height: 24.0),
+                  SkeletonBlock(width: 192.0, height: 16.0),
+                ],
+              ).center(),
+            ),
+
+            ...const [
+              SkeletonBlock(width: 128.0, height: 16.0),
+              SkeletonBlock(width: double.infinity, height: 24.0),
+              SkeletonBlock(width: double.infinity, height: 24.0),
+
+              SizedBox(height: 12.0),
+
+              SkeletonBlock(width: 128.0, height: 16.0),
+              SkeletonBlock(width: double.infinity, height: 24.0),
+              SkeletonBlock(width: double.infinity, height: 24.0),
+
+              SizedBox(height: 12.0),
+
+              SkeletonBlock(width: 128.0, height: 16.0),
+              SkeletonBlock(width: double.infinity, height: 24.0),
+              SkeletonBlock(width: double.infinity, height: 24.0),
+            ],
+          ],
+        ).margin(Insets.h16v8),
       ),
     );
   }
@@ -90,132 +130,121 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
           const SizedBox(height: 16.0),
 
-          ...[
-            Text(
-              'setting.sections.activity'.tr(),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ).margin(const EdgeInsets.only(left: 8.0)),
-            SettingOption.tile(
-              onTap: () async {
-                await ref.read(goRouterProvider).push(MyProjectsPage.routePath);
-              },
-
-              leading: const Icon(TablerIcons.briefcase_filled),
-              title: 'setting.options.published_projects'.tr(),
+          Text(
+            'setting.sections.activity'.tr(),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.outline,
             ),
-            SettingOption.tile(
-              onTap: () {},
+          ).margin(const EdgeInsets.only(left: 8.0)),
+          SettingOption.tile(
+            onTap: () async {
+              await ref.read(goRouterProvider).push(MyProjectsPage.routePath);
+            },
 
-              leading: const Icon(TablerIcons.file_filled),
-              title: 'setting.options.proposals_submitted'.tr(),
-            ),
-            SettingOption.tile(
-              onTap: () async {
-                await ref.read(goRouterProvider).push(PlansPage.routePath);
-              },
+            leading: const Icon(TablerIcons.briefcase_filled),
+            title: 'setting.options.published_projects'.tr(),
+          ),
+          SettingOption.tile(
+            onTap: () {},
 
-              leading: const Icon(TablerIcons.star_filled),
-              title: 'setting.options.benefits_plan'.tr(),
-            ),
-          ],
+            leading: const Icon(TablerIcons.file_filled),
+            title: 'setting.options.proposals_submitted'.tr(),
+          ),
+          SettingOption.tile(
+            onTap: () async {
+              await ref.read(goRouterProvider).push(PlansPage.routePath);
+            },
+
+            leading: const Icon(TablerIcons.star_filled),
+            title: 'setting.options.benefits_plan'.tr(),
+          ),
 
           const SizedBox(height: 16.0),
 
-          ...[
-            Text(
-              'setting.sections.preferences'.tr(),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ).margin(const EdgeInsets.only(left: 8.0)),
-            SettingOption.tile(
-              onTap: () async {
-                final newLocale = await showModalBottomSheet<String>(
-                  context: context,
-                  isScrollControlled: true,
-                  builder: (_) {
-                    return LocaleSelectorModal(
-                      value: currentLocale.languageCode,
-                    );
-                  },
-                );
-
-                if (newLocale == null) return;
-
-                await updateLocale(newLocale);
-              },
-              leading: const Icon(TablerIcons.globe_filled),
-              trailing: Text(
-                currentLocale.languageCode.toUpperCase(),
-                style: Theme.of(
-                  context,
-                ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade400),
-              ),
-              title: 'setting.options.language'.tr(),
+          Text(
+            'setting.sections.preferences'.tr(),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.outline,
             ),
-            SettingOption.toggle(
-              value: allowNotifications,
+          ).margin(const EdgeInsets.only(left: 8.0)),
+          SettingOption.tile(
+            onTap: () async {
+              final newLocale = await showModalBottomSheet<String>(
+                context: context,
+                isScrollControlled: true,
+                builder: (_) {
+                  return LocaleSelectorModal(value: currentLocale.languageCode);
+                },
+              );
 
-              onChanged: (checked) async {
-                if (checked) {
-                  final granted = await handleNotificationPermission(context);
+              if (newLocale == null) return;
 
-                  if (!granted) return;
-                }
-              },
-
-              leading: const Icon(TablerIcons.bell_filled),
-              title: 'setting.options.notifications'.tr(),
+              await updateLocale(newLocale);
+            },
+            leading: const Icon(TablerIcons.globe_filled),
+            trailing: Text(
+              currentLocale.languageCode.toUpperCase(),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade400),
             ),
-          ],
+            title: 'setting.options.language'.tr(),
+          ),
+          SettingOption.toggle(
+            value: allowNotifications,
+            onChanged: (checked) async {
+              if (checked) {
+                final granted = await handleNotificationPermission(context);
+
+                if (!granted) return;
+              }
+            },
+
+            leading: const Icon(TablerIcons.bell_filled),
+            title: 'setting.options.notifications'.tr(),
+          ),
 
           const SizedBox(height: 16.0),
 
-          ...[
-            Text(
-              'setting.sections.account'.tr(),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ).margin(const EdgeInsets.only(left: 12.0)),
-            SettingOption.tile(
-              onTap: () {},
-
-              leading: const Icon(TablerIcons.lock_filled),
-              title: 'setting.options.change_password'.tr(),
+          Text(
+            'setting.sections.account'.tr(),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.outline,
             ),
-            SettingOption.tile(
-              onTap: () {},
+          ).margin(const EdgeInsets.only(left: 12.0)),
+          SettingOption.tile(
+            onTap: () {},
 
-              leading: const Icon(TablerIcons.trash_filled),
-              title: 'setting.options.delete_account'.tr(),
-            ),
-          ],
+            leading: const Icon(TablerIcons.lock_filled),
+            title: 'setting.options.change_password'.tr(),
+          ),
+          SettingOption.tile(
+            onTap: () {},
+
+            leading: const Icon(TablerIcons.trash_filled),
+            title: 'setting.options.delete_account'.tr(),
+          ),
 
           const SizedBox(height: 16.0),
 
-          ...[
-            Text(
-              'setting.sections.support'.tr(),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.outline,
-              ),
-            ).margin(const EdgeInsets.only(left: 12.0)),
-            SettingOption.tile(
-              onTap: () {},
-
-              leading: const Icon(TablerIcons.info_circle_filled),
-              title: 'setting.options.help_center'.tr(),
+          Text(
+            'setting.sections.support'.tr(),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.outline,
             ),
-            SettingOption.tile(
-              onTap: () {},
+          ).margin(const EdgeInsets.only(left: 12.0)),
+          SettingOption.tile(
+            onTap: () {},
 
-              leading: const Icon(TablerIcons.message_filled),
-              title: 'setting.options.contact_us'.tr(),
-            ),
-          ],
+            leading: const Icon(TablerIcons.info_circle_filled),
+            title: 'setting.options.help_center'.tr(),
+          ),
+          SettingOption.tile(
+            onTap: () {},
+
+            leading: const Icon(TablerIcons.message_filled),
+            title: 'setting.options.contact_us'.tr(),
+          ),
 
           Text(
             '${'© 2025 Andorasoft'}\n${'all_rights_reserved'.tr()}',
@@ -230,8 +259,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Future<(User, Plan)> loadData() async {
-    final userId = ref.read(authProvider)!.id;
-
     final (user, plan) = await (
       ref.read(userProvider).getById(userId),
       ref.read(planProvider).getForUser(userId),
@@ -241,8 +268,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Future<void> updateLocale(String code) async {
-    final userId = ref.read(authProvider)!.id;
-
     try {
       preferences.setLocale(code);
 
@@ -255,8 +280,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   }
 
   Future<void> updateNotifications(bool value) async {
-    final userId = ref.read(authProvider)!.id;
-
     try {
       preferences.setNotifications(value);
 
@@ -280,8 +303,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       await showDialog<void>(
         context: context,
         barrierDismissible: false,
-
-        builder: (ctx) {
+        builder: (_) {
           return AlertDialog(
             insetPadding: const EdgeInsets.symmetric(horizontal: 16.0),
 

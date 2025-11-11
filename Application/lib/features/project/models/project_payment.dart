@@ -4,7 +4,7 @@
 /// currency, type, and relation to a specific project.
 class ProjectPayment {
   /// Unique identifier of the payment record.
-  final int id;
+  final String id;
 
   /// Timestamp when the payment record was created.
   final DateTime createdAt;
@@ -22,7 +22,7 @@ class ProjectPayment {
   final String type;
 
   /// Identifier of the related project.
-  final int projectId;
+  final String projectId;
 
   /// Creates an immutable [ProjectPayment] instance.
   const ProjectPayment({
