@@ -53,6 +53,6 @@ class ModalBottomSheet extends ConsumerWidget {
           if (bottom != null) bottom!,
         ],
       ),
-    ).useSafeArea();
+    ).useSafeArea().hideKeyboardOnTap(context);
   }
 }

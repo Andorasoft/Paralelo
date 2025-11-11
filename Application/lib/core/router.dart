@@ -6,7 +6,6 @@ import 'package:paralelo/features/management/exports.dart';
 import 'package:paralelo/features/plan/views/plans_page.dart';
 import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
-import 'package:paralelo/features/rating/views/rating_user_page.dart';
 import 'package:paralelo/widgets/bottom_nav_bar.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
@@ -115,13 +114,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: PlansPage.routePath,
         builder: (_, _) {
           return const PlansPage();
-        },
-      ),
-
-      GoRoute(
-        path: RatingUserPage.routePath,
-        builder: (_, _) {
-          return const RatingUserPage();
         },
       ),
     ],

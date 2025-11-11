@@ -4,7 +4,7 @@
 /// including the reason, status, and resolution details.
 class Report {
   /// Unique identifier of the report.
-  final int id;
+  final String id;
 
   /// Timestamp when the report was created.
   final DateTime createdAt;
@@ -25,7 +25,7 @@ class Report {
   final String reportedId;
 
   /// Optional ID of the related project (if applicable).
-  final int? projectId;
+  final String? projectId;
 
   /// Creates an immutable [Report] instance.
   const Report({

@@ -3,7 +3,7 @@
 /// Stores feedback and numeric scores between users.
 class UserRating {
   /// Unique identifier of the rating record.
-  final int id;
+  final String id;
 
   /// Timestamp when the rating was created.
   final DateTime createdAt;
@@ -21,7 +21,7 @@ class UserRating {
   final String ratedId;
 
   /// Related project ID.
-  final int projectId;
+  final String projectId;
 
   const UserRating({
     required this.id,

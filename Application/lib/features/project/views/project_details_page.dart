@@ -5,7 +5,7 @@ import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/plan/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
-import 'package:paralelo/features/rating/widgets/rating_user_modal.dart';
+import 'package:paralelo/features/rating/exports.dart';
 import 'package:paralelo/features/skill/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
@@ -27,13 +27,15 @@ class ProjectDetailsPage extends ConsumerStatefulWidget {
 
 class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  late final Future<(User, Plan, Project, ProjectPayment, List<Skill>, bool)>
-  loadDataFuture;
+
+  late final Future<_ProjectDetailsDto> loadDataFuture;
+  late final String userId;
 
   @override
   void initState() {
     super.initState();
 
+    userId = ref.read(authProvider)!.id;
     loadDataFuture = loadData();
   }
 
@@ -55,20 +57,15 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
     return Scaffold(key: scaffoldKey, body: const LoadingIndicator().center());
   }
 
-  Widget page((User, Plan, Project, ProjectPayment, List<Skill>, bool) data) {
-    final (owner, plan, project, payment, skills, applied) = data;
-    final userId = ref.read(authProvider)!.id;
-
+  Widget page(_ProjectDetailsDto data) {
     return Scaffold(
       key: scaffoldKey,
 
       appBar: AppBar(
         automaticallyImplyLeading: false,
-
         leading: const NavigationButton(),
-
         actions: [
-          if (userId == owner.id)
+          if (userId == data.owner.id)
             TextButton(onPressed: () {}, child: Text('button.edit'.tr())),
         ],
       ),
@@ -77,13 +74,13 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
         padding: Insets.h16v8,
         children: [
           Text(
-            project.title,
+            data.project.title,
             style: Theme.of(
               context,
             ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w500),
           ),
           Text(
-            'Publicado en ${project.createdAt.toLongDateString()}',
+            'Publicado en ${data.project.createdAt.toLongDateString()}',
           ).margin(const EdgeInsets.symmetric(vertical: 16.0)),
 
           Column(
@@ -91,21 +88,21 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
 
             children: [
               ProjectInfoPresenter(
-                project: project,
-                payment: payment,
-                skills: skills,
+                project: data.project,
+                payment: data.payment,
+                skills: data.skills,
                 showStatus: true,
               ),
-              if (userId != owner.id)
-                ProjectOwnerPresenter(owner: owner, plan: plan),
+              if (userId != data.owner.id)
+                ProjectOwnerPresenter(owner: data.owner, plan: data.plan),
             ],
           ),
         ],
       ),
 
       bottomNavigationBar: FilledButton(
-        onPressed: !applied
-            ? userId != owner.id
+        onPressed: !data.applied
+            ? userId != data.owner.id
                   ? () async {
                       await ref
                           .read(goRouterProvider)
@@ -123,7 +120,7 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
                     }
             : null,
         child: Text(
-          userId != owner.id
+          userId != data.owner.id
               ? 'button.offer_help'.tr()
               : 'button.mark_completed'.tr(),
         ),
@@ -131,23 +128,44 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
     );
   }
 
-  Future<(User, Plan, Project, ProjectPayment, List<Skill>, bool)>
-  loadData() async {
-    final userId = ref.read(authProvider)!.id;
+  Future<_ProjectDetailsDto> loadData() async {
+    final project = await ref.read(projectProvider).getById(widget.projectId);
 
-    final (project, payment, skills, applied) = await (
-      ref.read(projectProvider).getById(widget.projectId),
+    final (owner, plan, payment, skills, applied) = await (
+      ref.read(userProvider).getById(project!.ownerId),
+      ref.read(planProvider).getForUser(project.ownerId),
       ref.read(projectPaymentProvider).getForProject(widget.projectId),
       ref.read(skillProvider).getForProject(widget.projectId),
       ref
           .read(proposalProvider)
           .applied(projectId: widget.projectId, providerId: userId),
     ).wait;
-    final (owner, plan) = await (
-      ref.read(userProvider).getById(project!.ownerId),
-      ref.read(planProvider).getForUser(project.ownerId),
-    ).wait;
 
-    return (owner!, plan!, project, payment!, skills, applied);
+    return _ProjectDetailsDto(
+      owner: owner!,
+      plan: plan!,
+      project: project,
+      payment: payment!,
+      skills: skills,
+      applied: applied,
+    );
   }
+}
+
+class _ProjectDetailsDto {
+  final User owner;
+  final Plan plan;
+  final Project project;
+  final ProjectPayment payment;
+  final List<Skill> skills;
+  final bool applied;
+
+  const _ProjectDetailsDto({
+    required this.owner,
+    required this.plan,
+    required this.project,
+    required this.payment,
+    required this.skills,
+    required this.applied,
+  });
 }

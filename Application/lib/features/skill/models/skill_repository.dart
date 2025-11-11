@@ -48,7 +48,7 @@ class SupabaseSkillRepository implements SkillRepository {
         .select('skill_id')
         .eq('project_id', projectId);
 
-    final ids = res.map((e) => e['skill_id'] as int).toList();
+    final ids = res.map((e) => e['skill_id']).toList();
 
     if (ids.isEmpty) return [];
 
