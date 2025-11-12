@@ -46,18 +46,6 @@ class ProposalStatus {
   };
 }
 
-class ProposalEstimatedDurationUnit {
-  static const String hours = 'HOURS';
-  static const String days = 'DAYS';
-
-  static const List<String> values = [hours, days];
-
-  static Map<String, String> labels = {
-    hours: 'const.proposal_estimated_duration_unit.hours'.tr(),
-    days: 'const.proposal_estimated_duration_unit.days'.tr(),
-  };
-}
-
 class ProjectPaymentType {
   static const String fixed = 'FIXED';
   static const String hourly = 'HOURLY';

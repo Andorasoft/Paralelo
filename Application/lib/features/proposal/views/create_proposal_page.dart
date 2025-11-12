@@ -8,7 +8,6 @@ import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/features/chat/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
-import 'package:paralelo/widgets/number_input_form_field.dart';
 import 'package:paralelo/widgets/skeleton.dart';
 import 'package:paralelo/widgets/skeleton_block.dart';
 import 'package:paralelo/widgets/skeleton_card.dart';
@@ -29,25 +28,26 @@ class CreateProposalPage extends ConsumerStatefulWidget {
 class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final formKey = GlobalKey<FormState>();
-  late final Future<(Project, ProjectPayment, bool)> loadDataFuture;
+
+  late Future<_CreateProposalDto> loadDataFuture;
+  late final String userId;
 
   final messageFieldController = TextEditingController();
-  final messageFieldFocusNode = FocusNode();
-
   final amountFieldController = TextEditingController();
+  final durationFieldController = TextEditingController();
+
+  final messageFieldFocusNode = FocusNode();
   final amountFieldFocusNode = FocusNode();
-
-  final timeFieldController = NumberEditingController(value: 1);
-  final timeFieldFocusNode = FocusNode();
-
-  String selectedMode = 'REMOTE';
+  final durationFieldFocusNode = FocusNode();
 
   bool isBussy = false;
+  String selectedMode = ProposalMode.remote;
 
   @override
   void initState() {
     super.initState();
 
+    userId = ref.read(authProvider)!.id;
     loadDataFuture = loadData();
   }
 
@@ -62,7 +62,13 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
             return skeleton();
           }
 
-          return page(snapshot.data!);
+          final data = snapshot.data!;
+
+          return page(
+            project: data.project,
+            payment: data.payment,
+            applied: data.applied,
+          );
         },
       ),
     ).hideKeyboardOnTap(context);
@@ -130,12 +136,14 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
     );
   }
 
-  Widget page((Project, ProjectPayment, bool) data) {
-    final (project, payment, applied) = data;
-
+  Widget page({
+    required Project project,
+    required ProjectPayment payment,
+    required bool applied,
+  }) {
     if (amountFieldController.text.isEmpty) {
-      amountFieldController.text = ((payment.max + payment.min) / 2)
-          .toStringAsFixed(2);
+      final avg = ((payment.max + payment.min) / 2);
+      amountFieldController.text = avg.toStringAsFixed(2);
     }
 
     return Scaffold(
@@ -212,28 +220,13 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
             ),
 
             Text(
-              'Tiempo estimado de entrega',
+              'Tiempo estimado de entrega (opcional)',
             ).margin(const EdgeInsets.only(top: 16.0, bottom: 4.0)),
-            NumberInputFormField(
-              controller: timeFieldController,
-              focusNode: timeFieldFocusNode,
-              validator: (num? value) {
-                if (value == null) {
-                  return 'Por favor, ingresa un número válido';
-                }
-                if (value < 0) {
-                  return "El valor debe ser mayor o igual a 1";
-                }
+            TextFormField(
+              controller: durationFieldController,
+              focusNode: durationFieldFocusNode,
 
-                return null;
-              },
-
-              hintText: payment.type == ProjectPaymentType.fixed
-                  ? 'Ejemplo: 2 días'
-                  : 'Ejemplo: 4 horas',
-              min: 0,
-              max: 50,
-              icon: const Icon(LucideIcons.calendar),
+              decoration: InputDecoration(hintText: 'Ejemplo: 4 horas'),
             ),
           ],
         ),
@@ -249,12 +242,12 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
               }
             : null,
 
-        child: Text(!isBussy ? 'Aplicar' : 'Aplicando...'),
+        child: Text(!isBussy ? 'Enviar propuesta' : 'Enviando propuesta...'),
       ).margin(Insets.h16v8).useSafeArea(),
     );
   }
 
-  Future<(Project, ProjectPayment, bool)> loadData() async {
+  Future<_CreateProposalDto> loadData() async {
     final userId = ref.read(authProvider)!.id;
 
     final (project, payment, applied) = await (
@@ -265,21 +258,25 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
           .applied(projectId: widget.projectId, providerId: userId),
     ).wait;
 
-    return (project!, payment!, applied);
+    return _CreateProposalDto(
+      project: project!,
+      payment: payment!,
+      applied: applied,
+    );
   }
 
   Future<void> createProposal({
     required Project project,
     required ProjectPayment payment,
   }) async {
-    final userId = ref.read(authProvider)!.id;
+    final amount = num.parse(amountFieldController.text);
+    num? hourlyRate, fixedRate;
 
-    final hourlyRate = payment.type == 'HOURLY'
-        ? num.parse(amountFieldController.text)
-        : null;
-    final fixedRate = payment.type == 'FIXED'
-        ? num.parse(amountFieldController.text)
-        : null;
+    if (payment.type == ProjectPaymentType.hourly) {
+      hourlyRate = amount;
+    } else {
+      fixedRate = amount;
+    }
 
     final proposal = await ref
         .read(proposalProvider)
@@ -288,8 +285,7 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
           mode: selectedMode,
           amount: fixedRate,
           hourlyRate: hourlyRate,
-          estimatedDurationValue: timeFieldController.value!,
-          estimatedDurationUnit: payment.type == 'HOURLY' ? 'HOURS' : 'DAYS',
+          estimatedDuration: durationFieldController.text,
           providerId: userId,
           projectId: widget.projectId,
         );
@@ -308,4 +304,16 @@ class _CreateProposalPageState extends ConsumerState<CreateProposalPage> {
       text: proposal.message,
     );
   }
+}
+
+class _CreateProposalDto {
+  final Project project;
+  final ProjectPayment payment;
+  final bool applied;
+
+  const _CreateProposalDto({
+    required this.project,
+    required this.payment,
+    required this.applied,
+  });
 }
