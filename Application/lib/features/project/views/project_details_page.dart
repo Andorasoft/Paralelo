@@ -5,7 +5,6 @@ import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/plan/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
-import 'package:paralelo/features/rating/exports.dart';
 import 'package:paralelo/features/skill/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
@@ -28,7 +27,7 @@ class ProjectDetailsPage extends ConsumerStatefulWidget {
 class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
-  late final Future<_ProjectDetailsDto> loadDataFuture;
+  late Future<_ProjectDetailsDto> loadDataFuture;
   late final String userId;
 
   @override
@@ -66,7 +65,20 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
         leading: const NavigationButton(),
         actions: [
           if (userId == data.owner.id)
-            TextButton(onPressed: () {}, child: Text('button.edit'.tr())),
+            TextButton(
+              onPressed: () async {
+                final refresh = await ref
+                    .read(goRouterProvider)
+                    .push(EditProjectPage.routePath, extra: widget.projectId);
+
+                if (!((refresh as bool?) ?? false)) return;
+
+                safeSetState(() {
+                  loadDataFuture = loadData();
+                });
+              },
+              child: Text('button.edit'.tr()),
+            ),
         ],
       ),
 
@@ -85,7 +97,6 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
 
           Column(
             spacing: 8.0,
-
             children: [
               ProjectInfoPresenter(
                 project: data.project,
@@ -100,9 +111,9 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
         ],
       ),
 
-      bottomNavigationBar: FilledButton(
-        onPressed: !data.applied
-            ? userId != data.owner.id
+      bottomNavigationBar: userId != data.owner.id
+          ? FilledButton(
+              onPressed: !data.applied
                   ? () async {
                       await ref
                           .read(goRouterProvider)
@@ -111,20 +122,10 @@ class _ProjectDetailsPageState extends ConsumerState<ProjectDetailsPage> {
                             extra: widget.projectId,
                           );
                     }
-                  : () async {
-                      final rating = await showRatingUserModalBottomSheet(
-                        context,
-                      );
-
-                      debugPrint('$rating');
-                    }
-            : null,
-        child: Text(
-          userId != data.owner.id
-              ? 'button.offer_help'.tr()
-              : 'button.mark_completed'.tr(),
-        ),
-      ).margin(const EdgeInsets.all(16.0)).useSafeArea(),
+                  : null,
+              child: Text('button.offer_help'.tr()),
+            ).margin(const EdgeInsets.all(16.0)).useSafeArea()
+          : null,
     );
   }
 

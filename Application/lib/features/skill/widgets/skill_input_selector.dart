@@ -5,18 +5,22 @@ import 'package:paralelo/features/skill/exports.dart';
 
 class SkillInputSelector extends ConsumerStatefulWidget {
   final List<Skill> source;
+  final List<Skill>? initialValues;
   final int? max;
   final void Function(Skill)? onAdd;
   final void Function(Skill)? onRemove;
   final String? Function(String?)? validator;
+  final bool enabled;
 
   const SkillInputSelector({
     super.key,
     required this.source,
+    this.initialValues,
     this.max,
     this.onAdd,
     this.onRemove,
     this.validator,
+    this.enabled = true,
   });
 
   @override
@@ -47,6 +51,11 @@ class _ChipInputFormField extends ConsumerState<SkillInputSelector> {
   @override
   void initState() {
     super.initState();
+
+    if (widget.initialValues != null) {
+      final ids = widget.initialValues!.map((i) => i.id).toSet();
+      selected.addAll(ids);
+    }
 
     focusNode.addListener(handleFocusChange);
     controller.addListener(() {
@@ -160,15 +169,18 @@ class _ChipInputFormField extends ConsumerState<SkillInputSelector> {
 
   Widget chip(Skill item) {
     return Chip(
-      onDeleted: () {
-        safeSetState(() => selected.remove(item.id));
-        widget.onRemove?.call(item);
-      },
+      onDeleted: widget.enabled
+          ? () {
+              safeSetState(() => selected.remove(item.id));
+              widget.onRemove?.call(item);
+            }
+          : null,
       label: Text(item.name, style: Theme.of(context).textTheme.bodyMedium),
       padding: EdgeInsets.zero,
-      labelPadding: const EdgeInsets.only(left: 12.0),
+      labelPadding: widget.enabled
+          ? const EdgeInsets.only(left: 12.0)
+          : const EdgeInsets.symmetric(horizontal: 12.0),
       deleteIconBoxConstraints: const BoxConstraints(minWidth: 32.0),
-      deleteIcon: const Icon(LucideIcons.x).align(Alignment.center),
     );
   }
 
@@ -178,7 +190,7 @@ class _ChipInputFormField extends ConsumerState<SkillInputSelector> {
     return TextField(
       controller: controller,
       focusNode: focusNode,
-      enabled: !disabled,
+      enabled: !disabled && widget.enabled,
 
       decoration: const InputDecoration(
         isDense: true,

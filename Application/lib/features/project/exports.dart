@@ -7,10 +7,12 @@ export 'models/project_repository.dart';
 export 'models/project.dart';
 
 export 'views/create_project_page.dart';
+export 'views/edit_project_page.dart';
 export 'views/marketplace_page.dart';
 export 'views/my_projects_page.dart';
 export 'views/project_details_page.dart';
 
+export 'widgets/delete_project_modal.dart';
 export 'widgets/project_card.dart';
 export 'widgets/project_info_presenter.dart';
 export 'widgets/project_owner_presenter.dart';

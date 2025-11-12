@@ -34,6 +34,8 @@ abstract class ProjectRepository {
     String? categoryId,
   });
 
+  Future<void> delete(String id);
+
   Future<int> countActive(String ownerId);
 
   Future<int> countFeatured(String ownerId);
@@ -211,6 +213,14 @@ class SupabaseProjectRepository implements ProjectRepository {
         .maybeSingle();
 
     return data != null ? Project.fromMap(data) : null;
+  }
+
+  @override
+  Future<void> delete(String id) async {
+    await _client.functions.invoke(
+      'delete-project',
+      queryParameters: {'project_id': id},
+    );
   }
 
   @override

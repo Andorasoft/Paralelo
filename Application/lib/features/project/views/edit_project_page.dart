@@ -7,6 +7,7 @@ import 'package:paralelo/features/category/exports.dart';
 import 'package:paralelo/features/plan/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/features/skill/exports.dart';
+import 'package:paralelo/features/user/exports.dart';
 import 'package:paralelo/utils/validators.dart';
 import 'package:paralelo/widgets/info_bar.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
@@ -14,21 +15,25 @@ import 'package:paralelo/widgets/skeleton.dart';
 import 'package:paralelo/widgets/skeleton_block.dart';
 import 'package:paralelo/widgets/skeleton_card.dart';
 
-class CreateProjectPage extends ConsumerStatefulWidget {
-  static const routePath = '/create-project';
+class EditProjectPage extends ConsumerStatefulWidget {
+  static const routePath = '/edit-project';
 
-  const CreateProjectPage({super.key});
+  final String projectId;
+
+  const EditProjectPage({super.key, required this.projectId});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
-    return _CreateProjectPageState();
+    return _EditProjectPageState();
   }
 }
 
-class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
+class _EditProjectPageState extends ConsumerState<EditProjectPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   final formKey = GlobalKey<FormState>();
-  late final Future<(List<Skill>, List<Category>, bool, bool)> loadDataFuture;
+
+  late Future<_EditProjectDto> loadDataFuture;
+  late final String userId;
 
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
@@ -59,15 +64,16 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
   final badgeTypeValidator = Validator<String>()..required();
 
   bool bussy = false;
-  bool featured = false;
+  bool? featured;
   String? selectedCategory;
   String? selectedBudgetType;
-  Set<String> selectedSkills = {};
+  Set<Skill>? selectedSkills;
 
   @override
   void initState() {
     super.initState();
 
+    userId = ref.read(authProvider)!.id;
     loadDataFuture = loadData();
   }
 
@@ -82,7 +88,17 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
             return skeleton();
           }
 
-          return page(snapshot.data!);
+          final data = snapshot.data!;
+
+          return page(
+            owner: data.owner,
+            plan: data.plan,
+            project: data.project,
+            payment: data.payment,
+            skills: data.skills,
+            categories: data.categories,
+            canFeatured: data.canFeatured,
+          );
         },
       ),
     ).hideKeyboardOnTap(context);
@@ -150,38 +166,68 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
   }
 
   ///
-  Widget page((List<Skill>, List<Category>, bool, bool) data) {
-    final (skills, categories, canCreateActive, canCreateFeatured) = data;
+  Widget page({
+    required User owner,
+    required Plan plan,
+    required Project project,
+    required ProjectPayment payment,
+    required List<Skill> skills,
+    required List<Category> categories,
+    required bool canFeatured,
+  }) {
+    if (titleController.text.isEmpty) {
+      titleController.text = project.title;
+    }
+    if (descriptionController.text.isEmpty) {
+      descriptionController.text = project.description;
+    }
+    if (requirementController.text.isEmpty) {
+      requirementController.text = project.requirement ?? '';
+    }
+    if (minBadgeController.text.isEmpty) {
+      minBadgeController.text = payment.min.toStringAsFixed(2);
+    }
+    if (maxBadgeController.text.isEmpty) {
+      maxBadgeController.text = payment.max.toStringAsFixed(2);
+    }
+
+    selectedCategory ??= project.categoryId;
+    selectedBudgetType ??= payment.type;
+    selectedSkills ??= skills.toSet();
+    featured ??= project.featured;
 
     return Scaffold(
       key: scaffoldKey,
 
       appBar: AppBar(
         automaticallyImplyLeading: false,
-
         leading: const NavigationButton(type: NavigationButtonType.close),
-        title: const Text('Publicar un proyecto'),
+        title: const Text('Editar proyecto'),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              final delete = await showDeleteProjectModalBottomSheet(context);
+
+              if (!(delete ?? false)) return;
+
+              await deleteProject();
+            },
+            style: Theme.of(context).textButtonTheme.style?.copyWith(
+              foregroundColor: WidgetStateProperty.all(Colors.red),
+            ),
+            child: const Text('Eliminar'),
+          ),
+        ],
       ),
 
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
-
         child: Form(
           key: formKey,
-
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: 4.0,
-
             children: [
-              if (!canCreateActive)
-                const InfoBar(
-                  title: 'Límite de proyectos alcanzado',
-                  message:
-                      'No puedes publicar más proyectos activos con tu plan actual.',
-                  closable: false,
-                  severity: InfoBarSeverity.error,
-                ).margin(const EdgeInsets.only(bottom: 16.0)),
               const Text('Títutlo'),
               TextFormField(
                 minLines: 1,
@@ -284,12 +330,14 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
               ).margin(const EdgeInsets.only(top: 16.0)),
               SkillInputSelector(
                 max: 5,
+                enabled: false,
                 source: skills,
+                initialValues: selectedSkills!.toList(),
                 onAdd: (skill) {
-                  selectedSkills.add(skill.id);
+                  selectedSkills!.add(skill);
                 },
                 onRemove: (skill) {
-                  selectedSkills.remove(skill.id);
+                  selectedSkills!.remove(skill);
                 },
               ),
 
@@ -344,11 +392,7 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
                 initialValue: selectedBudgetType,
                 validator: badgeTypeValidator.validate,
 
-                onChanged: (value) {
-                  if (value.isNotNull) {
-                    safeSetState(() => selectedBudgetType = value);
-                  }
-                },
+                onChanged: null, // disabled
 
                 decoration: InputDecoration(
                   hintText: 'Elige si es un pago fijo o por horas.',
@@ -381,8 +425,8 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
                     ),
                   ).expanded(),
                   Switch.adaptive(
-                    value: featured,
-                    onChanged: canCreateFeatured
+                    value: featured!,
+                    onChanged: canFeatured
                         ? (value) {
                             safeSetState(() => featured = value);
                           }
@@ -391,7 +435,7 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
                 ],
               ),
 
-              if (!canCreateFeatured)
+              if (!canFeatured)
                 const InfoBar(
                   title: 'Límite de proyectos destacados',
                   message:
@@ -405,77 +449,100 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
       ),
 
       bottomNavigationBar: FilledButton(
-        onPressed: canCreateActive && !bussy
+        onPressed: !bussy
             ? () async {
                 if (!formKey.currentState!.validate()) {
                   return;
                 }
 
-                await createProject();
+                await updateProject(
+                  projectId: project.id,
+                  paymentId: payment.id,
+                  title: titleController.text != project.title
+                      ? titleController.text
+                      : null,
+                  description: descriptionController.text != project.title
+                      ? descriptionController.text
+                      : null,
+                  requirement: requirementController.text != project.title
+                      ? requirementController.text
+                      : null,
+                  categoryId: selectedCategory != project.categoryId
+                      ? selectedCategory
+                      : null,
+                  minBadge: double.parse(minBadgeController.text) != payment.min
+                      ? double.parse(minBadgeController.text)
+                      : null,
+                  maxBadge: double.parse(maxBadgeController.text) != payment.max
+                      ? double.parse(maxBadgeController.text)
+                      : null,
+                  featured: featured != project.featured ? featured : null,
+                );
               }
             : null,
-        child: Text(!bussy ? 'Publicar proyecto' : 'Publicando...'),
+        child: Text(!bussy ? 'Actualizar proyecto' : 'Actualizando...'),
       ).useSafeArea().margin(Insets.h16v8),
     );
   }
 
-  Future<(List<Skill>, List<Category>, bool, bool)> loadData() async {
-    final userId = ref.read(authProvider)!.id;
+  Future<_EditProjectDto> loadData() async {
+    final project = await ref.read(projectProvider).getById(widget.projectId);
 
-    final (skills, categories, plan, actives, features) = await (
-      ref.read(skillProvider).getAll(),
+    final (owner, plan, payment, skills, categories, features) = await (
+      ref.read(userProvider).getById(project!.ownerId),
+      ref.read(planProvider).getForUser(project.ownerId),
+      ref.read(projectPaymentProvider).getForProject(widget.projectId),
+      ref.read(skillProvider).getForProject(widget.projectId),
       ref.read(categoryProvider).getAll(),
-      ref.read(planProvider).getForUser(userId),
-      ref.read(projectProvider).countActive(userId),
       ref.read(projectProvider).countFeatured(userId),
     ).wait;
 
-    final canCreateActive = plan!.activeProjectsLimit == null
-        ? true
-        : actives < plan.activeProjectsLimit!;
     final canCreateFeatured =
-        plan.featuredProjectsLimit > 0 && features < plan.featuredProjectsLimit;
+        plan!.featuredProjectsLimit > 0 &&
+        features < plan.featuredProjectsLimit;
 
-    return (skills, categories, canCreateActive, canCreateFeatured);
+    return _EditProjectDto(
+      owner: owner!,
+      plan: plan,
+      project: project,
+      payment: payment!,
+      skills: skills,
+      categories: categories,
+      canFeatured: canCreateFeatured,
+    );
   }
 
-  Future<void> createProject() async {
-    final userId = ref.read(authProvider)!.id;
-
+  Future<void> updateProject({
+    required String projectId,
+    required String paymentId,
+    String? title,
+    String? description,
+    String? requirement,
+    String? categoryId,
+    double? minBadge,
+    double? maxBadge,
+    bool? featured,
+  }) async {
     try {
       safeSetState(() => bussy = true);
 
-      final project = await ref
-          .read(projectProvider)
-          .create(
-            title: titleController.text,
-            description: descriptionController.text,
-            requirement: requirementController.text,
-            featured: featured,
-            ownerId: userId,
-            categoryId: selectedCategory!,
-          );
-
       await (
         ref
-            .read(projectPaymentProvider)
-            .create(
-              min: double.parse(minBadgeController.text),
-              max: double.parse(maxBadgeController.text),
-              currency: 'USD',
-              type: selectedBudgetType!,
-              projectId: project.id,
+            .read(projectProvider)
+            .update(
+              widget.projectId,
+              title: title,
+              description: description,
+              requirement: requirement,
+              featured: featured,
+              categoryId: categoryId,
             ),
-        Future.wait(
-          selectedSkills.map(
-            (id) => ref
-                .read(projectSkillProvider)
-                .create(projectId: project.id, skillId: id),
-          ),
-        ),
+        ref
+            .read(projectPaymentProvider)
+            .update(paymentId, min: minBadge, max: maxBadge),
       ).wait;
 
-      ref.read(goRouterProvider).pop();
+      ref.read(goRouterProvider).pop(true);
     } on PostgrestException catch (e) {
       showSnackbar(context, e.message);
     } catch (err) {
@@ -487,4 +554,39 @@ class _CreateProjectPageState extends ConsumerState<CreateProjectPage> {
       safeSetState(() => bussy = false);
     }
   }
+
+  Future<void> deleteProject() async {
+    try {
+      safeSetState(() => bussy = true);
+
+      ref.read(goRouterProvider).pop(true);
+    } on PostgrestException catch (e) {
+      showSnackbar(context, '$e');
+    } catch (e) {
+      debugPrint('Error on [EditProjectPage.deleteProject]: $e');
+      showSnackbar(context, '');
+    } finally {
+      safeSetState(() => bussy = false);
+    }
+  }
+}
+
+class _EditProjectDto {
+  final User owner;
+  final Plan plan;
+  final Project project;
+  final ProjectPayment payment;
+  final List<Skill> skills;
+  final List<Category> categories;
+  final bool canFeatured;
+
+  const _EditProjectDto({
+    required this.owner,
+    required this.plan,
+    required this.project,
+    required this.payment,
+    required this.skills,
+    required this.categories,
+    required this.canFeatured,
+  });
 }
