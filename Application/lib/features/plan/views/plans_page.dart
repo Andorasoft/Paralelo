@@ -1,6 +1,7 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/constants.dart';
 import 'package:paralelo/core/imports.dart';
+import 'package:paralelo/core/services.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/plan/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
@@ -64,24 +65,39 @@ class _PlansPageState extends ConsumerState<PlansPage> {
             .map(
               (i) => PlanCard(
                 plan: i,
-                onTap: () {},
+                onTap: () async {
+                  if (i.name == Plans.free) return;
+
+                  switch (i.name) {
+                    case Plans.pro:
+                      await SubscriptionService.instance.purchase(
+                        'plan_pro_monthly',
+                      );
+                      break;
+                    case Plans.premium:
+                      await SubscriptionService.instance.purchase(
+                        'plan_premium_monthly',
+                      );
+                      break;
+                  }
+                },
                 icon: switch (i.name) {
-                  'Premium' => LucideIcons.crown,
-                  'Pro' => LucideIcons.star,
+                  Plans.premium => LucideIcons.crown,
+                  Plans.pro => LucideIcons.star,
                   _ => LucideIcons.send,
                 },
                 backgroundColor: switch (i.name) {
-                  'Premium' => Theme.of(
+                  Plans.premium => Theme.of(
                     context,
                   ).colorScheme.secondaryContainer.withAlpha(64),
-                  'Pro' => Theme.of(
+                  Plans.pro => Theme.of(
                     context,
                   ).colorScheme.primaryContainer.withAlpha(128),
                   _ => null,
                 },
                 borderColor: switch (i.name) {
-                  'Premium' => Theme.of(context).colorScheme.secondary,
-                  'Pro' => Theme.of(context).colorScheme.primary,
+                  Plans.premium => Theme.of(context).colorScheme.secondary,
+                  Plans.pro => Theme.of(context).colorScheme.primary,
                   _ => null,
                 },
                 borderWidth: 2.0,

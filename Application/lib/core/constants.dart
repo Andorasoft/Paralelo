@@ -67,6 +67,20 @@ class PlanPeriodUnit {
   static Map<String, String> labels = {month: 'mes', year: 'año'};
 }
 
+class Plans {
+  static const String free = 'Free';
+  static const String pro = 'Pro';
+  static const String premium = 'Premium';
+
+  static List<String> values = [free, pro, premium];
+
+  static Map<String, String> labels = {
+    free: 'Gratis',
+    pro: 'Pro',
+    premium: 'Premium',
+  };
+}
+
 @immutable
 class Insets {
   const Insets._internal();

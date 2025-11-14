@@ -51,7 +51,24 @@ create table if not exists "public"."user" (
 );
 
 -- ============================================================
--- 4. Table: skill
+-- 4. Table: user_subscription
+-- ============================================================
+create table if not exists "public"."user_subscription" (
+  "id" uuid primary key default uuid_generate_v4(),
+  "created_at" timestamptz not null default now(),
+  "platform" text not null,
+  "expiry_time" timestamptz,
+  "purchase_token" text not null,
+  "status" text not null default 'ACTIVE',
+  "auto_renewing" boolean not null default true,
+  "product_id" text not null,
+  "user_id" uuid not null references "user" ("id") on delete cascade,
+  "plan_id" uuid not null references "plan" ("id") on delete cascade,
+  unique ("user_id", "plan_id", "product_id")
+);
+
+-- ============================================================
+-- 5. Table: skill
 -- ============================================================
 create table if not exists "public"."skill" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -60,7 +77,7 @@ create table if not exists "public"."skill" (
 );
 
 -- ============================================================
--- 5. Table: category
+-- 6. Table: category
 -- ============================================================
 create table if not exists "public"."category" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -70,7 +87,7 @@ create table if not exists "public"."category" (
 );
 
 -- ============================================================
--- 6. Table: project
+-- 7. Table: project
 -- ============================================================
 create table if not exists "public"."project" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -85,7 +102,7 @@ create table if not exists "public"."project" (
 );
 
 -- ============================================================
--- 7. Table: proposal
+-- 8. Table: proposal
 -- ============================================================
 create table if not exists "public"."proposal" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -101,7 +118,7 @@ create table if not exists "public"."proposal" (
 );
 
 -- ============================================================
--- 8. Table: project_payment
+-- 9. Table: project_payment
 -- ============================================================
 create table if not exists "public"."project_payment" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -114,7 +131,7 @@ create table if not exists "public"."project_payment" (
 );
 
 -- ============================================================
--- 9. Table: project_skill
+-- 10. Table: project_skill
 -- ============================================================
 create table if not exists "public"."project_skill" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -124,7 +141,7 @@ create table if not exists "public"."project_skill" (
 );
 
 -- ============================================================
--- 10. Table: user_skill
+-- 11. Table: user_skill
 -- ============================================================
 create table if not exists "public"."user_skill" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -135,7 +152,7 @@ create table if not exists "public"."user_skill" (
 );
 
 -- ============================================================
--- 11. Table: chat_room
+-- 12. Table: chat_room
 -- ============================================================
 create table if not exists "public"."chat_room" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -147,7 +164,7 @@ create table if not exists "public"."chat_room" (
 );
 
 -- ============================================================
--- 12. Table: user_rating
+-- 13. Table: user_rating
 -- ============================================================
 create table if not exists "public"."user_rating" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -159,7 +176,7 @@ create table if not exists "public"."user_rating" (
 );
 
 -- ============================================================
--- 13. Table: report
+-- 14. Table: report
 -- ============================================================
 create table if not exists "public"."report" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -177,7 +194,7 @@ create table if not exists "public"."report" (
 );
 
 -- ============================================================
--- 14. Table: application
+-- 15. Table: application
 -- ============================================================
 create table if not exists "public"."application" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -191,7 +208,7 @@ create table if not exists "public"."application" (
 );
 
 -- ============================================================
--- 15. Table: user_preference
+-- 16. Table: user_preference
 -- ============================================================
 create table if not exists "public"."user_preference" (
   "id" uuid primary key default uuid_generate_v4 (),

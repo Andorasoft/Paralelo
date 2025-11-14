@@ -1,7 +1,7 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/constants.dart';
 import 'package:paralelo/core/imports.dart';
-import 'package:paralelo/features/plan/models/plan.dart';
+import 'package:paralelo/features/plan/exports.dart';
 
 class PlanCard extends ConsumerWidget {
   final Plan plan;
@@ -127,7 +127,9 @@ class PlanCard extends ConsumerWidget {
 
           FilledButton(
             onPressed: !(isCurrent ?? false) ? onTap : null,
-            child: Text(!(isCurrent ?? false) ? 'Upgrade' : 'Current plan'),
+            child: Text(
+              !(isCurrent ?? false) ? 'Actualizar' : 'Tu plan actual',
+            ),
           ).margin(const EdgeInsets.only(top: 8.0)),
         ],
       ).margin(Insets.a16),
