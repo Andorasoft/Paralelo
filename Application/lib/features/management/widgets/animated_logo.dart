@@ -2,7 +2,9 @@ import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
 
 class AnimatedLogo extends ConsumerStatefulWidget {
-  const AnimatedLogo({super.key});
+  final bool animated;
+
+  const AnimatedLogo({super.key, this.animated = true});
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
@@ -22,12 +24,16 @@ class _AnimatedLogoState extends ConsumerState<AnimatedLogo>
     controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
+    );
 
     scaleAnimation = Tween<double>(
       begin: 0.9,
       end: 1.1,
     ).animate(CurvedAnimation(parent: controller, curve: Curves.easeInOut));
+
+    if (widget.animated) {
+      controller.repeat(reverse: true);
+    }
   }
 
   @override
@@ -38,20 +44,27 @@ class _AnimatedLogoState extends ConsumerState<AnimatedLogo>
 
   @override
   Widget build(BuildContext context) {
-    return ScaleTransition(
-      scale: scaleAnimation,
-      child: SvgPicture.asset(
-        'assets/images/icon.svg',
-        width: calculateSize(context),
-        height: calculateSize(context),
-      ),
-    ).center();
+    final size = calculateSize(context);
+    return widget.animated
+        ? ScaleTransition(
+            scale: scaleAnimation,
+            child: Image.asset(
+              'assets/images/icon-blue.png',
+              width: size,
+              height: size,
+            ),
+          ).center()
+        : Image.asset(
+            'assets/images/icon-blue.png',
+            width: size,
+            height: size,
+          ).center();
   }
 
   /// Returns a responsive icon size based on the screen's shortest side.
   /// Uses about 40% of that dimension for consistent scaling.
   double calculateSize(BuildContext context) {
     final shortestSide = MediaQuery.of(context).size.shortestSide;
-    return shortestSide * 0.4;
+    return shortestSide * 0.35;
   }
 }

@@ -3,10 +3,10 @@ description: "A new Flutter project."
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
-version: 1.0.0+1
+version: 1.0.1+9
 
 environment:
   sdk: ^3.9.2
@@ -22,7 +22,11 @@ dependencies:
   andorasoft_flutter:
     path: ../../Andorasoft-Flutter
   #...
+  in_app_purchase: ^3.2.3
+  #...
   easy_localization: ^3.0.8
+  #...
+  package_info_plus: ^9.0.0
   #...
   flutter_tabler_icons: ^1.43.0
   #...
@@ -31,6 +35,8 @@ dependencies:
   flutter_dotenv: ^5.1.0
   #...
   flutter_svg: ^2.2.0
+  #...
+  flutter_rating_bar: ^4.0.1
   #...
   shared_preferences: ^2.5.3
   #...

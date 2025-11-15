@@ -1,10 +1,12 @@
-import 'package:paralelo/features/auth/models/auth_user.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' hide AuthUser;
+import 'package:paralelo/core/imports.dart';
+import '../models/auth_user.dart';
 
 /// Defines authentication-related operations.
 abstract class AuthRepository {
   /// Signs in using email and password.
-  Future<AuthUser?> signIn(String email, String password);
+  Future<AuthUser?> signIn({required String email, required String password});
+
+  Future<AuthUser?> signUp({required String email, required String password});
 
   /// Ends the current user session.
   Future<void> singOut();
@@ -23,9 +25,30 @@ class SupabaseAuthRepository implements AuthRepository {
   const SupabaseAuthRepository(this._client);
 
   @override
-  Future<AuthUser?> signIn(String email, String password) async {
+  Future<AuthUser?> signIn({
+    required String email,
+    required String password,
+  }) async {
     await _client.auth.signInWithPassword(email: email, password: password);
     return currentUser();
+  }
+
+  @override
+  Future<AuthUser?> signUp({
+    required String email,
+    required String password,
+  }) async {
+    final res = await _client.auth.signUp(
+      email: email,
+      password: password,
+      emailRedirectTo: 'com.paralelo.andorasoft://callback',
+    );
+
+    if (res.user == null) return null;
+
+    final user = res.user!;
+
+    return AuthUser(id: user.id, email: user.email ?? '');
   }
 
   @override
@@ -39,10 +62,6 @@ class SupabaseAuthRepository implements AuthRepository {
 
     if (user == null) return null;
 
-    return AuthUser(
-      id: user.id,
-      email: user.email ?? "",
-      pictureUrl: user.userMetadata?['avatar_url'],
-    );
+    return AuthUser(id: user.id, email: user.email ?? '');
   }
 }

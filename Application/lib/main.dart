@@ -1,7 +1,6 @@
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/core/providers.dart';
 import 'package:paralelo/core/router.dart';
-import 'package:paralelo/core/services.dart';
 import 'package:paralelo/core/theme.dart';
 import 'package:paralelo/firebase_options.dart';
 
@@ -24,18 +23,10 @@ void main() async {
     authOptions: const FlutterAuthClientOptions(autoRefreshToken: true),
   );
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  await FCMService.initialize(
-    onMessage: (msg) {
-      debugPrint("🔥 Foreground: ${msg.notification?.title}");
-    },
-    onMessageOpenedApp: (msg) {
-      debugPrint("👉 Abrieron notificación: ${msg.notification?.title}");
-    },
-  );
 
   runApp(
     EasyLocalization(
-      supportedLocales: const [Locale('en'), Locale('es')],
+      supportedLocales: const [Locale('es')],
       fallbackLocale: const Locale('es'),
       path: 'assets/translations',
 

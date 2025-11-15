@@ -1,11 +1,13 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:paralelo/core/constants.dart';
+import 'package:paralelo/core/exceptions.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/core/router.dart';
 import 'package:paralelo/core/services.dart';
 import 'package:paralelo/features/auth/exports.dart';
-import 'package:paralelo/features/chats/exports.dart';
+import 'package:paralelo/features/chat/exports.dart';
+import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
-import 'package:paralelo/utils/extensions.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
 import 'package:paralelo/widgets/skeleton.dart';
 import 'package:paralelo/widgets/skeleton_block.dart';
@@ -14,7 +16,7 @@ import 'package:paralelo/widgets/skeleton_card.dart';
 class ProposalDetailsPage extends ConsumerStatefulWidget {
   static const routePath = '/proposal-details';
 
-  final int proposalId;
+  final String proposalId;
 
   const ProposalDetailsPage({super.key, required this.proposalId});
 
@@ -28,7 +30,7 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   late final Future<(Proposal, ChatRoom)> loadDataFuture;
 
-  bool isBussy = false;
+  bool bussy = false;
 
   @override
   void initState() {
@@ -39,18 +41,19 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: loadDataFuture,
-      builder: (_, snapshot) {
-        if (!snapshot.hasData) {
-          return skeleton();
-        }
+    return WillPopScope(
+      onWillPop: () async => !bussy,
+      child: FutureBuilder(
+        future: loadDataFuture,
+        builder: (_, snapshot) {
+          if (!snapshot.hasData) {
+            return skeleton();
+          }
 
-        final (proposal, room) = snapshot.data!;
-
-        return page(proposal: proposal, room: room);
-      },
-    );
+          return page(snapshot.data!);
+        },
+      ),
+    ).hideKeyboardOnTap(context);
   }
 
   Widget skeleton() {
@@ -58,12 +61,11 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
       color: Theme.of(context).colorScheme.surface,
       child: Skeleton(
         child: Scaffold(
-          backgroundColor: Colors.transparent,
           key: scaffoldKey,
+          backgroundColor: Colors.transparent,
 
           appBar: AppBar(
             leading: const SkeletonBlock(
-              radius: 100.0,
               width: 40.0,
               height: 40.0,
             ).align(Alignment.centerRight),
@@ -92,26 +94,24 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
                       SkeletonBlock(width: double.infinity, height: 16.0),
                     ],
                   ],
-                ).margin(const EdgeInsets.all(16.0)),
+                ).margin(Insets.h16),
               ),
             ],
-          ).margin(const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0)),
+          ).margin(Insets.h16v8),
 
-          bottomNavigationBar:
-              SkeletonBlock(
-                radius: 12.0,
-                width: double.infinity,
-                height: 44.0,
-              ).useSafeArea().margin(
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              ),
+          bottomNavigationBar: SkeletonBlock(
+            radius: 12.0,
+            width: double.infinity,
+            height: 44.0,
+          ).margin(Insets.h16v8).useSafeArea(),
         ),
       ),
     );
   }
 
-  Widget page({required Proposal proposal, required ChatRoom room}) {
+  Widget page((Proposal, ChatRoom) data) {
     final userId = ref.read(authProvider)!.id;
+    final (proposal, room) = data;
 
     return Scaffold(
       key: scaffoldKey,
@@ -121,7 +121,9 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
         actions: [
           if (proposal.providerId == userId)
             TextButton(
-              onPressed: proposal.status != 'ACCEPTED' ? () {} : null,
+              onPressed: proposal.status != ProposalStatus.accepted
+                  ? () {}
+                  : null,
               child: Text('button.edit'.tr()),
             ),
         ],
@@ -160,7 +162,10 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Text('USD 20 / hora'),
+                    if (proposal.amount.isNotNull)
+                      Text('USD ${proposal.amount}')
+                    else
+                      Text('USD ${proposal.hourlyRate} / hora'),
                   ],
                 ),
 
@@ -170,15 +175,17 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
                     context,
                   ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                 ).margin(const EdgeInsets.only(top: 12.0)),
-                Text('Presencial'),
+                Text(ProposalMode.labels[proposal.mode]!),
 
-                Text(
-                  'Tiempo estimado',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
-                ).margin(const EdgeInsets.only(top: 12.0)),
-                Text('5 días'),
+                if (proposal.estimatedDuration != null) ...[
+                  Text(
+                    'Tiempo estimado',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ).margin(const EdgeInsets.only(top: 12.0)),
+                  Text(proposal.estimatedDuration!),
+                ],
 
                 Text(
                   'Estado',
@@ -186,7 +193,7 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
                     context,
                   ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                 ).margin(const EdgeInsets.only(top: 12.0)),
-                Text('Pendiente'),
+                Text(ProposalStatus.labels[proposal.status]!),
 
                 Text(
                   'Mensaje inicial',
@@ -195,37 +202,29 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
                   ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
                 ).margin(const EdgeInsets.only(top: 12.0)),
                 Text(proposal.message),
+                FilledButton.tonal(
+                  onPressed: () async {
+                    await ref
+                        .read(goRouterProvider)
+                        .push(
+                          ProjectDetailsPage.routePath,
+                          extra: proposal.projectId,
+                        );
+                  },
+                  child: const Text('Ir al proyecto'),
+                ).margin(const EdgeInsets.only(top: 20.0)),
               ],
-            ).margin(const EdgeInsets.all(16.0)),
+            ).margin(Insets.a16),
           ),
         ],
       ).margin(Insets.h16v8),
 
       bottomNavigationBar: proposal.providerId != userId
           ? FilledButton(
-              onPressed: proposal.status != 'ACCEPTED' && !isBussy
-                  ? () async {
-                      safeSetState(() => isBussy = true);
-
-                      final success = await acceptProposal();
-
-                      if (!success) return;
-
-                      await ChatService.instance.sendMessage(
-                        roomId: room.id,
-                        senderId: userId,
-                        recipientId: room.user1Id == userId
-                            ? room.user2Id
-                            : room.user1Id,
-                        text:
-                            '¡Tu propuesta ha sido aceptada!'
-                            '\nBuenas noticias, tu propuesta para el proyecto ha sido aceptada por el solicitante.'
-                            '\nAhora puedes comenzar a coordinar los detalles y gestionar la entrega desde el chat del proyecto.',
-                      );
-                      ref.read(goRouterProvider).pop();
-                    }
+              onPressed: proposal.status != 'ACCEPTED' && !bussy
+                  ? () => acceptProposal(room, userId)
                   : null,
-              child: Text(!isBussy ? 'Aceptar propuesta' : 'Aceptando...'),
+              child: Text(!bussy ? 'Aceptar propuesta' : 'Aceptando...'),
             ).margin(Insets.h16v8).useSafeArea()
           : null,
     );
@@ -240,7 +239,30 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
     return (proposal!, room!);
   }
 
-  Future<bool> acceptProposal() {
-    return ref.read(proposalProvider).accept(widget.proposalId);
+  Future<void> acceptProposal(ChatRoom room, String userId) async {
+    try {
+      safeSetState(() => bussy = true);
+
+      final success = await ref
+          .read(proposalProvider)
+          .accept(widget.proposalId);
+
+      if (!success) throw NetworkException('');
+
+      await ChatService.instance.sendMessage(
+        roomId: room.id,
+        senderId: userId,
+        recipientId: room.user1Id == userId ? room.user2Id : room.user1Id,
+        text:
+            '¡Tu propuesta ha sido aceptada!'
+            '\nBuenas noticias, tu propuesta para el proyecto ha sido aceptada por el solicitante.'
+            '\nAhora puedes comenzar a coordinar los detalles y gestionar la entrega desde el chat del proyecto.',
+      );
+      ref.read(goRouterProvider).pop();
+    } on NetworkException catch (e) {
+      showSnackbar(context, e.message);
+    } finally {
+      safeSetState(() => bussy = false);
+    }
   }
 }

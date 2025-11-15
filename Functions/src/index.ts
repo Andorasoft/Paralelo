@@ -63,7 +63,7 @@ export const sendChatNotification = onDocumentCreated(
   async (event) => {
     // Extract message payload and room ID from Firestore
     const message = event.data?.data();
-    const chatRoomId = event.params.room;
+    const roomId = event.params.room;
 
     // --- Step 1: Validate incoming message ---
     if (!message) {
@@ -78,6 +78,8 @@ export const sendChatNotification = onDocumentCreated(
       logger.warn("Message missing 'recipient' field.");
       return;
     }
+
+    logger.log(`Recipient: ${recipientId}`);
 
     if (!text) {
       logger.info("Message contains no text. Notification skipped.");
@@ -112,7 +114,7 @@ export const sendChatNotification = onDocumentCreated(
       .single();
 
     if (prefsError) {
-      logger.error("Supabase query failed (preferences):", prefsError);
+      logger.error("Supabase query failed (preferences):", prefsError.message);
       return;
     }
 
@@ -134,7 +136,7 @@ export const sendChatNotification = onDocumentCreated(
         body: text.length > 120 ? text.substring(0, 117) + "..." : text,
       },
       data: {
-        room_id: chatRoomId,
+        room_id: roomId,
       },
       token: user.device_token,
     };

@@ -1,6 +1,6 @@
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/core/router.dart';
-import 'package:paralelo/features/projects/exports.dart';
+import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
 
 class CreateProposalButton extends ConsumerWidget {
@@ -17,7 +17,7 @@ class CreateProposalButton extends ConsumerWidget {
           : () async {
               await ref
                   .read(goRouterProvider)
-                  .push(CreateProposalPage.routePath, extra: project);
+                  .push(CreateProposalPage.routePath, extra: project.id);
             },
 
       style: Theme.of(context).outlinedButtonTheme.style?.copyWith(

@@ -1,0 +1,103 @@
+/* --- Sección general --- */
+.download-section {
+  padding: 80px 16px;
+}
+
+@media (min-width: 768px) {
+  .download-section {
+    padding: 80px 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .download-section {
+    padding: 80px 32px;
+  }
+}
+
+.download-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* --- Título y subtítulo --- */
+.download-container h2 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 24px;
+}
+
+@media (min-width: 768px) {
+  .download-container h2 {
+    font-size: 3rem;
+  }
+}
+
+.download-container p {
+  font-size: 1.25rem;
+  color: var(--muted-foreground);
+  margin-bottom: 48px;
+}
+
+/* --- Botones --- */
+.download-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .download-buttons {
+    flex-direction: row;
+  }
+}
+
+/* Botón oscuro */
+.btn-dark {
+  padding: 16px 32px;
+  background: var(--foreground);
+  color: var(--background);
+  border-radius: 10px;
+
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  cursor: pointer;
+  transition: opacity 0.25s ease;
+}
+
+.btn-dark:hover {
+  opacity: 0.9;
+}
+
+/* Botón primario */
+.btn-primary {
+  padding: 16px 32px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: 10px;
+
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  cursor: pointer;
+  transition: opacity 0.25s ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}

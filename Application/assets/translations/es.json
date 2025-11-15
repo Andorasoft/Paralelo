@@ -11,7 +11,6 @@
     },
     "report": {
       "title": "Reportar proyecto",
-      "submit": "Enviar reporte",
       "options": {
         "inappropriate": {
           "title": "Contenido inapropiado",
@@ -47,6 +46,12 @@
     "notification": {
       "title": "Activar notificaciones",
       "content": "Tienes las notificaciones desactivadas.\nPara recibir avisos importantes, actívalas en los ajustes de tu dispositivo."
+    },
+    "rating_user": {
+      "title": "Califica la ayuda recibida",
+      "options": {
+        "tell_more": "¿Puedes contarnos más?"
+      }
     }
   },
   "button": {
@@ -61,7 +66,9 @@
     "open_settings": "Abrir ajustes",
     "show_proposal": "Ver propuesta",
     "offer_help": "Ofrecer ayuda",
-    "mark_completed": "Marcar como completado"
+    "mark_completed": "Marcar como completado",
+    "send_report": "Enviar reporte",
+    "send_rating": "Enviar calificación"
   },
   "setting": {
     "sections": {
@@ -124,8 +131,8 @@
       "days": "Días"
     },
     "project_payment_type": {
-      "fixed": "Por proyecto",
-      "hourly": "Por hora"
+      "fixed": "Proyecto",
+      "hourly": "Hora"
     }
   }
 }

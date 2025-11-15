@@ -1,0 +1,95 @@
+/* --- Sección general --- */
+.usecases-section {
+  padding: 80px 16px;
+}
+
+@media (min-width: 768px) {
+  .usecases-section {
+    padding: 80px 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .usecases-section {
+    padding: 80px 32px;
+  }
+}
+
+.usecases-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- Header --- */
+.usecases-header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.usecases-header h2 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+@media (min-width: 768px) {
+  .usecases-header h2 {
+    font-size: 3rem;
+  }
+}
+
+.usecases-header p {
+  font-size: 1.25rem;
+  color: var(--muted-foreground);
+}
+
+/* --- Grid de Use Cases --- */
+.usecases-grid {
+  display: grid;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .usecases-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* --- Card individual --- */
+.usecase-card {
+  text-align: center;
+  padding: 24px;
+
+  background: var(--card);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.usecase-card:hover {
+  border-color: rgba(79, 70, 229, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Icono */
+.usecase-icon {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+}
+
+/* Título */
+.usecase-card h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+/* Descripción */
+.usecase-description {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}

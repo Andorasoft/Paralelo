@@ -3,7 +3,7 @@
 /// Stores institutional information for universities linked to users.
 class University {
   /// Unique identifier of the university.
-  final int id;
+  final String id;
 
   /// Timestamp when the record was created.
   final DateTime createdAt;

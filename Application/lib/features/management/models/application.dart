@@ -3,7 +3,7 @@
 /// Stores versioning and maintenance configuration for the mobile app.
 class Application {
   /// Unique identifier of the application record.
-  final int id;
+  final String id;
 
   /// Timestamp when the record was last updated.
   final DateTime updatedAt;

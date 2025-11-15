@@ -1,4 +1,5 @@
-import 'imports.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
+import './imports.dart';
 
 /// Background handler for FCM messages.
 /// This will be triggered when the app is in the background or terminated.
@@ -8,6 +9,7 @@ Future<void> _messagingBackgroundHandler(RemoteMessage message) async {
 }
 
 /// Service for managing chat messages with Firestore.
+@immutable
 class ChatService {
   /// Singleton instance.
   static final instance = ChatService._internal();
@@ -109,9 +111,12 @@ class ChatService {
 ///
 /// Implements a Singleton pattern to ensure only one instance is used
 /// throughout the application.
+@immutable
 class FCMService {
   /// Singleton instance.
   static final instance = FCMService._internal();
+
+  static bool _initialized = false;
 
   final _messaging = FirebaseMessaging.instance;
 
@@ -152,12 +157,24 @@ class FCMService {
   /// Returns the token as a [String], or `null` if there was an error.
   Future<String?> getDeviceToken() async {
     try {
+      // if (isiOS) {
+      //   final apn = await _messaging.getAPNSToken();
+      // }
+
       String? token = await _messaging.getToken();
       debugPrint("📱 Device Token: $token");
       return token;
     } catch (e) {
-      debugPrint("❌ Error retrieving FCM token: $e");
+      debugPrint('❌ Error retrieving FCM token: $e');
       return null;
+    }
+  }
+
+  Future<void> deleteDeviceToken() async {
+    try {
+      await _messaging.deleteToken();
+    } catch (e) {
+      debugPrint('❌ Error deleting FCM token: $e');
     }
   }
 
@@ -200,6 +217,8 @@ class FCMService {
     void Function(RemoteMessage message)? onMessageOpenedApp,
     void Function(String token)? onTokenRefresh,
   }) async {
+    if (_initialized) return;
+
     if (onTokenRefresh != null) {
       instance._listenTokenRefresh(onTokenRefresh);
     }
@@ -211,5 +230,75 @@ class FCMService {
 
     // Background message handler
     FirebaseMessaging.onBackgroundMessage(_messagingBackgroundHandler);
+
+    _initialized = true;
+  }
+}
+
+@immutable
+class SubscriptionService {
+  /// Singleton instance.
+  static final instance = SubscriptionService._internal();
+
+  static bool _initialized = false;
+
+  final _purchase = InAppPurchase.instance;
+
+  /// Private constructor for Singleton.
+  SubscriptionService._internal();
+
+  void _listenToPurchaseUpdated({
+    void Function(PurchaseDetails details)? onData,
+    void Function()? onDone,
+    void Function(dynamic error)? onError,
+  }) {
+    instance._purchase.purchaseStream.listen(
+      (details) {
+        for (final detail in details) {
+          onData?.call(detail);
+        }
+      },
+      onDone: () {
+        onDone?.call();
+      },
+      onError: (e) {
+        onError?.call(e);
+      },
+    );
+  }
+
+  Future<void> restore() async {
+    await _purchase.restorePurchases();
+  }
+
+  Future<bool> purchase(String productId) async {
+    final response = await InAppPurchase.instance.queryProductDetails({
+      productId,
+    });
+    return await InAppPurchase.instance.buyNonConsumable(
+      purchaseParam: PurchaseParam(
+        productDetails: response.productDetails.first,
+      ),
+    );
+  }
+
+  Future<void> complete(PurchaseDetails purchase) async {
+    await _purchase.completePurchase(purchase);
+  }
+
+  static Future<void> initialize({
+    void Function(PurchaseDetails purchase)? onData,
+    void Function()? onDone,
+    void Function(dynamic error)? onError,
+  }) async {
+    if (_initialized || !await instance._purchase.isAvailable()) return;
+
+    instance._listenToPurchaseUpdated(
+      onData: onData,
+      onDone: onDone,
+      onError: onError,
+    );
+
+    _initialized = true;
   }
 }

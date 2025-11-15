@@ -1,17 +1,41 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:paralelo/core/imports.dart';
-import 'package:paralelo/features/settings/views/settings_page.dart';
-import 'package:paralelo/features/chats/views/chats_page.dart';
-import 'package:paralelo/features/home/views/home_page.dart';
-import 'package:paralelo/features/projects/views/create_project_page.dart';
-import 'package:paralelo/features/projects/views/marketplace_page.dart';
 import 'package:paralelo/core/router.dart';
+import 'package:paralelo/core/services.dart';
+import 'package:paralelo/features/auth/exports.dart';
+import 'package:paralelo/features/management/exports.dart';
+import 'package:paralelo/features/setting/exports.dart';
+import 'package:paralelo/features/chat/exports.dart';
+import 'package:paralelo/features/home/exports.dart';
+import 'package:paralelo/features/project/exports.dart';
+import 'package:paralelo/features/subscription/exports.dart';
 
-class BottomNavBar extends ConsumerWidget {
+class BottomNavBar extends ConsumerStatefulWidget {
   const BottomNavBar({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() {
+    return _BottomNavBarState();
+  }
+}
+
+class _BottomNavBarState extends ConsumerState<BottomNavBar> {
+  bool hasMessages = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await initializeFCMService();
+      await initializeSubscriptionService();
+      await SubscriptionService.instance.restore();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Theme(
       data: Theme.of(
         context,
@@ -22,7 +46,11 @@ class BottomNavBar extends ConsumerWidget {
         ),
 
         child: BottomNavBarWidget(
-          onTap: (index) {},
+          onTap: (index) {
+            if (index == 2 && hasMessages) {
+              safeSetState(() => hasMessages = false);
+            }
+          },
 
           height: 56.0,
           showLabels: false,
@@ -60,7 +88,8 @@ class BottomNavBar extends ConsumerWidget {
             BottomNavBarItem(
               label: 'nav.chats'.tr(),
               icon: Badge(
-                isLabelVisible: false,
+                smallSize: 8.0,
+                isLabelVisible: hasMessages,
                 backgroundColor: Theme.of(context).colorScheme.primary,
 
                 child: const Icon(TablerIcons.message_2, size: 28.0),
@@ -75,6 +104,57 @@ class BottomNavBar extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> initializeFCMService() {
+    return FCMService.initialize(
+      onMessage: (msg) {
+        if (!hasMessages) {
+          safeSetState(() => hasMessages = true);
+        }
+      },
+      onMessageOpenedApp: (msg) async {
+        await ref
+            .read(goRouterProvider)
+            .push(ChatRoomPage.routePath, extra: msg.data['room_id']);
+      },
+    );
+  }
+
+  Future<void> initializeSubscriptionService() {
+    return SubscriptionService.initialize(
+      onData: (purchase) async {
+        if (purchase.status == PurchaseStatus.purchased ||
+            purchase.status == PurchaseStatus.restored) {
+          final userId = ref.read(authProvider)!.id;
+          final token = purchase.verificationData.serverVerificationData;
+
+          final success = await ref
+              .read(userSubscriptionProvider)
+              .verify(
+                purchaseToken: token,
+                productId: purchase.productID,
+                userId: userId,
+              );
+
+          if (success) {
+            if (purchase.pendingCompletePurchase) {
+              await SubscriptionService.instance.complete(purchase);
+              await ref
+                  .read(goRouterProvider)
+                  .pushReplacement(SplashPage.routePath);
+            }
+          } else {
+            showSnackbar(context, 'Error');
+          }
+
+          showSnackbar(context, 'Purchase status: ${purchase.status}');
+        }
+      },
+      onError: (error) {
+        showSnackbar(context, 'Error: $error');
+      },
     );
   }
 }

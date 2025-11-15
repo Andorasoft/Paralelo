@@ -1,0 +1,103 @@
+/* --- Sección principal --- */
+.faq-section {
+  padding: 80px 16px;
+  background: var(--card);
+}
+
+@media (min-width: 768px) {
+  .faq-section {
+    padding: 80px 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .faq-section {
+    padding: 80px 32px;
+  }
+}
+
+.faq-container {
+  max-width: 768px;
+  margin: 0 auto;
+}
+
+/* --- Encabezado --- */
+.faq-header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.faq-header h2 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+@media (min-width: 768px) {
+  .faq-header h2 {
+    font-size: 3rem;
+  }
+}
+
+.faq-header p {
+  font-size: 1.25rem;
+  color: var(--muted-foreground);
+}
+
+/* --- Lista de FAQs --- */
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* --- FAQ Item --- */
+.faq-item {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--background);
+}
+
+/* --- Pregunta (Botón) --- */
+.faq-question {
+  width: 100%;
+  padding: 24px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: transparent;
+  border: none;
+
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+
+.faq-question:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.faq-question h3 {
+  font-weight: 600;
+  color: var(--foreground);
+  text-align: left;
+  margin: 0;
+}
+
+/* --- Ícono rotante --- */
+.faq-icon {
+  transition: transform 0.3s ease;
+}
+
+.faq-icon.rotated {
+  transform: rotate(180deg);
+}
+
+/* --- Respuesta --- */
+.faq-answer {
+  padding: 0 24px 24px 24px;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}

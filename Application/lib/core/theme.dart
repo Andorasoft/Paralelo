@@ -173,7 +173,7 @@ extension AppThemeData on ThemeData {
       ),
 
       actionsPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-      titleSpacing: 4.0,
+      titleSpacing: 16.0,
       centerTitle: false,
     ),
 

@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+:root {
+  /* Primary: Teal Blue - Trustworthy, Tech-Forward */
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+
+  /* Secondary: Orange Accent - Friendly, Approachable */
+  --secondary: #fcbe2b;
+  --secondary-foreground: #ffffff;
+
+  /* Neutrals */
+  --background: #ffffff;
+  --foreground: #1a202c;
+  --card: #f8fafc;
+  --card-foreground: #1a202c;
+  --muted: #e2e8f0;
+  --muted-foreground: #64748b;
+  --border: #e2e8f0;
+  --input: #f1f5f9;
+
+  /* Other */
+  --accent: #1e40af;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --ring: #0891b2;
+  --radius: 0.625rem;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
