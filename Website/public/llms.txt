@@ -1,0 +1,5 @@
+# llms.txt for Paralelo
+# Public content is allowed for LLM indexing.
+
+User-Agent: *
+Allow: /
