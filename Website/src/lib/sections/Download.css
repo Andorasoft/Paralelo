@@ -1,14 +1,3 @@
-/* Variables globales */
-:root {
-  --primary: #4f46e5;
-  --primary-foreground: #ffffff;
-
-  --foreground: #111111;
-  --background: #ffffff;
-
-  --muted-foreground: #6b7280;
-}
-
 /* --- Sección general --- */
 .download-section {
   padding: 80px 16px;

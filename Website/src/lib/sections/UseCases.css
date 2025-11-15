@@ -1,12 +1,3 @@
-/* Variables globales ya usadas en otras secciones */
-:root {
-  --primary: #4f46e5;
-  --border: #e5e7eb;
-  --muted-foreground: #6b7280;
-  --card: #f9fafb;
-  --background: #ffffff;
-}
-
 /* --- Sección general --- */
 .usecases-section {
   padding: 80px 16px;

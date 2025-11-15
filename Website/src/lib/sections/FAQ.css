@@ -1,12 +1,3 @@
-:root {
-  --primary: #4f46e5;
-  --foreground: #111;
-  --muted-foreground: #6b7280;
-  --card: #f9fafb;
-  --background: #ffffff;
-  --border: #e5e7eb;
-}
-
 /* --- Sección principal --- */
 .faq-section {
   padding: 80px 16px;

@@ -1,15 +1,3 @@
-/* Variables globales (mismas que en Hero) */
-:root {
-  --primary: #4f46e5;
-  --primary-foreground: #ffffff;
-
-  --muted-foreground: #6b7280;
-
-  --card: #f9fafb;
-  --background: #ffffff;
-  --border: #e5e7eb;
-}
-
 /* --- Sección contenedora --- */
 .hiw-section {
   padding: 80px 16px;

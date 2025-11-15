@@ -24,7 +24,7 @@
 .logo {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #4f46e5;
+  color: var(--primary);
   /* primary */
   text-decoration: none;
 }
@@ -43,13 +43,13 @@
 }
 
 .nav-desktop a:hover {
-  color: #4f46e5;
+  color: var(--primary);
 }
 
 /* Botón principal */
 .btn-primary {
   padding: 10px 24px;
-  background: #4f46e5;
+  background: var(--primary);
   color: white;
   border-radius: 8px;
   border: none;
@@ -97,7 +97,7 @@
 }
 
 .mobile-menu-inner a:hover {
-  color: #4f46e5;
+  color: var(--primary);
 }
 
 /* --- Breakpoints --- */

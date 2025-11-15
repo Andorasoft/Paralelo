@@ -2,11 +2,11 @@
 
 :root {
   /* Primary: Teal Blue - Trustworthy, Tech-Forward */
-  --primary: #0891b2;
+  --primary: #3b82f6;
   --primary-foreground: #ffffff;
 
   /* Secondary: Orange Accent - Friendly, Approachable */
-  --secondary: #ea580c;
+  --secondary: #fcbe2b;
   --secondary-foreground: #ffffff;
 
   /* Neutrals */
@@ -20,7 +20,7 @@
   --input: #f1f5f9;
 
   /* Other */
-  --accent: #06b6d4;
+  --accent: #1e40af;
   --accent-foreground: #ffffff;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
