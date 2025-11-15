@@ -1,0 +1,108 @@
+/* Variables globales ya usadas en otras secciones */
+:root {
+  --primary: #4f46e5;
+  --secondary: #ec4899;
+
+  --foreground: #111;
+  --background: #ffffff;
+
+  --muted-foreground: #6b7280;
+  --card: #f9fafb;
+  --border: #e5e7eb;
+}
+
+/* --- Sección general --- */
+.testimonials-section {
+  padding: 80px 16px;
+  background: var(--card);
+}
+
+@media (min-width: 768px) {
+  .testimonials-section {
+    padding: 80px 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .testimonials-section {
+    padding: 80px 32px;
+  }
+}
+
+.testimonials-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- Header --- */
+.testimonials-header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.testimonials-header h2 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+@media (min-width: 768px) {
+  .testimonials-header h2 {
+    font-size: 3rem;
+  }
+}
+
+.testimonials-header p {
+  font-size: 1.25rem;
+  color: var(--muted-foreground);
+}
+
+/* --- Grid --- */
+.testimonials-grid {
+  display: grid;
+  gap: 32px;
+}
+
+@media (min-width: 768px) {
+  .testimonials-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* --- Cards --- */
+.testimonial-card {
+  background: var(--background);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid var(--border);
+}
+
+/* Stars */
+.testimonial-stars {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.star {
+  color: var(--secondary);
+}
+
+/* Text */
+.testimonial-text {
+  color: var(--muted-foreground);
+  font-style: italic;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+/* Author */
+.testimonial-author {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.testimonial-role {
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+}

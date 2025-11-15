@@ -1,0 +1,106 @@
+/* Variables usadas globalmente */
+:root {
+  --primary: #4f46e5;
+  --secondary: #ec4899;
+
+  --muted-foreground: #6b7280;
+
+  --foreground: #111;
+  --background: #ffffff;
+
+  --primary-5: rgba(79, 70, 229, 0.05);
+  /* bg-primary/5 */
+  --secondary-foreground: #ffffff;
+
+  --border: #e5e7eb;
+}
+
+/* --- Sección general --- */
+.benefits-section {
+  padding: 80px 16px;
+  background: var(--primary-5);
+}
+
+@media (min-width: 768px) {
+  .benefits-section {
+    padding: 80px 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .benefits-section {
+    padding: 80px 32px;
+  }
+}
+
+.benefits-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- Header --- */
+.benefits-header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.benefits-header h2 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+@media (min-width: 768px) {
+  .benefits-header h2 {
+    font-size: 3rem;
+  }
+}
+
+.benefits-header p {
+  font-size: 1.25rem;
+  color: var(--muted-foreground);
+}
+
+/* --- Grid --- */
+.benefits-grid {
+  display: grid;
+  gap: 32px;
+}
+
+@media (min-width: 768px) {
+  .benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* --- Benefit item --- */
+.benefit-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.benefit-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.benefit-item h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.benefit-description {
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}

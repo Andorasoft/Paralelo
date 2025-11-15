@@ -1,0 +1,149 @@
+/* Variables de color inspiradas en tus clases Tailwind */
+:root {
+  --primary: #4f46e5;
+  --primary-foreground: #ffffff;
+  --secondary: #ec4899;
+  --muted-foreground: #6b7280;
+  --border: #e5e7eb;
+}
+
+/* --- Sección principal --- */
+.hero {
+  padding: 80px 16px;
+}
+
+@media (min-width: 768px) {
+  .hero {
+    padding: 130px 16px;
+  }
+}
+
+.hero-container {
+  max-width: 1200px;
+  margin: 0 auto;
+
+  display: grid;
+  gap: 48px;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .hero-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* --- Textos columna izquierda --- */
+.hero-text {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.hero-text h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  line-height: 1.1;
+}
+
+@media (min-width: 768px) {
+  .hero-text h1 {
+    font-size: 3.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-text h1 {
+    font-size: 4rem;
+  }
+}
+
+.hero-text .highlight {
+  color: var(--secondary);
+}
+
+.description {
+  font-size: 1.125rem;
+  color: var(--muted-foreground);
+  line-height: 1.6;
+}
+
+/* --- Botones --- */
+.hero-buttons {
+  display: flex;
+  gap: 16px;
+  padding-top: 16px;
+}
+
+/* Botón principal */
+.btn-primary {
+  padding: 12px 32px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* Botón outline */
+.btn-outline {
+  padding: 12px 32px;
+  background: transparent;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-outline:hover {
+  background: rgba(79, 70, 229, 0.08);
+}
+
+/* --- Mockup columna derecha --- */
+.hero-mockup {
+  display: flex;
+  justify-content: center;
+}
+
+.mockup-box {
+  width: 260px;
+  height: 380px;
+  border-radius: 28px;
+  border: 8px solid var(--border);
+
+  background: linear-gradient(to bottom right,
+      rgba(79, 70, 229, 0.2),
+      rgba(236, 72, 153, 0.2));
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mockup-inner {
+  text-align: center;
+}
+
+.mockup-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.mockup-text {
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+}
+
+.mockup-subtext {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  margin-top: 6px;
+}
