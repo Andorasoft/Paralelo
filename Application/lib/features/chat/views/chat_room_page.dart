@@ -7,6 +7,7 @@ import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/chat/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
+import 'package:paralelo/features/user_rating/exports.dart';
 import 'package:paralelo/utils/helpers.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
 import 'package:paralelo/widgets/skeleton.dart';
@@ -106,7 +107,7 @@ class _ChatRoomPageState extends ConsumerState<ChatRoomPage> {
 
         leading: const NavigationButton(),
         title: Text(obscureText(recipient.displayName)),
-        actions: const [UserRatingStar(rating: 0.0)],
+        actions: const [RatingPresenter(rating: 0.0)],
 
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(36.0),

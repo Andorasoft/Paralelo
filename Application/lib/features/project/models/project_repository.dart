@@ -1,5 +1,5 @@
 import 'package:paralelo/core/imports.dart';
-import '../models/project.dart';
+import './project.dart';
 
 abstract class ProjectRepository {
   Future<(int, List<Project>)> getPaginated({

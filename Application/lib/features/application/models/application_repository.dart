@@ -1,5 +1,5 @@
 import 'package:paralelo/core/imports.dart';
-import '../models/application.dart';
+import 'application.dart';
 
 abstract class ApplicationRepository {
   Future<Application?> getByPlatform(String platform);

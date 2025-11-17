@@ -1,5 +1,5 @@
 import 'package:paralelo/core/imports.dart';
-import 'package:paralelo/features/user/models/user_preference.dart';
+import 'package:paralelo/features/user_preference/models/user_preference.dart';
 
 abstract class UserPreferenceRepository {
   Future<UserPreference?> getForUser(String userId);

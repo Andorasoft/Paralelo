@@ -7,8 +7,8 @@ import 'package:paralelo/core/router.dart';
 import 'package:paralelo/core/services.dart';
 import 'package:paralelo/core/theme.dart';
 import 'package:paralelo/features/auth/exports.dart';
-import 'package:paralelo/features/management/exports.dart';
-import 'package:paralelo/features/subscription/exports.dart';
+import 'package:paralelo/features/application/exports.dart';
+import 'package:paralelo/features/user_subscription/exports.dart';
 import 'package:paralelo/firebase_options.dart';
 
 void main() async {

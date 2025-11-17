@@ -1,5 +1,5 @@
 import 'package:paralelo/core/imports.dart';
-import 'package:paralelo/features/user/models/user_repository.dart';
+import '../models/user_repository.dart';
 
 /// Provides a singleton instance of [SupabaseUserRepository].
 ///

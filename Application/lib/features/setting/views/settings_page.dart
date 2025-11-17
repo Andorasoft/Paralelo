@@ -9,6 +9,7 @@ import 'package:paralelo/features/plan/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/features/setting/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
+import 'package:paralelo/features/user_preference/exports.dart';
 import 'package:paralelo/widgets/skeleton.dart';
 import 'package:paralelo/widgets/skeleton_block.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -170,17 +171,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           ).margin(const EdgeInsets.only(left: 8.0)),
           SettingOption.tile(
             onTap: () async {
-              final newLocale = await showModalBottomSheet<String>(
-                context: context,
-                isScrollControlled: true,
-                builder: (_) {
-                  return LocaleSelectorModal(value: currentLocale.languageCode);
-                },
-              );
-
-              if (newLocale == null) return;
-
-              await updateLocale(newLocale);
+              await updateLocale(currentLocale);
             },
             leading: const Icon(TablerIcons.globe_filled),
             trailing: Text(
@@ -195,7 +186,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             value: allowNotifications,
             onChanged: (checked) async {
               if (checked) {
-                final granted = await handleNotificationPermission(context);
+                final granted = await handleNotificationPermission();
 
                 if (!granted) return;
               }
@@ -288,7 +279,17 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     return (user!, plan!);
   }
 
-  Future<void> updateLocale(String code) async {
+  Future<void> updateLocale(Locale locale) async {
+    final code = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return LocaleSelectorModal(value: locale.languageCode);
+      },
+    );
+
+    if (code == null) return;
+
     try {
       preferences.setLocale(code);
 
@@ -313,7 +314,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     }
   }
 
-  Future<bool> handleNotificationPermission(BuildContext context) async {
+  Future<bool> handleNotificationPermission() async {
     var granted = await FCMService.instance.checkPermission();
 
     if (!granted) {

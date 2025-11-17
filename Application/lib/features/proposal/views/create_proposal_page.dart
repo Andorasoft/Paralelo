@@ -6,6 +6,7 @@ import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
 import 'package:paralelo/features/chat/exports.dart';
+import 'package:paralelo/features/project_payment/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/widgets/navigation_button.dart';
 import 'package:paralelo/widgets/skeleton.dart';

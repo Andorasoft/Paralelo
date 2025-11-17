@@ -3,6 +3,7 @@ import 'package:paralelo/core/constants.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
+import 'package:paralelo/features/project_payment/exports.dart';
 import 'package:paralelo/features/proposal/exports.dart';
 import 'package:paralelo/features/report/exports.dart';
 import 'package:paralelo/features/skill/exports.dart';

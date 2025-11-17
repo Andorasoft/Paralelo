@@ -6,6 +6,8 @@ import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/category/exports.dart';
 import 'package:paralelo/features/plan/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
+import 'package:paralelo/features/project_payment/exports.dart';
+import 'package:paralelo/features/project_skill/exports.dart';
 import 'package:paralelo/features/skill/exports.dart';
 import 'package:paralelo/utils/validators.dart';
 import 'package:paralelo/widgets/info_bar.dart';

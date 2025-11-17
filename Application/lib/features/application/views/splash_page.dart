@@ -6,8 +6,9 @@ import 'package:paralelo/core/providers.dart';
 import 'package:paralelo/core/router.dart';
 import 'package:paralelo/core/services.dart';
 import 'package:paralelo/features/auth/exports.dart';
-import 'package:paralelo/features/management/exports.dart';
+import 'package:paralelo/features/application/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
+import 'package:paralelo/features/user_preference/exports.dart';
 import 'package:paralelo/utils/helpers.dart';
 
 class SplashPage extends ConsumerStatefulWidget {

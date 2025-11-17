@@ -1,6 +1,6 @@
 import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
-import '../models/user_subscription.dart';
+import './user_subscription.dart';
 
 abstract class UserSubscriptionRepository {
   Future<UserSubscription> create({

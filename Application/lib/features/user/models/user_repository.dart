@@ -1,6 +1,5 @@
-import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
-import 'package:paralelo/features/user/models/user.dart';
+import './user.dart';
 
 /// Repository interface for user data management.
 abstract class UserRepository {
@@ -78,16 +77,16 @@ class SupabaseUserRepository implements UserRepository {
   }) async {
     final updates = <String, dynamic>{};
 
-    if (displayName.isNotNull) {
+    if (displayName != null) {
       updates['display_name'] = displayName;
     }
-    if (pictureUrl.isNotNull) {
+    if (pictureUrl != null) {
       updates['picture_url'] = pictureUrl;
     }
-    if (deviceToken.isNotNull) {
+    if (deviceToken != null) {
       updates['device_token'] = deviceToken;
     }
-    if (planId.isNotNull) {
+    if (planId != null) {
       updates['plan_id'] = planId;
     }
 

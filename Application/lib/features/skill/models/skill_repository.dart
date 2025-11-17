@@ -1,5 +1,5 @@
 import 'package:paralelo/core/imports.dart';
-import 'skill.dart';
+import './skill.dart';
 
 abstract class SkillRepository {
   Future<List<Skill>> getAll();
