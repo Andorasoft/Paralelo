@@ -11,7 +11,10 @@ abstract class UserSubscriptionRepository {
     required String userId,
     required String planId,
   });
-  Future<UserSubscription?> getForUser(String userId);
+
+  Future<UserSubscription?> getByToken(String token);
+
+  Future<List<UserSubscription>> getByUser(String userId);
 
   Future<bool> verify({
     required String purchaseToken,
@@ -51,14 +54,24 @@ class SupabaseUserSubscriptionRepository implements UserSubscriptionRepository {
   }
 
   @override
-  Future<UserSubscription?> getForUser(String userId) async {
+  Future<UserSubscription?> getByToken(String token) async {
     final data = await _client
         .from('user_subscription')
         .select()
-        .eq('user_id', userId)
+        .eq('purchase_token', token)
         .maybeSingle();
 
     return data != null ? UserSubscription.fromMap(data) : null;
+  }
+
+  @override
+  Future<List<UserSubscription>> getByUser(String userId) async {
+    final data = await _client
+        .from('user_subscription')
+        .select()
+        .eq('user_id', userId);
+
+    return data.map((i) => UserSubscription.fromMap(i)).toList();
   }
 
   @override

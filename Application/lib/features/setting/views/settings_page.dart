@@ -11,6 +11,7 @@ import 'package:paralelo/features/setting/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
 import 'package:paralelo/widgets/skeleton.dart';
 import 'package:paralelo/widgets/skeleton_block.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
   static const routePath = '/settings';
@@ -234,13 +235,33 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             ),
           ).margin(const EdgeInsets.only(left: 12.0)),
           SettingOption.tile(
-            onTap: () {},
+            onTap: () async {
+              final uri = Uri.parse("https://paralelo.ec#faq");
+
+              if (await canLaunchUrl(uri)) {
+                await launchUrl(uri, mode: LaunchMode.inAppWebView);
+              } else {
+                throw "No se pudo abrir la URL";
+              }
+            },
 
             leading: const Icon(TablerIcons.info_circle_filled),
             title: 'setting.options.help_center'.tr(),
           ),
           SettingOption.tile(
-            onTap: () {},
+            onTap: () async {
+              final Uri emailUri = Uri(
+                scheme: 'mailto',
+                path: 'support@andorasoft.com',
+                query: 'subject=Ayuda&body=Necesito soporte',
+              );
+
+              if (await canLaunchUrl(emailUri)) {
+                await launchUrl(emailUri);
+              } else {
+                showSnackbar(context, 'No se pudo abrir el cliente de correo');
+              }
+            },
 
             leading: const Icon(TablerIcons.message_filled),
             title: 'setting.options.contact_us'.tr(),

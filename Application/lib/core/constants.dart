@@ -50,7 +50,7 @@ class ProjectPaymentType {
   static const String fixed = 'FIXED';
   static const String hourly = 'HOURLY';
 
-  static List<String> values = [fixed, hourly];
+  static const List<String> values = [fixed, hourly];
 
   static Map<String, String> labels = {
     fixed: 'const.project_payment_type.fixed'.tr(),
@@ -62,9 +62,9 @@ class PlanPeriodUnit {
   static const String month = 'MONTH';
   static const String year = 'YEAR';
 
-  static List<String> values = [month, year];
+  static const List<String> values = [month, year];
 
-  static Map<String, String> labels = {month: 'mes', year: 'año'};
+  static const Map<String, String> labels = {month: 'mes', year: 'año'};
 }
 
 class Plans {
@@ -72,12 +72,24 @@ class Plans {
   static const String pro = 'Pro';
   static const String premium = 'Premium';
 
-  static List<String> values = [free, pro, premium];
+  static const List<String> values = [free, pro, premium];
 
   static Map<String, String> labels = {
     free: 'Gratis',
     pro: 'Pro',
     premium: 'Premium',
+  };
+}
+
+class SubscriptionStatus {
+  static const String active = 'ACTIVE';
+  static const String expired = 'EXPIRED';
+
+  static const List<String> values = [active, expired];
+
+  static const Map<String, String> labels = {
+    active: 'Activa',
+    expired: 'Expirada',
   };
 }
 

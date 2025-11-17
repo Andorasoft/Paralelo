@@ -236,16 +236,16 @@ class FCMService {
 }
 
 @immutable
-class SubscriptionService {
+class PurchaseService {
   /// Singleton instance.
-  static final instance = SubscriptionService._internal();
+  static final instance = PurchaseService._internal();
 
   static bool _initialized = false;
 
   final _purchase = InAppPurchase.instance;
 
   /// Private constructor for Singleton.
-  SubscriptionService._internal();
+  PurchaseService._internal();
 
   void _listenToPurchaseUpdated({
     void Function(PurchaseDetails details)? onData,
