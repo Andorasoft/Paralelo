@@ -51,24 +51,7 @@ create table if not exists "public"."user" (
 );
 
 -- ============================================================
--- 4. Table: user_subscription
--- ============================================================
-create table if not exists "public"."user_subscription" (
-  "id" uuid primary key default uuid_generate_v4(),
-  "created_at" timestamptz not null default now(),
-  "platform" text not null,
-  "expiry_time" timestamptz,
-  "purchase_token" text not null,
-  "status" text not null default 'ACTIVE',
-  "auto_renewing" boolean not null default true,
-  "product_id" text not null,
-  "user_id" uuid not null references "user" ("id") on delete cascade,
-  "plan_id" uuid not null references "plan" ("id") on delete cascade,
-  unique ("user_id", "plan_id", "product_id")
-);
-
--- ============================================================
--- 5. Table: skill
+-- 4. Table: skill
 -- ============================================================
 create table if not exists "public"."skill" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -77,7 +60,7 @@ create table if not exists "public"."skill" (
 );
 
 -- ============================================================
--- 6. Table: category
+-- 5. Table: category
 -- ============================================================
 create table if not exists "public"."category" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -87,7 +70,7 @@ create table if not exists "public"."category" (
 );
 
 -- ============================================================
--- 7. Table: project
+-- 6. Table: project
 -- ============================================================
 create table if not exists "public"."project" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -102,7 +85,7 @@ create table if not exists "public"."project" (
 );
 
 -- ============================================================
--- 8. Table: proposal
+-- 7. Table: proposal
 -- ============================================================
 create table if not exists "public"."proposal" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -118,7 +101,7 @@ create table if not exists "public"."proposal" (
 );
 
 -- ============================================================
--- 9. Table: project_payment
+-- 8. Table: project_payment
 -- ============================================================
 create table if not exists "public"."project_payment" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -131,7 +114,7 @@ create table if not exists "public"."project_payment" (
 );
 
 -- ============================================================
--- 10. Table: project_skill
+-- 9. Table: project_skill
 -- ============================================================
 create table if not exists "public"."project_skill" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -141,7 +124,7 @@ create table if not exists "public"."project_skill" (
 );
 
 -- ============================================================
--- 11. Table: user_skill
+-- 10. Table: user_skill
 -- ============================================================
 create table if not exists "public"."user_skill" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -152,7 +135,7 @@ create table if not exists "public"."user_skill" (
 );
 
 -- ============================================================
--- 12. Table: chat_room
+-- 11. Table: chat_room
 -- ============================================================
 create table if not exists "public"."chat_room" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -164,7 +147,7 @@ create table if not exists "public"."chat_room" (
 );
 
 -- ============================================================
--- 13. Table: user_rating
+-- 12. Table: user_rating
 -- ============================================================
 create table if not exists "public"."user_rating" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -176,7 +159,7 @@ create table if not exists "public"."user_rating" (
 );
 
 -- ============================================================
--- 14. Table: report
+-- 13. Table: report
 -- ============================================================
 create table if not exists "public"."report" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -194,7 +177,7 @@ create table if not exists "public"."report" (
 );
 
 -- ============================================================
--- 15. Table: application
+-- 14. Table: application
 -- ============================================================
 create table if not exists "public"."application" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -208,7 +191,7 @@ create table if not exists "public"."application" (
 );
 
 -- ============================================================
--- 16. Table: user_preference
+-- 15. Table: user_preference
 -- ============================================================
 create table if not exists "public"."user_preference" (
   "id" uuid primary key default uuid_generate_v4 (),
@@ -220,33 +203,21 @@ create table if not exists "public"."user_preference" (
 );
 
 -- ============================================================
--- Function: create_user_preference()
+-- 16. Table: user_subscription
 -- ============================================================
-create
-or replace function "public"."create_user_preference"() returns trigger language plpgsql as $ $ begin
-insert into
-  "public"."user_preference" (
-    "user_id",
-    "language",
-    "dark_mode",
-    "notifications_enabled"
-  )
-values
-  (new.id, 'es', false, false);
-
-return new;
-
-end;
-
-$ $;
-
--- ============================================================
--- Trigger: after insert on user
--- ============================================================
-create trigger trg_create_user_preference
-after
-insert
-  on "public"."user" for each row execute function "public"."create_user_preference"();
+create table if not exists "public"."user_subscription" (
+  "id" uuid primary key default uuid_generate_v4(),
+  "created_at" timestamptz not null default now(),
+  "platform" text not null,
+  "expiry_time" timestamptz,
+  "purchase_token" text not null,
+  "status" text not null default 'ACTIVE',
+  "auto_renewing" boolean not null default true,
+  "product_id" text not null,
+  "user_id" uuid not null references "user" ("id") on delete cascade,
+  "plan_id" uuid not null references "plan" ("id") on delete cascade,
+  unique ("user_id", "plan_id", "product_id")
+);
 
 -- ============================================================
 -- ENUM-LIKE FIELDS (reference only)
@@ -261,3 +232,4 @@ insert
 -- report.status                    → 'OPEN', 'IN_REVIEW', 'RESOLVED', 'CLOSED'
 -- application.platform             → 'iOS', 'Android'
 -- user_preference.language         → 'es', 'en'
+-- user_subscription.status         → 'ACTIVE', 'EXPIRED'
