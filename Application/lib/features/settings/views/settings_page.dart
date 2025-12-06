@@ -7,7 +7,7 @@ import 'package:paralelo/core/router.dart';
 import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/plan/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
-import 'package:paralelo/features/setting/exports.dart';
+import 'package:paralelo/features/settings/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
 import 'package:paralelo/features/user_preference/exports.dart';
 import 'package:paralelo/widgets/skeleton.dart';
@@ -146,12 +146,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             leading: const Icon(TablerIcons.briefcase_filled),
             title: 'setting.options.published_projects'.tr(),
           ),
-          SettingOption.tile(
-            onTap: () {},
+          // SettingOption.tile(
+          //   onTap: () {},
 
-            leading: const Icon(TablerIcons.file_filled),
-            title: 'setting.options.proposals_submitted'.tr(),
-          ),
+          //   leading: const Icon(TablerIcons.file_filled),
+          //   title: 'setting.options.proposals_submitted'.tr(),
+          // ),
           SettingOption.tile(
             onTap: () async {
               await ref.read(goRouterProvider).push(PlansPage.routePath);
@@ -226,34 +226,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             ),
           ).margin(const EdgeInsets.only(left: 12.0)),
           SettingOption.tile(
-            onTap: () async {
-              final uri = Uri.parse("https://paralelo.ec#faq");
-
-              if (await canLaunchUrl(uri)) {
-                await launchUrl(uri, mode: LaunchMode.inAppWebView);
-              } else {
-                throw "No se pudo abrir la URL";
-              }
-            },
-
+            onTap: () async => await openHelpCenter(),
             leading: const Icon(TablerIcons.info_circle_filled),
             title: 'setting.options.help_center'.tr(),
           ),
           SettingOption.tile(
-            onTap: () async {
-              final Uri emailUri = Uri(
-                scheme: 'mailto',
-                path: 'support@andorasoft.com',
-                query: 'subject=Ayuda&body=Necesito soporte',
-              );
-
-              if (await canLaunchUrl(emailUri)) {
-                await launchUrl(emailUri);
-              } else {
-                showSnackbar(context, 'No se pudo abrir el cliente de correo');
-              }
-            },
-
+            onTap: () async => await openMailApp(),
             leading: const Icon(TablerIcons.message_filled),
             title: 'setting.options.contact_us'.tr(),
           ),
@@ -311,6 +289,30 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     } catch (e) {
       showSnackbar(context, '');
       debugPrint('$e');
+    }
+  }
+
+  Future<void> openHelpCenter() async {
+    final uri = Uri.parse("https://paralelo.ec#faq");
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.inAppWebView);
+    } else {
+      throw "No se pudo abrir la URL";
+    }
+  }
+
+  Future<void> openMailApp() async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: 'support@andorasoft.com',
+      query: 'subject=Ayuda&body=Necesito soporte',
+    );
+
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri);
+    } else {
+      showSnackbar(context, 'No se pudo abrir el cliente de correo');
     }
   }
 

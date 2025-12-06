@@ -12,6 +12,7 @@ import 'package:paralelo/widgets/navigation_button.dart';
 import 'package:paralelo/widgets/skeleton.dart';
 import 'package:paralelo/widgets/skeleton_block.dart';
 import 'package:paralelo/widgets/skeleton_card.dart';
+import '../data/proposal_details_dto.dart';
 
 class ProposalDetailsPage extends ConsumerStatefulWidget {
   static const routePath = '/proposal-details';
@@ -28,7 +29,8 @@ class ProposalDetailsPage extends ConsumerStatefulWidget {
 
 class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  late final Future<(Proposal, ChatRoom)> loadDataFuture;
+
+  late final Future<ProposalDetailsDto> loadDataFuture;
 
   bool bussy = false;
 
@@ -109,9 +111,10 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
     );
   }
 
-  Widget page((Proposal, ChatRoom) data) {
+  Widget page(ProposalDetailsDto dto) {
     final userId = ref.read(authProvider)!.id;
-    final (proposal, room) = data;
+    final proposal = dto.proposal;
+    final room = dto.chatRoom;
 
     return Scaffold(
       key: scaffoldKey,
@@ -230,24 +233,24 @@ class _ProposalDetailsPageState extends ConsumerState<ProposalDetailsPage> {
     );
   }
 
-  Future<(Proposal, ChatRoom)> loadData() async {
+  Future<ProposalDetailsDto> loadData() async {
     final (proposal, room) = await (
       ref.read(proposalProvider).getById(widget.proposalId),
       ref.read(chatRoomProvider).getByProposal(widget.proposalId),
     ).wait;
 
-    return (proposal!, room!);
+    return ProposalDetailsDto(proposal: proposal!, chatRoom: room!);
   }
 
   Future<void> acceptProposal(ChatRoom room, String userId) async {
     try {
       safeSetState(() => bussy = true);
 
-      final success = await ref
+      final proposal = await ref
           .read(proposalProvider)
-          .accept(widget.proposalId);
+          .update(widget.proposalId, status: ProposalStatus.accepted);
 
-      if (!success) throw NetworkException('');
+      if (proposal == null) throw NetworkException('');
 
       await ChatService.instance.sendMessage(
         roomId: room.id,

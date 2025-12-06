@@ -48,7 +48,10 @@ class MainApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await _initializePurchaseService(context, ref);
+      if (!isWeb) {
+        debugPrint('You\'re in web');
+        await _initializePurchaseService(context, ref);
+      }
 
       await PurchaseService.instance.restore();
     });

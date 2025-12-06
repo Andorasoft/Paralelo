@@ -2,7 +2,7 @@ import 'package:andorasoft_flutter/andorasoft_flutter.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/core/router.dart';
 import 'package:paralelo/core/services.dart';
-import 'package:paralelo/features/setting/exports.dart';
+import 'package:paralelo/features/settings/exports.dart';
 import 'package:paralelo/features/chat/exports.dart';
 import 'package:paralelo/features/home/exports.dart';
 import 'package:paralelo/features/project/exports.dart';

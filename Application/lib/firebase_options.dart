@@ -16,12 +16,8 @@ import 'package:flutter/foundation.dart'
 /// ```
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
-    if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
-    }
+    if (kIsWeb) return web;
+
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
@@ -66,4 +62,12 @@ class DefaultFirebaseOptions {
     iosBundleId: 'com.andorasoft.paralelo',
   );
 
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: "AIzaSyDGLa1-DhrBw5IFqwRfNvbj8ap_7TIHRLw",
+    authDomain: "andorasoft-paralelo.firebaseapp.com",
+    projectId: "andorasoft-paralelo",
+    storageBucket: "andorasoft-paralelo.firebasestorage.app",
+    messagingSenderId: "91360332225",
+    appId: "1:91360332225:web:7dea217a2b0a878e5d4740",
+  );
 }
