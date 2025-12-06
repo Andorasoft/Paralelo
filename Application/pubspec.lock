@@ -12,9 +12,11 @@ packages:
   andorasoft_flutter:
     dependency: "direct main"
     description:
-      path: "../../Andorasoft-Flutter"
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "5cde464b5be72fd6c32695ecfdd4fa69a1485c4c"
+      url: "https://github.com/Andorasoft/Andorasoft-Flutter.git"
+    source: git
     version: "0.0.1"
   app_links:
     dependency: transitive
