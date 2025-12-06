@@ -6,6 +6,7 @@ import 'package:paralelo/features/auth/exports.dart';
 import 'package:paralelo/features/category/exports.dart';
 import 'package:paralelo/features/plan/exports.dart';
 import 'package:paralelo/features/project/exports.dart';
+import 'package:paralelo/features/project_payment/exports.dart';
 import 'package:paralelo/features/skill/exports.dart';
 import 'package:paralelo/features/user/exports.dart';
 import 'package:paralelo/utils/validators.dart';
@@ -206,10 +207,6 @@ class _EditProjectPageState extends ConsumerState<EditProjectPage> {
         actions: [
           TextButton(
             onPressed: () async {
-              final delete = await showDeleteProjectModalBottomSheet(context);
-
-              if (!(delete ?? false)) return;
-
               await deleteProject();
             },
             style: Theme.of(context).textButtonTheme.style?.copyWith(
@@ -556,8 +553,14 @@ class _EditProjectPageState extends ConsumerState<EditProjectPage> {
   }
 
   Future<void> deleteProject() async {
+    final delete = await showDeleteProjectModalBottomSheet(context);
+
+    if (!(delete ?? false)) return;
+
     try {
       safeSetState(() => bussy = true);
+
+      await ref.read(projectProvider).delete(widget.projectId);
 
       ref.read(goRouterProvider).pop(true);
     } on PostgrestException catch (e) {

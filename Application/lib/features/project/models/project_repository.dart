@@ -1,5 +1,5 @@
 import 'package:paralelo/core/imports.dart';
-import '../models/project.dart';
+import './project.dart';
 
 abstract class ProjectRepository {
   Future<(int, List<Project>)> getPaginated({
@@ -217,10 +217,7 @@ class SupabaseProjectRepository implements ProjectRepository {
 
   @override
   Future<void> delete(String id) async {
-    await _client.functions.invoke(
-      'delete-project',
-      queryParameters: {'project_id': id},
-    );
+    await _client.from('project').delete().eq('id', id);
   }
 
   @override

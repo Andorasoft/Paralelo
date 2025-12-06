@@ -1,7 +1,14 @@
+import 'package:andorasoft_flutter/andorasoft_flutter.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:paralelo/core/constants.dart';
 import 'package:paralelo/core/imports.dart';
 import 'package:paralelo/core/providers.dart';
 import 'package:paralelo/core/router.dart';
+import 'package:paralelo/core/services.dart';
 import 'package:paralelo/core/theme.dart';
+import 'package:paralelo/features/auth/exports.dart';
+import 'package:paralelo/features/application/exports.dart';
+import 'package:paralelo/features/user_subscription/exports.dart';
 import 'package:paralelo/firebase_options.dart';
 
 void main() async {
@@ -40,6 +47,15 @@ class MainApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!isWeb) {
+        debugPrint('You\'re in web');
+        await _initializePurchaseService(context, ref);
+      }
+
+      await PurchaseService.instance.restore();
+    });
+
     final router = ref.watch(goRouterProvider);
     final prefs = ref.watch(preferencesProvider);
 
@@ -55,6 +71,55 @@ class MainApp extends ConsumerWidget {
       locale: prefs.locale,
 
       routerConfig: router,
+    );
+  }
+
+  Future<void> _initializePurchaseService(
+    BuildContext context,
+    WidgetRef ref,
+  ) async {
+    await PurchaseService.initialize(
+      onData: (purchase) async {
+        if (purchase.status == PurchaseStatus.purchased ||
+            purchase.status == PurchaseStatus.restored) {
+          final userId = ref.read(authProvider)?.id ?? '';
+
+          if (userId.isEmpty) return;
+
+          try {
+            final token = purchase.verificationData.serverVerificationData;
+            final sub = await ref
+                .read(userSubscriptionProvider)
+                .getByToken(token);
+
+            if (sub != null && sub.status == SubscriptionStatus.active) return;
+
+            final success = await ref
+                .read(userSubscriptionProvider)
+                .verify(
+                  purchaseToken: token,
+                  productId: purchase.productID,
+                  userId: userId,
+                );
+
+            if (!success) return;
+
+            if (purchase.pendingCompletePurchase) {
+              await PurchaseService.instance.complete(purchase);
+              await ref
+                  .read(goRouterProvider)
+                  .pushReplacement(SplashPage.routePath);
+            }
+          } catch (e) {
+            showSnackbar(context, 'Error: $e');
+          }
+
+          showSnackbar(context, 'Purchase status: ${purchase.status}');
+        }
+      },
+      onError: (error) {
+        showSnackbar(context, 'Error: $error');
+      },
     );
   }
 }

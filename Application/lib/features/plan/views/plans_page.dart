@@ -70,12 +70,12 @@ class _PlansPageState extends ConsumerState<PlansPage> {
 
                   switch (i.name) {
                     case Plans.pro:
-                      await SubscriptionService.instance.purchase(
+                      await PurchaseService.instance.purchase(
                         'plan_pro_monthly',
                       );
                       break;
                     case Plans.premium:
-                      await SubscriptionService.instance.purchase(
+                      await PurchaseService.instance.purchase(
                         'plan_premium_monthly',
                       );
                       break;

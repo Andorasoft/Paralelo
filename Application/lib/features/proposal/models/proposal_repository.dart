@@ -20,13 +20,11 @@ abstract class ProposalRepository {
     String id, {
     num? amount,
     num? hourlyRate,
-    num? estimatedDurationValue,
-    String? estimatedDurationUnit,
+    String? status,
+    String? estimatedDuration,
   });
 
   Future<bool> applied({required String projectId, required String providerId});
-
-  Future<bool> accept(String id);
 }
 
 class SupabaseProposalRepository implements ProposalRepository {
@@ -87,8 +85,8 @@ class SupabaseProposalRepository implements ProposalRepository {
     String id, {
     num? amount,
     num? hourlyRate,
-    num? estimatedDurationValue,
-    String? estimatedDurationUnit,
+    String? status,
+    String? estimatedDuration,
   }) async {
     final updates = <String, dynamic>{};
 
@@ -98,11 +96,11 @@ class SupabaseProposalRepository implements ProposalRepository {
     if (hourlyRate != null) {
       updates['hourly_rate'] = hourlyRate;
     }
-    if (estimatedDurationValue != null) {
-      updates['estimated_duration_value'] = estimatedDurationValue;
+    if (status != null) {
+      updates['status'] = status;
     }
-    if (estimatedDurationUnit != null) {
-      updates['estimated_duration_unit'] = estimatedDurationUnit;
+    if (estimatedDuration != null) {
+      updates['estimated_duration_unit'] = estimatedDuration;
     }
 
     if (updates.isEmpty) return await getById(id);
@@ -131,15 +129,5 @@ class SupabaseProposalRepository implements ProposalRepository {
         .maybeSingle();
 
     return data != null;
-  }
-
-  @override
-  Future<bool> accept(String id) async {
-    final res = await _client.functions.invoke(
-      'accept-proposal',
-      queryParameters: {'proposal_id': id},
-    );
-
-    return res.status == 200;
   }
 }
