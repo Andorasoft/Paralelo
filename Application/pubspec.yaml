@@ -20,7 +20,8 @@ dependencies:
     sdk: flutter
   #...
   andorasoft_flutter:
-    path: ../../Andorasoft-Flutter
+    git:
+      url: https://github.com/Andorasoft/Andorasoft-Flutter.git
   #...
   url_launcher: ^6.3.2
   #...
