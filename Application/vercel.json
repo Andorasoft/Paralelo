@@ -1,5 +1,0 @@
-{
-  "buildCommand": "./vercel-install.sh && flutter build web",
-  "outputDirectory": "build/web",
-  "framework": null
-}
